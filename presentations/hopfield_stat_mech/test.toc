@@ -1,0 +1,6 @@
+\beamer@endinputifotherversion {3.26pt}
+\select@language {english}
+\beamer@sectionintoc {1}{What are Artificial Neural Networks (ANN)?}{3}{0}{1}
+\beamer@sectionintoc {2}{The Hopfield model}{4}{0}{2}
+\beamer@subsectionintoc {3}{1}{Lists I}{9}{0}{2}
+\beamer@subsectionintoc {3}{2}{Lists II}{11}{0}{2}

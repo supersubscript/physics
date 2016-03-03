@@ -1,0 +1,11 @@
+		int gridSize  			= 20;
+		double deathRate        = 0.05;       
+		double gamma 			= 0.7;
+		int initialGenomeSize	= 200;
+		double substitProb 		= 0.00005;
+		double indelProb 		= 0.000005;
+		double initialEnergy 	= 2.;
+		int spawnDistance       = 3;
+		int initialPop 			= 200;
+		int printStep           = 100;
+		int duration 			= 100000; 
