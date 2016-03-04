@@ -1,6 +1,5 @@
 
 public enum Encoding
 {
-		BINARY, 
-		GRAY
+	BINARY, GRAY
 }
