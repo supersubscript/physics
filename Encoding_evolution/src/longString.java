@@ -16,51 +16,41 @@ import java.util.stream.Stream;
 public class longString
 {
 	// @formatter:off
-	public static final int ITERATIONS = 10000; // # generations
-	public static final int POP_SIZE = 10; // # ind. in pop
-	public static final int TARGETS_SIZE = 10; // # targets
-	public static final int GENOME_LENGTH = 100; // # bits in gen.
-	public static final int GENE_LENGTH = 10; 
-	public static final int SIMULATIONS = 100; // 
+	private static final int ITERATIONS = 10000; // # generations
+	private static final int POP_SIZE = 10; // # ind. in pop
+	private static final int GENOME_LENGTH = 100; // # bits in gen.
+	private static final int GENE_LENGTH = 10; 
+	private static final int SIMULATIONS = 100; // 
 	
-	public static  double MUTATE_PROB = 0.01; // for single bit
-	public static final double PENALTY = 10; 
-	public static final Encoding e = Encoding.GRAY; 
-	
-	
-	public static final int PRINTERVAL = 10; 
+	private static double MUTATE_PROB = 0.01; // for single bit
+	private static final double PENALTY = 10; 
+	private static final Encoding e = Encoding.GRAY; 
+	private static final int PRINTERVAL = 10; 
+	private static double fitAvg = 0; // for single bit
+	private static double mutAvg = 0.; // for single bit
+	private static double mutPosAvg = 0.; // for single bit
+	private static double mutPosOcc = 0.; // for single bit
+	private static double hamAvg = 0; // for single bit
+	private static double reachedMin = 0; // for single bit
 	private static int t;
 	
 //	private static Random rand;
 	private static ArrayList<Bitstring> target;
 	private static ArrayList<ArrayList<Bitstring>> targets;
 	private static ArrayList<ArrayList<Bitstring>> pop;
+	private static ArrayList<HashMap<Bitstring, Double>> fitnessMap;
 	private static BitstringComparator bc;
 	private static DistancePairComparator dpc;
 	private static PrintWriter hamWriter;
 	private static PrintWriter fitWriter;
 	private static PrintWriter mutWriter;	
+	private static PrintWriter avgWriter;	
 	// @formatter:on
 
 	public static void main(String[] args)
 	      throws FileNotFoundException, UnsupportedEncodingException
 	{
-		fitWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/fitness/"
-		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
-		mutWriter = new PrintWriter(
-		      "/home/william/b16_henrikahl/evo_out/mutation/" + e + "_mut_prob_"
-		            + MUTATE_PROB + ".dat");
-		hamWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/hamming/"
-		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
-
-		target = new ArrayList<Bitstring>();
-		targets = new ArrayList<ArrayList<Bitstring>>();
-		pop = new ArrayList<ArrayList<Bitstring>>();
-		bc = new BitstringComparator();
-		dpc = new DistancePairComparator();
-
-		ArrayList<HashMap<Bitstring, Double>> fitnessMap = new ArrayList<HashMap<Bitstring, Double>>();
-		t = 0;
+		init();
 
 		for (int i = 0; i < SIMULATIONS; i++)
 		{
@@ -117,6 +107,13 @@ public class longString
 					// Print effect of mutation to file
 					mutWriter.print(before - td + "\t");
 
+					// Sum for statistics
+					mutAvg += before - td;
+					if (before - td > 0)
+					{
+						mutPosAvg += before - td;
+						mutPosOcc++;
+					}
 					// Add to map
 					fitnessMap.get(i).put(bmut, td);
 				}
@@ -124,13 +121,17 @@ public class longString
 				// Put all POP_SIZE best individuals in new pop. Print best
 				// individual to file.
 				ArrayList<Bitstring> newPop = new ArrayList<Bitstring>(POP_SIZE);
-				fitnessMap.set(i, (HashMap) sortByValue(fitnessMap.get(i)));
+				fitnessMap.set(i,
+				      (HashMap<Bitstring, Double>) sortByValue(fitnessMap.get(i)));
 				Iterator<Map.Entry<Bitstring, Double>> it = fitnessMap.get(i)
 				      .entrySet().iterator();
 				Map.Entry<Bitstring, Double> entry = it.next();
 
 				if (t % PRINTERVAL == 0)
+				{
 					fitWriter.print(entry.getValue() + "\t");
+				}
+				fitAvg += entry.getValue();
 				// System.out.print(entry.getValue() + "\t");
 				for (int l = 0; l < POP_SIZE && it.hasNext(); l++)
 				{
@@ -146,6 +147,15 @@ public class longString
 			}
 			// System.out.println();
 			mutWriter.println();
+			avgWriter.println(t + "\t" + fitAvg / SIMULATIONS + "\t"
+			      + mutAvg / SIMULATIONS + "\t" + mutPosAvg / mutPosOcc + "\t"
+			      + hamAvg / SIMULATIONS + reachedMin / SIMULATIONS);
+
+			fitAvg = 0.;
+			mutAvg = 0.;
+			mutPosAvg = 0.;
+			hamAvg = 0.;
+			reachedMin = 0.;
 
 		}
 		mutWriter.close();
@@ -224,6 +234,7 @@ public class longString
 		}
 		if (t % PRINTERVAL == 0)
 			hamWriter.print(hd + "\t");
+		hamAvg += hd;
 		return td;
 	}
 
@@ -237,22 +248,28 @@ public class longString
 		return -1;
 	}
 
-	// Print list of Bitstrings
-	public static <T> void printB(Collection<T> list)
+	public static void init() throws FileNotFoundException
 	{
-		for (T b : list)
-			System.out.print(b + "\t");
-	}
+		fitWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/fitness/"
+		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
+		mutWriter = new PrintWriter(
+		      "/home/william/b16_henrikahl/evo_out/mutation/" + e + "_mut_prob_"
+		            + MUTATE_PROB + ".dat");
+		hamWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/hamming/"
+		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
+		avgWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/stat/"
+		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
+		avgWriter.println("%Generation" + "\t" + "fitAvg" + "\t" + "mutAvg" + "\t"
+		      + "mutPosAvg" + "\t" + "hamAvg" + "\t" + "reachedMin");
 
-	// public static double minDist(Bitstring b, ArrayList<Bitstring> targets)
-	// {
-	// double dist = Double.MAX_VALUE;
-	// for (Bitstring b2 : targets)
-	// if (dist(b, b2, e) < dist)
-	// dist = dist(b, b2, e);
-	//
-	// return dist;
-	//
-	// }
+		target = new ArrayList<Bitstring>();
+		targets = new ArrayList<ArrayList<Bitstring>>();
+		pop = new ArrayList<ArrayList<Bitstring>>();
+		fitnessMap = new ArrayList<HashMap<Bitstring, Double>>();
+		bc = new BitstringComparator();
+		dpc = new DistancePairComparator();
+		t = 0;
+
+	}
 
 }
