@@ -2,7 +2,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,25 +19,24 @@ public class longString
 	private static final int POP_SIZE = 10; // # ind. in pop
 	private static final int GENOME_LENGTH = 100; // # bits in gen.
 	private static final int GENE_LENGTH = 10; 
-	private static final int SIMULATIONS = 100; // 
+	private static final int SIMULATIONS = 100;  
 	
-	private static double MUTATE_PROB = 0.01; // for single bit
+	private static double MUTATE_PROB = 0.010; // for single bit
 	private static final double PENALTY = 10; 
-	private static final Encoding e = Encoding.GRAY; 
+	private static Encoding e = Encoding.GRAY; 
 	private static final int PRINTERVAL = 10; 
-	private static double fitAvg = 0; // for single bit
-	private static double mutAvg = 0.; // for single bit
-	private static double mutPosAvg = 0.; // for single bit
-	private static double mutPosOcc = 0.; // for single bit
-	private static double hamAvg = 0; // for single bit
-	private static double reachedMin = 0; // for single bit
+	private static double fitAvg = 0;
+	private static double mutAvg = 0.;
+	private static double mutPosAvg = 0.; 
+	private static double mutPosOcc = 0.;
+	private static double hamAvg = 0;
+	private static double reachedMin = 0; 
 	private static int t;
 	
-//	private static Random rand;
 	private static ArrayList<Bitstring> target;
 	private static ArrayList<ArrayList<Bitstring>> targets;
 	private static ArrayList<ArrayList<Bitstring>> pop;
-	private static ArrayList<HashMap<Bitstring, Double>> fitnessMap;
+	private static ArrayList<HashMap<Bitstring, Double>> fitnessMaps;
 	private static BitstringComparator bc;
 	private static DistancePairComparator dpc;
 	private static PrintWriter hamWriter;
@@ -50,11 +48,11 @@ public class longString
 	public static void main(String[] args)
 	      throws FileNotFoundException, UnsupportedEncodingException
 	{
-		init();
+		init(args);
 
 		for (int i = 0; i < SIMULATIONS; i++)
 		{
-			fitnessMap.add(new HashMap<Bitstring, Double>());
+			fitnessMaps.add(new HashMap<Bitstring, Double>());
 			target.add(new Bitstring(GENOME_LENGTH));
 			targets.add(target.get(i).split(GENE_LENGTH));
 			ArrayList<Bitstring> ab = new ArrayList<Bitstring>();
@@ -64,82 +62,85 @@ public class longString
 		}
 
 		// Simulate evolution
-		for (; t < ITERATIONS; t++)
-		{
-			mutWriter.print(t + "\t");
-			if (t % PRINTERVAL == 0)
+			for (; t < ITERATIONS; t++)
 			{
-				fitWriter.print(t + "\t");
-				hamWriter.print(t + "\t");
-			}
-			// System.out.print(t + "\t");
-
-			for (int i = 0; i < SIMULATIONS; i++)
-			{
-				fitnessMap.set(i, new HashMap<Bitstring, Double>());
-				ArrayList<Bitstring> tlist = targets.get(i); // used a lot
-
-				// This for-loop computes the fitness for all organisms, mutates
-				// them, and puts the
-				// result in a Map structure.
-				for (Bitstring p : pop.get(i))
-				{
-					ArrayList<Bitstring> genes = p.split(GENE_LENGTH);
-
-					double td = 0;
-					if (genes.size() < tlist.size())
-						td = totalDist(genes, tlist, i);
-					else
-						td = totalDist(tlist, genes, i);
-
-					// Add fitness to population map
-					fitnessMap.get(i).put(p, td);
-					double before = td;
-
-					// Mutate string and calculate fitness
-					Bitstring bmut = new Bitstring(p); // copy
-					Operator.mutate_single(bmut, MUTATE_PROB);
-					genes = bmut.split(GENE_LENGTH);
-					if (genes.size() < tlist.size())
-						td = totalDist(genes, tlist, i);
-					else
-						td = totalDist(tlist, genes, i);
-					// Print effect of mutation to file
-					mutWriter.print(before - td + "\t");
-
-					// Sum for statistics
-					mutAvg += before - td;
-					if (before - td > 0)
-					{
-						mutPosAvg += before - td;
-						mutPosOcc++;
-					}
-					// Add to map
-					fitnessMap.get(i).put(bmut, td);
-				}
-
-				// Put all POP_SIZE best individuals in new pop. Print best
-				// individual to file.
-				ArrayList<Bitstring> newPop = new ArrayList<Bitstring>(POP_SIZE);
-				fitnessMap.set(i,
-				      (HashMap<Bitstring, Double>) sortByValue(fitnessMap.get(i)));
-				Iterator<Map.Entry<Bitstring, Double>> it = fitnessMap.get(i)
-				      .entrySet().iterator();
-				Map.Entry<Bitstring, Double> entry = it.next();
-
+				mutWriter.print(t + "\t");
 				if (t % PRINTERVAL == 0)
 				{
-					fitWriter.print(entry.getValue() + "\t");
+					fitWriter.print(t + "\t");
+					hamWriter.print(t + "\t");
 				}
-				fitAvg += entry.getValue();
-				// System.out.print(entry.getValue() + "\t");
-				for (int l = 0; l < POP_SIZE && it.hasNext(); l++)
+				// System.out.print(t + "\t");
+	
+				for (int i = 0; i < SIMULATIONS; i++)
 				{
-					newPop.add(entry.getKey());
-					entry = it.next();
+					fitnessMaps.set(i, new HashMap<Bitstring, Double>());
+					ArrayList<Bitstring> tlist = targets.get(i); // used a lot
+	
+					// This for-loop computes the fitness for all organisms, mutates
+					// them, and puts the
+					// result in a Map structure.
+					for (Bitstring p : pop.get(i))
+					{
+						ArrayList<Bitstring> genes = p.split(GENE_LENGTH);
+	
+						double td = 0;
+						if (genes.size() < tlist.size())
+							td = totalDist(genes, tlist, i);
+						else
+							td = totalDist(tlist, genes, i);
+	
+						// Add fitness to population map
+						fitnessMaps.get(i).put(p, td);
+						double before = td;
+	
+						// Mutate string and calculate fitness
+						Bitstring bmut = new Bitstring(p); // copy
+						Operator.mutate_single(bmut, MUTATE_PROB);
+						genes = bmut.split(GENE_LENGTH);
+						if (genes.size() < tlist.size())
+							td = totalDist(genes, tlist, i);
+						else
+							td = totalDist(tlist, genes, i);
+						// Print effect of mutation to file
+						mutWriter.print(before - td + "\t");
+	
+						if (td == 0)
+							reachedMin++;
+	
+						// Sum for statistics
+						mutAvg += before - td;
+						if (before - td > 0)
+						{
+							mutPosAvg += before - td;
+							mutPosOcc++;
+						}
+						// Add to map
+						fitnessMaps.get(i).put(bmut, td);
+					}
+	
+					// Put all POP_SIZE best individuals in new pop. Print best
+					// individual to file.
+					ArrayList<Bitstring> newPop = new ArrayList<Bitstring>(POP_SIZE);
+					fitnessMaps.set(i,
+					      (HashMap<Bitstring, Double>) sortByValue(fitnessMaps.get(i)));
+					Iterator<Map.Entry<Bitstring, Double>> it = fitnessMaps.get(i)
+					      .entrySet().iterator();
+					Map.Entry<Bitstring, Double> entry = it.next();
+	
+					if (t % PRINTERVAL == 0)
+					{
+						fitWriter.print(entry.getValue() + "\t");
+					}
+					fitAvg += entry.getValue();
+					// System.out.print(entry.getValue() + "\t");
+					for (int l = 0; l < POP_SIZE && it.hasNext(); l++)
+					{
+						newPop.add(entry.getKey());
+						entry = it.next();
+					}
+					pop.set(i, newPop);
 				}
-				pop.set(i, newPop);
-			}
 			if (t % PRINTERVAL == 0)
 			{
 				fitWriter.println();
@@ -149,11 +150,12 @@ public class longString
 			mutWriter.println();
 			avgWriter.println(t + "\t" + fitAvg / SIMULATIONS + "\t"
 			      + mutAvg / SIMULATIONS + "\t" + mutPosAvg / mutPosOcc + "\t"
-			      + hamAvg / SIMULATIONS + reachedMin / SIMULATIONS);
+			      + hamAvg / SIMULATIONS + "\t" + reachedMin / SIMULATIONS);
 
 			fitAvg = 0.;
 			mutAvg = 0.;
 			mutPosAvg = 0.;
+			mutPosOcc = 0.;
 			hamAvg = 0.;
 			reachedMin = 0.;
 
@@ -248,8 +250,13 @@ public class longString
 		return -1;
 	}
 
-	public static void init() throws FileNotFoundException
+	public static void init(String[] args) throws FileNotFoundException
 	{
+		MUTATE_PROB = args.length > 0
+		      ? (double) Math.round(Double.parseDouble(args[0]) * 1000d) / 1000d
+		      : MUTATE_PROB;
+		e = args.length > 0 ? Encoding.valueOf(args[1]) : e;
+
 		fitWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/fitness/"
 		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
 		mutWriter = new PrintWriter(
@@ -265,11 +272,9 @@ public class longString
 		target = new ArrayList<Bitstring>();
 		targets = new ArrayList<ArrayList<Bitstring>>();
 		pop = new ArrayList<ArrayList<Bitstring>>();
-		fitnessMap = new ArrayList<HashMap<Bitstring, Double>>();
+		fitnessMaps = new ArrayList<HashMap<Bitstring, Double>>();
 		bc = new BitstringComparator();
 		dpc = new DistancePairComparator();
 		t = 0;
-
 	}
-
 }

@@ -197,7 +197,7 @@ Can you say something about cell division?
 --------------------------------------------------
 How to model this is not currently very well known; different ideas exist.
 Henrik uses methods for cell division rules that reach back to the 19th 
-century:   
+Bcentury:   
 
 1. Hofmeister (1863) perpendicular to main axis of growth
 2. Sachs (1878) perpendicular to old walls
@@ -209,60 +209,182 @@ Stress can explain direction of growth. See Henrik's notes.
 
 What is the Lotka­Volterra model? What assumptions is it based on?
 --------------------------------------------------
-Predator--Prey.
+The Lotka–Volterra equations, also known as the predator–prey equations, are a pair of 
+first-order, non-linear, differential equations frequently used to describe the dynamics 
+of biological systems in which two species interact, one as a predator and the other as prey.
+
+Assumptions: 
 1. Unlimited food for prey (x)
 2. Predators limited only by prey
 3. Predators have unlimited appetite
 4. Individuals are ageless 
 
-
 Can you design a more realistic model for a simple predator­prey system?
 --------------------------------------------------
+Limited food. 
+Limited growth rate. 
+Stochasticity.
+Intra-species competition. 
+More details, e.g. age, health, sex  
 
 Consider an epidemiological model such as the SIR model. Can you interpret the parameters?
 --------------------------------------------------
+\begin{align*}
+ \frac{dS}{dt} = - \frac{\beta I S}{N}  \\
+ \frac{dI}{dt} = \frac{\beta I S}{N}- \gamma I  \\
+ \frac{dR}{dt} = \gamma I 
+\end{align*}
+
+$S$ -- Susceptible
+$I$ -- Infected
+$R$ -- Recovered
+$N$ -- total population
+$\beta$ -- parameter of infectivity
+$\gamma$ -- rate of recovery
+
+Some notes on the infection rate (force of infection): 
+
+Note that in the above model the function
+F = \beta I ,
+models the transition rate from the compartment of susceptible individuals to
+the compartment of infectious individuals, so that it is called the force of
+infection. However, for large classes of communicable diseases it is more
+realistic to consider a force of infection that does not depend on the absolute
+number of infectious subjects, but on their fraction (with respect to the total
+constant population N):
+
+$F = \beta \frac{I}{N}$
+
+Capasso and, afterwards, other authors have proposed nonlinear forces of
+infection to model more realistically the contagion process.
 
 How would you extend the SIR model to include death? loss of resistance?
 --------------------------------------------------
+Extra category. People who die come from the infected group. Dead people stay
+dead (often).  
+
+The SIR model with vital dynamics and constant population:
+Considering a population characterized by a death rate \mu and birth rate $\Lambda$,
+and where a communicable disease is spreading. The model with mass-action transmission is
+
+\begin{align*}
+ \frac{dS}{dt} = \Lambda - \mu S - \beta I S  \\
+ \frac{dI}{dt} = \beta I S - (\gamma +\mu ) I \\
+ \frac{dR}{dt} = \gamma I  - \mu R 
+\end{align*}
+
+Can also have loss-of-resistance: SIS, SIRS (temporal resistance, i.e. fraction of R back to S).
 
 How could these population models be extended to include spatial aspects?
 --------------------------------------------------
+Use nodes and inter-nodal travel, grids, etc. Diffusion?    
 
 What problems arise when simulating spatial models stochastically?
 --------------------------------------------------
+Instability.
+Number of reactions. Hard to keep track of what happens when and where? Could
+potentially be solved with alternative Gillespie methods. 
+Concentration--Particle number issues? 
+
+ASK CARL?
+
+
+
+
+
 
 What types of optimization methods can be used for fitting models to data?
 --------------------------------------------------
+Local optimization: Gradient descent and variations
+Global and stochastic optimization: Simulated annealing, genetic algorithms
 
 Briefly describe the gradient based methods.
 --------------------------------------------------
+Steepest descent: The search direction is $p_k = −\del f (x_{k+1})$
+Every new step is always perpedicular to the old one.  
+
+Conjugate descent: 
+We start with the first direction given by the gradient. We choose the new 
+direction so as we move along it the gradient in the old direction remains 0.
+$\nabla f (x_k + \Delta x_{k+1} ) = H \Delta x_{k+1} + \nabla f (x_k)$
+
 
 Briefly describe the simplex method.
 --------------------------------------------------
+Introduce artifical variables. Simplices are not actually used in the method, 
+but one interpretation of it is that it operates on simplicial cones, and 
+these become proper simplices with an additional constraint. The simplicial 
+cones in question are the corners (i.e., the neighborhoods of the vertices) of 
+a geometric object called a polytope. The shape of this polytope is defined by 
+the constraints applied to the objective function.
+
+See lecture slides. 
 
 Briefly describe simulated annealing.
 --------------------------------------------------
+Introduce artificial temperature. Go to neighbouring state with probability 1 if
+the energy (or cost function) is lower there, and with probability e^{-\Delta
+E/T} if the energy is higher.  
+
+Lower temperature with time. 
 
 Briefly describe evolutionary/genetic algorithms.
 --------------------------------------------------
+Encode information about the system in strings. Define genetic operations such
+as mutation, crossover and selection (various kinds exist). For every new
+time-step (generation), update the current population by mutating, and breeding
+new individuals. Then, finally, update the population according to how you have
+defined the selection rules for survival. 
 
 What is a cost function?
 --------------------------------------------------
+Something which determines the fitness of your system (how good it is). For
+example, how good is the fit to data given some well-defined measure?  
+
+Example: Least-squares distance.
+Example: Cross-entropy.
 
 How could a cost function be constructed? Can you think of some alternatives?
 --------------------------------------------------
+ASK CARL?
 
 What is overfitting?
 --------------------------------------------------
-
+When your solution is too dependent on single data values. Example: prediction
+of outliers. In neural networks -- overtraining. Generally: non-generality. 
+   
 What is sensitivity analysis, and why does it matter?
 --------------------------------------------------
+How sensitive is your system to small changes in your parameter (model) values?  
+
+1. Testing the robustness of the results of a model or system in the presence of uncertainty.
+2. Increased understanding of the relationships between input and output variables 
+   in a system or model.
+3. Uncertainty reduction: identifying model inputs that cause significant uncertainty 
+   in the output and should therefore be the focus of attention if the robustness is to be 
+   increased (perhaps by further research).
+4. Searching for errors in the model (by encountering unexpected relationships between inputs 
+   and outputs).
+5. Model simplification – fixing model inputs that have no effect on the output, or identifying 
+   and removing redundant parts of the model structure.
+6. Enhancing communication from modelers to decision makers (e.g. by making recommendations 
+   more credible, understandable, compelling or persuasive).
+7. Finding regions in the space of input factors for which the model output is either maximum 
+   or minimum or meets some optimum criterion (see optimization and Monte Carlo filtering).
+8. In case of calibrating models with large number of parameters, a primary sensitivity test 
+   can ease the calibration stage by focusing on the sensitive parameters. Not knowing the 
+   sensitivity of parameters can result in time being uselessly spent on non-sensitive ones.
 
 Why may some parameters be hard to determine?
 --------------------------------------------------
+Lack of knowledge about the range. May not be necessary for the system to function. Might be 
+completely artificial and have no physical significance (interpretation hard). Also the 
+counter-case -- the model might not be able to capture the complexity of the system.
 
 How can you validate a model (and/or its parameters)?
 --------------------------------------------------
+Take out validation sample from data. Use cross-validation.  
 
 What makes a model good/useful?
 --------------------------------------------------
+It predicts. 
