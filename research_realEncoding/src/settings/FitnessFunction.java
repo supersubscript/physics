@@ -30,7 +30,7 @@ public interface FitnessFunction<O extends Organism<O>>
 			sum += Math.max(0., this.applyDirectly(p));
 		}
 		return sum == 0 ? 1. / w.getPopulation().size()
-				: Math.max(0., this.applyDirectly(o) / sum);
+		      : Math.max(0., this.applyDirectly(o) / sum);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public interface FitnessFunction<O extends Organism<O>>
 		for (O o : w.getPopulation())
 		{
 			result.put(o, sum == 0 ? 1. / w.getPopulation().size()
-					: Math.max(0., this.applyDirectly(o) / sum));
+			      : Math.max(0., this.applyDirectly(o) / sum));
 		}
 		return result;
 	}

@@ -139,7 +139,7 @@ public interface SelectionRule<O extends Organism<O>>
 		return new SelectionRule<O>()
 		{
 			Random rand = new Random();
-
+			
 			@Override
 			public Set<O> select(World<O> w)
 			{
