@@ -31,6 +31,7 @@ public interface MutationOperator
 			}
 		};
 	}
+
 	public static MutationOperator probFlip(double prob)
 	{
 		return new MutationOperator()
@@ -39,13 +40,12 @@ public interface MutationOperator
 			public Sequence mutate(Sequence seq)
 			{
 				for (int i = 0; i < seq.length(); i++)
-					if(Math.random() < prob)
+					if (Math.random() < prob)
 						seq.flip(i);
-			
+
 			}
 		};
 	}
-	
 
 	/**
 	 * Combine several mutations.
@@ -124,7 +124,7 @@ public interface MutationOperator
 				for (int i = 0; i < probs.length; i++)
 				{
 					int amt = Distribution.binomial(seq.length() / (i + 1), probs[i])
-							.getRandom();
+		               .getRandom();
 
 					for (int j = 0; j < amt; j++)
 					{
@@ -183,7 +183,7 @@ public interface MutationOperator
 				for (int i = 0; i < probs.length; i++)
 				{
 					int amt = Distribution.binomial(seq.length(), probs[i] / (i + 1))
-							.getRandom();
+		               .getRandom();
 
 					for (int j = 0; j < amt; j++)
 					{
@@ -223,7 +223,7 @@ public interface MutationOperator
 	public static MutationOperator poisson_indel(double... probs)
 	{
 		return MutationOperator.combine(MutationOperator.poisson_in(probs),
-				MutationOperator.poisson_del(probs));
+		      MutationOperator.poisson_del(probs));
 	}
 
 }

@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Random;
 
-public class GeneNetwork
+public class O
 {
 	private static Random				rand	= new Random();
 	private double[]						vals	= new double[7];
@@ -34,7 +34,7 @@ public class GeneNetwork
 	private static double				tC		= 1941.7197236716297;
 
 	// Initialize random GeneNetwork
-	public GeneNetwork()
+	public O()
 	{
 		p = new HashMap<String, Double>();
 		// Production
@@ -69,7 +69,7 @@ public class GeneNetwork
 		updateRK();
 	}
 
-	public GeneNetwork(HashMap<String, Double> parameters)
+	public O(HashMap<String, Double> parameters)
 	{
 		this.p = parameters;
 		updateRK();
@@ -166,19 +166,19 @@ public class GeneNetwork
 
 	public void setOxA(double oxA)
 	{
-		GeneNetwork.oxA = oxA;
+		O.oxA = oxA;
 		updateRK();
 	}
 
 	public void setOxB(double oxB)
 	{
-		GeneNetwork.oxB = oxB;
+		O.oxB = oxB;
 		updateRK();
 	}
 
 	public void setOxC(double oxC)
 	{
-		GeneNetwork.oxC = oxC;
+		O.oxC = oxC;
 		updateRK();
 	}
 

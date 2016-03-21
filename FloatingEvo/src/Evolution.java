@@ -20,9 +20,9 @@ public class Evolution
 	static final double						h					= .5;
 	static final double						NUMBER_PARAMS	= 11;
 	static final double						MUTATE_PROB		= 1 / NUMBER_PARAMS;
-	static ArrayList<GeneNetwork>			pop;
-	static SelectionRule<GeneNetwork>	crossoverSelection;
-	static FitnessFunction<GeneNetwork>	fitness;
+	static ArrayList<O>			pop;
+	static SelectionRule<O>	crossoverSelection;
+	static FitnessFunction<O>	fitness;
 	static Data[]								data;
 
 	public static void main(String[] args) throws IOException
@@ -32,19 +32,19 @@ public class Evolution
 		for (int t = 0; t < GENERATIONS; t++)
 		{
 			// List of new networks being created this generation
-			ArrayList<GeneNetwork> newNets = new ArrayList<GeneNetwork>();
+			ArrayList<O> newNets = new ArrayList<O>();
 
 			// Perform crossovers based on a roulette wheel selection scheme.
 			for (int i = 0; i < POP_SIZE / 10; i++)
 			{
-				ArrayList<GeneNetwork> crossPicks = crossoverSelection.select(pop);
-				GeneNetwork offspring = Operator.PIM_crossover(crossPicks.get(0),
+				ArrayList<O> crossPicks = crossoverSelection.select(pop);
+				O offspring = Operator.PIM_crossover(crossPicks.get(0),
 				      crossPicks.get(1));
 				newNets.add(offspring);
 			}
 
 			// Perform mutations
-			for (GeneNetwork gn : pop)
+			for (O gn : pop)
 			{
 				HashMap<String, Double> map = (HashMap<String, Double>) gn
 				      .getParameters().entrySet().stream().collect(Collectors
@@ -88,7 +88,7 @@ public class Evolution
 						map.put(key, newVal);
 					}
 				}
-				GeneNetwork gnew = new GeneNetwork(map);
+				O gnew = new O(map);
 				newNets.add(gnew);
 			}
 
@@ -96,12 +96,12 @@ public class Evolution
 
 			// Sort individual solutions by fitness and add the best to a new pool.
 
-			Map<GeneNetwork, Double> fitMap = fitness.applyDirectlySortedMap(pop);
+			Map<O, Double> fitMap = fitness.applyDirectlySortedMap(pop);
 
-			ArrayList<GeneNetwork> newPop = new ArrayList<GeneNetwork>(POP_SIZE);
-			Iterator<Entry<GeneNetwork, Double>> iterator = fitMap.entrySet()
+			ArrayList<O> newPop = new ArrayList<O>(POP_SIZE);
+			Iterator<Entry<O, Double>> iterator = fitMap.entrySet()
 			      .iterator();
-			Map.Entry<GeneNetwork, Double> entry = iterator.next();
+			Map.Entry<O, Double> entry = iterator.next();
 			newPop.add(entry.getKey());
 
 			// Print best solution to file every 100th generation.
@@ -296,9 +296,9 @@ public class Evolution
 		// * Math.pow((vals[5] / p.get("kDC")), p.get("nuDC"))))
 		// - p.get("dmD") * vals[6];
 
-		pop = new ArrayList<GeneNetwork>();
+		pop = new ArrayList<O>();
 		for (int j = 0; j < POP_SIZE; j++)
-			pop.add(new GeneNetwork(p));
+			pop.add(new O(p));
 
 	}
 }

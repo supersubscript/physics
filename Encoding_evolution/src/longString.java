@@ -62,85 +62,85 @@ public class longString
 		}
 
 		// Simulate evolution
-			for (; t < ITERATIONS; t++)
+		for (; t < ITERATIONS; t++)
+		{
+			mutWriter.print(t + "\t");
+			if (t % PRINTERVAL == 0)
 			{
-				mutWriter.print(t + "\t");
+				fitWriter.print(t + "\t");
+				hamWriter.print(t + "\t");
+			}
+			// System.out.print(t + "\t");
+
+			for (int i = 0; i < SIMULATIONS; i++)
+			{
+				fitnessMaps.set(i, new HashMap<Bitstring, Double>());
+				ArrayList<Bitstring> tlist = targets.get(i); // used a lot
+
+				// This for-loop computes the fitness for all organisms, mutates
+				// them, and puts the
+				// result in a Map structure.
+				for (Bitstring p : pop.get(i))
+				{
+					ArrayList<Bitstring> genes = p.split(GENE_LENGTH);
+
+					double td = 0;
+					if (genes.size() < tlist.size())
+						td = totalDist(genes, tlist, i);
+					else
+						td = totalDist(tlist, genes, i);
+
+					// Add fitness to population map
+					fitnessMaps.get(i).put(p, td);
+					double before = td;
+
+					// Mutate string and calculate fitness
+					Bitstring bmut = new Bitstring(p); // copy
+					Operator.mutate_single(bmut, MUTATE_PROB);
+					genes = bmut.split(GENE_LENGTH);
+					if (genes.size() < tlist.size())
+						td = totalDist(genes, tlist, i);
+					else
+						td = totalDist(tlist, genes, i);
+					// Print effect of mutation to file
+					mutWriter.print(before - td + "\t");
+
+					if (td == 0)
+						reachedMin++;
+
+					// Sum for statistics
+					mutAvg += before - td;
+					if (before - td > 0)
+					{
+						mutPosAvg += before - td;
+						mutPosOcc++;
+					}
+					// Add to map
+					fitnessMaps.get(i).put(bmut, td);
+				}
+
+				// Put all POP_SIZE best individuals in new pop. Print best
+				// individual to file.
+				ArrayList<Bitstring> newPop = new ArrayList<Bitstring>(POP_SIZE);
+				fitnessMaps.set(i,
+				      (HashMap<Bitstring, Double>) sortByValue(fitnessMaps.get(i)));
+				Iterator<Map.Entry<Bitstring, Double>> it = fitnessMaps.get(i)
+				      .entrySet().iterator();
+				Map.Entry<Bitstring, Double> entry = it.next();
+
 				if (t % PRINTERVAL == 0)
 				{
-					fitWriter.print(t + "\t");
-					hamWriter.print(t + "\t");
+					fitWriter.print(entry.getValue() + "\t");
 				}
-				// System.out.print(t + "\t");
-	
-				for (int i = 0; i < SIMULATIONS; i++)
+				fitAvg += entry.getValue();
+				// System.out.print(entry.getValue() + "\t");
+				for (int l = 0; l < POP_SIZE && it.hasNext(); l++)
 				{
-					fitnessMaps.set(i, new HashMap<Bitstring, Double>());
-					ArrayList<Bitstring> tlist = targets.get(i); // used a lot
-	
-					// This for-loop computes the fitness for all organisms, mutates
-					// them, and puts the
-					// result in a Map structure.
-					for (Bitstring p : pop.get(i))
-					{
-						ArrayList<Bitstring> genes = p.split(GENE_LENGTH);
-	
-						double td = 0;
-						if (genes.size() < tlist.size())
-							td = totalDist(genes, tlist, i);
-						else
-							td = totalDist(tlist, genes, i);
-	
-						// Add fitness to population map
-						fitnessMaps.get(i).put(p, td);
-						double before = td;
-	
-						// Mutate string and calculate fitness
-						Bitstring bmut = new Bitstring(p); // copy
-						Operator.mutate_single(bmut, MUTATE_PROB);
-						genes = bmut.split(GENE_LENGTH);
-						if (genes.size() < tlist.size())
-							td = totalDist(genes, tlist, i);
-						else
-							td = totalDist(tlist, genes, i);
-						// Print effect of mutation to file
-						mutWriter.print(before - td + "\t");
-	
-						if (td == 0)
-							reachedMin++;
-	
-						// Sum for statistics
-						mutAvg += before - td;
-						if (before - td > 0)
-						{
-							mutPosAvg += before - td;
-							mutPosOcc++;
-						}
-						// Add to map
-						fitnessMaps.get(i).put(bmut, td);
-					}
-	
-					// Put all POP_SIZE best individuals in new pop. Print best
-					// individual to file.
-					ArrayList<Bitstring> newPop = new ArrayList<Bitstring>(POP_SIZE);
-					fitnessMaps.set(i,
-					      (HashMap<Bitstring, Double>) sortByValue(fitnessMaps.get(i)));
-					Iterator<Map.Entry<Bitstring, Double>> it = fitnessMaps.get(i)
-					      .entrySet().iterator();
-					Map.Entry<Bitstring, Double> entry = it.next();
-	
-					if (t % PRINTERVAL == 0)
-					{
-						fitWriter.print(entry.getValue() + "\t");
-					}
-					fitAvg += entry.getValue();
-					// System.out.print(entry.getValue() + "\t");
-					for (int l = 0; l < POP_SIZE && it.hasNext(); l++)
-					{
-						newPop.add(entry.getKey());
-						entry = it.next();
-					}
-					pop.set(i, newPop);
+					newPop.add(entry.getKey());
+					entry = it.next();
 				}
+				pop.set(i, newPop);
+			}
 			if (t % PRINTERVAL == 0)
 			{
 				fitWriter.println();
@@ -257,14 +257,14 @@ public class longString
 		      : MUTATE_PROB;
 		e = args.length > 0 ? Encoding.valueOf(args[1]) : e;
 
-		fitWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/fitness/"
+		fitWriter = new PrintWriter("/home/henrik/evo_out/fitness/"
 		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
 		mutWriter = new PrintWriter(
-		      "/home/william/b16_henrikahl/evo_out/mutation/" + e + "_mut_prob_"
+		      "/home/henrik/evo_out/mutation/" + e + "_mut_prob_"
 		            + MUTATE_PROB + ".dat");
-		hamWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/hamming/"
+		hamWriter = new PrintWriter("/home/henrik/evo_out/hamming/"
 		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
-		avgWriter = new PrintWriter("/home/william/b16_henrikahl/evo_out/stat/"
+		avgWriter = new PrintWriter("/home/henrik/evo_out/stat/"
 		      + e + "_mut_prob_" + MUTATE_PROB + ".dat");
 		avgWriter.println("%Generation" + "\t" + "fitAvg" + "\t" + "mutAvg" + "\t"
 		      + "mutPosAvg" + "\t" + "hamAvg" + "\t" + "reachedMin");

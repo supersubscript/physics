@@ -29,48 +29,48 @@ public interface SelectionRule<GeneNetwork>
 		return select(pop).contains(o);
 	}
 
-	// Returns two organisms based on a roulette wheel scheme.
-	public static <GeneNetwork> SelectionRule<GeneNetwork> rouletteWheel(
-	      FitnessFunction<GeneNetwork> fitness)
-	{
-		return new SelectionRule<GeneNetwork>()
+		// Returns two organisms based on a roulette wheel scheme.
+		public static <GeneNetwork> SelectionRule<GeneNetwork> rouletteWheel(
+		      FitnessFunction<GeneNetwork> fitness)
 		{
-			Random rand = new Random();
-
-			@Override
-			public ArrayList<GeneNetwork> select(ArrayList<GeneNetwork> pop)
+			return new SelectionRule<GeneNetwork>()
 			{
-				// System.out.println(pop.size());
-
-				Map<GeneNetwork, Double> fs = fitness.apply(pop);
-
-				double[] cumulativeFitnesses = new double[pop.size()];
-				cumulativeFitnesses[0] = fitness.applyDirectly(pop.get(0));
-				for (int i = 1; i < pop.size(); i++)
+				Random rand = new Random();
+	
+				@Override
+				public ArrayList<GeneNetwork> select(ArrayList<GeneNetwork> pop)
 				{
-					GeneNetwork gn = pop.get(i);
-					double f = fitness.applyDirectly(gn);
-					cumulativeFitnesses[i] = cumulativeFitnesses[i - 1] + f;
-				}
-
-				int selectionSize = 2;
-				ArrayList<GeneNetwork> selection = new ArrayList<GeneNetwork>(
-		            selectionSize);
-				for (int i = 0; i < selectionSize; i++)
-				{
-					double randomFitness = rand.nextDouble()
-		               * cumulativeFitnesses[cumulativeFitnesses.length - 1];
-					int index = Arrays.binarySearch(cumulativeFitnesses,
-		               randomFitness);
-					if (index < 0)
+					// System.out.println(pop.size());
+	
+					Map<GeneNetwork, Double> fs = fitness.apply(pop);
+	
+					double[] cumulativeFitnesses = new double[pop.size()];
+					cumulativeFitnesses[0] = fitness.applyDirectly(pop.get(0));
+					for (int i = 1; i < pop.size(); i++)
 					{
-						// Convert negative insertion point to array index.
-						index = Math.abs(index + 1);
+						GeneNetwork gn = pop.get(i);
+						double f = fitness.applyDirectly(gn);
+						cumulativeFitnesses[i] = cumulativeFitnesses[i - 1] + f;
 					}
-					selection.add(pop.get(index));
+	
+					int selectionSize = 2;
+					ArrayList<GeneNetwork> selection = new ArrayList<GeneNetwork>(
+			            selectionSize);
+					for (int i = 0; i < selectionSize; i++)
+					{
+						double randomFitness = rand.nextDouble()
+			               * cumulativeFitnesses[cumulativeFitnesses.length - 1];
+						int index = Arrays.binarySearch(cumulativeFitnesses,
+			               randomFitness);
+						if (index < 0)
+						{
+							// Convert negative insertion point to array index.
+							index = Math.abs(index + 1);
+						}
+						selection.add(pop.get(index));
+					}
+					return selection;
 				}
-				return selection;
-			}
-		};
-	}
+			};
+		}
 }

@@ -15,9 +15,9 @@ public class DistancePair
 	{
 		this.first = first;
 		this.second = second;
+		this.distance = distance;
 	}
 
-	
 	@Override
 	public String toString()
 	{

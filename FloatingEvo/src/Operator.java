@@ -17,8 +17,8 @@ public class Operator
 		      highRange);
 	}
 
-	public static Pair<GeneNetwork, GeneNetwork> onePointCrossover(GeneNetwork a,
-	      GeneNetwork b)
+	public static Pair<O, O> onePointCrossover(O a,
+	      O b)
 	{
 		HashMap<String, Double> offParam1 = new HashMap<String, Double>();
 		HashMap<String, Double> offParam2 = new HashMap<String, Double>();
@@ -44,14 +44,14 @@ public class Operator
 			offParam2.put(e1.getKey(), e1.getValue());
 		}
 
-		GeneNetwork off1 = new GeneNetwork(offParam1);
-		GeneNetwork off2 = new GeneNetwork(offParam2);
+		O off1 = new O(offParam1);
+		O off2 = new O(offParam2);
 
-		return new Pair<GeneNetwork, GeneNetwork>(off1, off2);
+		return new Pair<O, O>(off1, off2);
 	}
 
 	// Perform point-in-middle crossover
-	public static GeneNetwork PIM_crossover(GeneNetwork a, GeneNetwork b)
+	public static O PIM_crossover(O a, O b)
 	{
 
 		HashMap<String, Double> offParam = new HashMap<String, Double>();
@@ -69,7 +69,7 @@ public class Operator
 			offParam.put(e1.getKey(), (1 - r) * e1.getValue() + r * e2.getValue());
 		}
 
-		return new GeneNetwork(offParam);
+		return new O(offParam);
 	}
 
 }
