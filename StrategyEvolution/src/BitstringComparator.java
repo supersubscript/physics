@@ -13,8 +13,7 @@ public class BitstringComparator implements Comparator<Bitstring>
 	@Override
 	public int compare(Bitstring a, Bitstring b)
 	{
-		// Can return big number, so normalize
-		return (int) Math.signum(e.distance(a, b));
+		return (int) e.signDistance(a, b);
 	}
 
 }

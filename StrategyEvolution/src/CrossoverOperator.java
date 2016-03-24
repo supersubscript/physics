@@ -5,7 +5,12 @@ import java.util.Random;
 public interface CrossoverOperator
 {
 	static Random rand = new Random();
+
 	Bitstring apply(Bitstring t, Bitstring u);
+
+	public default void doNothing()
+	{
+	};
 
 	/**
 	 * CrossOverOperator that simply returns a random parent without crossover.

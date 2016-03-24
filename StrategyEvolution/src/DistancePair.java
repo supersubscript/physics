@@ -11,12 +11,6 @@ public class DistancePair
 		this.second = second;
 		this.distance = distance;
 	}
-	public DistancePair(Bitstring first, Bitstring second)
-	{
-		this.first = first;
-		this.second = second;
-		this.distance = distance;
-	}
 
 	@Override
 	public String toString()

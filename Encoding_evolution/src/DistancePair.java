@@ -1,9 +1,9 @@
 
 public class DistancePair
 {
-	public Bitstring	first;
-	public Bitstring	second;
-	public double		distance;
+	public final Bitstring	first;
+	public final Bitstring	second;
+	public final double		distance;
 
 	public DistancePair(Bitstring first, Bitstring second, double distance)
 	{
@@ -11,33 +11,10 @@ public class DistancePair
 		this.second = second;
 		this.distance = distance;
 	}
-	public DistancePair(Bitstring first, Bitstring second)
-	{
-		this.first = first;
-		this.second = second;
-	}
 
-	
 	@Override
 	public String toString()
 	{
 		return first + "\t" + second + "\t" + distance;
 	}
-
-	//
-	// public double getDistance()
-	// {
-	// return distance;
-	// }
-	//
-	// public Bitstring getFirst()
-	// {
-	// return first;
-	// }
-	//
-	// public Bitstring getSecond()
-	// {
-	// return second;
-	// }
-
 }

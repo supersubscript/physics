@@ -2,11 +2,12 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.stream.Stream;
 
 public class General
 {
-
+	static Random rand = new Random();
 	/* Sort a non-sorting map by value. */
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(
 			Map<K, V> map)
@@ -18,23 +19,11 @@ public class General
 
 		return result;
 	}
+	
+   public static int geometric(double p) {
+      assert (p >= 0.0 && p <= 1.0);
+      return (int) Math.ceil(Math.log(rand.nextDouble()) / Math.log(1.0 - p));
+  }
 
-	public static int hammingDistance(Bitstring a, Bitstring b)
-	{
-		boolean[] ab = a.getSequence();
-		boolean[] bb = b.getSequence();
-
-		int shorter = Math.min(a.size(), b.size());
-		int longest = Math.max(a.size(), b.size());
-
-		int result = 0;
-		for (int i = 0; i < shorter; i++)
-			if (ab[i] != bb[i])
-				result++;
-
-		result += longest - shorter;
-
-		return result;
-	}
 
 }

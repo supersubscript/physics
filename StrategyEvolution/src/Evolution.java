@@ -1,5 +1,7 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -8,35 +10,35 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /* Perform a single evolution. @author henrikahl */
 public class Evolution
 {
-	static final Random rand = new Random();
-	static FitnessFunction<Bitstring> fitness;
+	//	@formatter:off
+	static final int							SIMULATIONS					= 100;
+	static final int							NUMBER_OF_GENERATIONS	= 1000000;
+	static final int							POPULATION_SIZE			= 100;
+	static final int							GENOME_LENGTH				= 100;
+	static final int							GENE_LENGTH					= 10;
+	static final double						MUTATE_PROB					= 1. / GENOME_LENGTH;
+	static final double						CROSS_PROB					= 0.01;
+	static final double						PENALTY						= 100.;
 
-	static final double MUTATE_PROB = 0.01;
-	static final double CROSS_PROB = 0.01;
-	static final double PENALTY = 100.;
+	static final Random						rand							= new Random();
+	static final Encoding					e								= Encoding.GRAY;
+	static final MutationOperator			bitMutator					= MutationOperator.probFlip(MUTATE_PROB);
+	static final CrossoverOperator		none							= CrossoverOperator.none();
+	static final BitstringComparator		bc								= new BitstringComparator(e);
+	static final DistancePairComparator	dpc							= new DistancePairComparator();
 
-	static final int NUMBER_OF_GENERATIONS = 10000;
-	static final int POPULATION_SIZE = 10;
-	static final int GENOME_LENGTH = 100;
-	static final int GENE_LENGTH = 10;
-	static final int SIMULATIONS = 100;
-
-	static final Encoding e = Encoding.GRAY;
-	static final MutationOperator bitMutator = MutationOperator
-			.probFlip(MUTATE_PROB);
-	static final CrossoverOperator none = CrossoverOperator.none();
-	static SelectionOperator crossPick;
-	static SelectionOperator survivalPick;
-	static Population<Bitstring> pop;
-	static Bitstring target;
-	static ArrayList<Bitstring> targetGenes;
-
-	static BitstringComparator bc = new BitstringComparator(e);
-	static DistancePairComparator dpc = new DistancePairComparator();
+	static SelectionOperator				crossPick;
+	static SelectionOperator				survivalPick;
+	static Population<Bitstring>			pop;
+	static Bitstring							target;
+	static ArrayList<Bitstring>			targetGenes;
+	static FitnessFunction<Bitstring>	fitness;
+	//	@formatter:on
 
 	public static void main(String[] args)
 	{
@@ -44,23 +46,18 @@ public class Evolution
 		fitness = (o) ->
 		{
 			double td = 0;
-			ArrayList<Bitstring> genes = o.split(GENE_LENGTH);
-			if (genes.size() < targetGenes.size())
-				td = totalDistance(genes, targetGenes, false);
-			else
-				td = totalDistance(targetGenes, genes, false);
-			return (double) GENOME_LENGTH / GENE_LENGTH > targetGenes.size()
-					? td - (double) GENOME_LENGTH / GENE_LENGTH * PENALTY : td;
+			ArrayList<Bitstring> seekerGenes = o.split(GENE_LENGTH);
+			td = totalDistance(targetGenes, seekerGenes, false);
+			return td;
 		};
-
 		pop = new Population<Bitstring>(POPULATION_SIZE);
-		target = new Bitstring(GENOME_LENGTH);
+		target = new Bitstring(GENOME_LENGTH).randomize();
 		targetGenes = target.split(GENE_LENGTH);
 		crossPick = SelectionOperator.rouletteWheel(fitness, 2);
-		survivalPick = SelectionOperator.bestFraction(fitness, POPULATION_SIZE);
+		survivalPick = SelectionOperator.elitism(fitness, POPULATION_SIZE);
 
 		for (int i = 0; i < POPULATION_SIZE; i++)
-			pop.add(new Bitstring(GENOME_LENGTH));
+			pop.add(new Bitstring(GENOME_LENGTH).randomize());
 
 		// Evolution process
 		for (int t = 0; t < NUMBER_OF_GENERATIONS; t++)
@@ -79,21 +76,12 @@ public class Evolution
 
 			// Select
 			pop.addAll(newStrings);
-			ArrayList<Bitstring> temp = (ArrayList<Bitstring>) survivalPick
-					.select(pop);
+			pop = (Population<Bitstring>) survivalPick.select(pop);
 
-			System.out.println(fitness.applyDirectly(temp.get(0)));
-
-			// Gives different results depending on which argument goes in first
-			// System.out.println(totalDistance(targetGenes,
-			// temp.get(0).split(GENE_LENGTH), true));
-			System.out.println(totalDistance(temp.get(0).split(GENE_LENGTH),
-					targetGenes, true));
-
-			System.out.println();
-
-			pop.clear();
-			pop.addAll(temp);
+//			System.out.println();
+			System.err.println(
+					totalDistance(targetGenes, pop.get(0).split(GENE_LENGTH), true));
+//			System.out.println();
 		}
 	}
 
@@ -110,79 +98,55 @@ public class Evolution
 		seekers.sort(bc);
 
 		ArrayList<DistancePair> pairs = new ArrayList<DistancePair>();
-		Set<Bitstring> f = new HashSet<Bitstring>();
-		TreeMap<Double,ArrayList<DistancePair>> map = new TreeMap<Double,ArrayList<DistancePair>>();
-		
-		int j = 0; 
+
+		int j = 0;
 		for (int i = 0; i < seekers.size(); i++)
 		{
-			double dist = e.distance(seekers.get(i), targets.get(j));
+			Bitstring seeker = seekers.get(i);
 
-			for (; j < targets.size(); j++)
+			for (; j < targets.size();)
 			{
-				if(j == targets.size() - 1)
+				Bitstring target = targets.get(j);
+				double dist = e.distance(seekers.get(i), targets.get(j));
+
+				if (j == targets.size() - 1)
 				{
-					if(map.get(dist) == null)
-						map.put(dist, new ArrayList<DistancePair>());
-					map.put(dist, map.get(dist).add(new DistancePair(seekers.get(i),targets.get(j))));
-					break; 
-				}
-				else if(dist < e.distance(seekers.get(i), targets.get(j+1)))
-				{
-					map.put(dist, new DistancePair(seekers.get(i), targets.get(j)));
+					pairs.add(new DistancePair(seeker, target, dist));
 					break;
-				}	
-				else
+				} else if (dist == e.distance(seeker, targets.get(j + 1)))
+				{
+					pairs.add(new DistancePair(seeker, target, dist));
 					j++;
+				} else if (dist < e.distance(seeker, targets.get(j + 1)))
+				{
+					pairs.add(new DistancePair(seeker, target, dist));
+					break;
+				} else j++;
+
 			}
 		}
-		
-//		int j = 0;
-//		for (Bitstring b : targets)
-//			while (j < seekers.size())
-//			{
-//				double dist = e.distance(b, seekers.get(j));
-//				// If this is the only remaining one, give to all
-//				if (j == seekers.size() - 1)
-//				{
-//					pairs.add(new DistancePair(b, seekers.get(j), dist));
-//					break; // go to next b
-//				}
-//				// If this hit is best, take it
-//				else if (dist < e.distance(b, seekers.get(j + 1)))
-//				{
-//					pairs.add(new DistancePair(b, seekers.get(j), dist));
-//					break; // go to next b
-//				}
-//				// If next hit better, move on
-//				else
-//					j++;
-//			}
-		// Check which list holds targets
-		boolean sIsTargets = true;
-//		pairs.sort(dpc);
-		// System.out.println(":)" + "\t" + pairs.get(0).distance);
 
+		Set<Bitstring> alreadyTagged = new HashSet<Bitstring>();
+		pairs.sort(dpc);
 		for (DistancePair p : pairs)
 		{
-			// if (best)
-			// {
-			// System.out.println(p.first);
-			// System.out.println(p.second);
-			// System.out.println(p.distance);
-			// }
-
-			Bitstring b = sIsTargets ? p.first : p.second;
-			// Trying to fit to tagged target?
-			if (f.contains(b))
+			System.out.println(p);
+			Bitstring b = p.second;
+			if (alreadyTagged.contains(b))
 				total += p.distance + PENALTY;
 			else
 			{
 				total += p.distance;
-				f.add(b);
+				alreadyTagged.add(b);
 			}
 		}
 		return total;
+	}
+
+	public static void collectMutationData(Bitstring before, Bitstring after,
+			File file)
+	{
+
 	}
 
 }

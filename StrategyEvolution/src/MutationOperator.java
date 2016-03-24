@@ -1,7 +1,9 @@
+import java.util.Random;
 
 @FunctionalInterface
 public interface MutationOperator
 {
+	static Random rand = new Random();
 
 	public Bitstring mutate(Bitstring seq);
 
@@ -30,8 +32,9 @@ public interface MutationOperator
 				Bitstring b = seq.clone();
 
 				for (int i = 0; i < b.size(); i++)
-					if (Math.random() < prob)
+					if (rand.nextDouble() < prob)
 						b.flip(i);
+				
 				return b;
 			}
 		};
