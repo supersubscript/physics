@@ -12,7 +12,6 @@ public interface SelectionOperator
 	/**
 	 * Which Organisms to select, out of all the Organisms in the World.
 	 */
-
 	public <T extends Collection<Bitstring>> T select(Population<Bitstring> pop);
 
 	// Returns @param:selectionSize organisms based on a roulette wheel scheme.
@@ -151,8 +150,6 @@ public interface SelectionOperator
 				for (int i = 0; i < N; i++)
 				{
 					int pos = (int) (rand.nextDouble() * popCopy.size());
-					// System.out.println(pos);
-					// System.out.println(pop.size());
 					Bitstring b = popCopy.get(pos);
 					selection.add(b);
 					popCopy.remove(b);
@@ -182,20 +179,24 @@ public interface SelectionOperator
 					Population<Bitstring> pop)
 			{
 				Population<Bitstring> selection = new Population<Bitstring>();
+				Population<Bitstring> popCopy = pop.clone();
 
 				for (int i = 0; i < N; i++)
 				{
 					Population<Bitstring> subPop = SelectionOperator
-							.random(tournamentSize).select(pop);
+							.random(tournamentSize).select(popCopy);
 					Map<Bitstring, Double> fitnessMap = fitness.apply(subPop);
 					fitnessMap = General.sortByValue(fitnessMap);
-					int pick = General.geometric(prob) % tournamentSize;
+					int pick = (General.geometric(prob) - 1) % tournamentSize;
 					// System.out.println(pick);
+
 					Iterator<Map.Entry<Bitstring, Double>> it = fitnessMap.entrySet()
 							.iterator();
 					for (int j = 0; j < pick - 1; j++)
 						it.next();
+
 					selection.add(it.next().getKey().clone());
+					it.remove();
 				}
 				// System.out.println(selection.size());
 

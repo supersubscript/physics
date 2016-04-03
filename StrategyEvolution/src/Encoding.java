@@ -61,7 +61,7 @@ public enum Encoding
 	public static void main(String[] args)
 	{
 		Bitstring t = new Bitstring(new boolean[] { true, true });
-		Bitstring tt = new Bitstring(new boolean[] { true, true});
+		Bitstring tt = new Bitstring(new boolean[] { true, true });
 
 		System.out.println(t + "\t" + tt);
 		System.out.println("binary\t" + binary(t) + "\t" + binary(tt));

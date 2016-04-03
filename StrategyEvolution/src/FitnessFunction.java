@@ -1,6 +1,8 @@
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
 
 /**
  * Represents a fitness function.
@@ -13,7 +15,7 @@ public interface FitnessFunction<O extends Organism>
 	 * values is not necessarily 1.
 	 */
 	public double applyDirectly(O o);
-
+	
 	/**
 	 * Compute the fitness of an organism, rescaled based on the other values in
 	 * the population.
@@ -56,5 +58,13 @@ public interface FitnessFunction<O extends Organism>
 		for (Map.Entry<O, Double> entry : result.entrySet())
 			System.out.println(entry.getKey() + "\t" + entry.getValue());
 	}
-
+	
+	public default FitnessFunction<O> compose(O o, DoubleUnaryOperator before){
+	FitnessFunction<O> f = d -> { 
+			return before.applyAsDouble(this.applyDirectly(o));
+		};
+		return f;
+	}
+	
+	
 }
