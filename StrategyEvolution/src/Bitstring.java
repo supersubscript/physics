@@ -22,6 +22,7 @@ public class Bitstring extends Organism
 				t[i] = true;
 	}
 
+	
 	// Initializes bitstring with given sequence
 	public Bitstring(boolean[] t)
 	{
@@ -31,7 +32,7 @@ public class Bitstring extends Organism
 	@Override
 	public Bitstring clone()
 	{
-		return new Bitstring(Arrays.copyOf(this.t, t.length));
+		return new Bitstring(Arrays.copyOf(t, t.length));
 	}
 
 	public boolean[] getSequence()
@@ -84,12 +85,11 @@ public class Bitstring extends Organism
 		return Arrays.equals(this.t, b.getSequence());
 	}
 
-	@Override
-	public boolean equals(Object b)
-	{
-		return this.hashCode() == b.hashCode();
-		// return this.isSame((Bitstring) b);
-	}
+//	@Override
+//	public boolean equals(Object b)
+//	{
+//		return this.hashCode() == b.hashCode();
+//	}
 
 	/* Split Bitstring into set of new bitstrings */
 	public ArrayList<Bitstring> split(int length)
@@ -112,6 +112,13 @@ public class Bitstring extends Organism
 
 		}
 		return temp;
+	}
+
+	/* Retrieve a subsequence of a Bitstring. */
+	public static Bitstring subsequence(Bitstring b, int from, int to)
+	{
+		assert (from > 0 && from < b.size() && to >= from && to < b.size());
+		return new Bitstring(Arrays.copyOfRange(b.getSequence(), from, to));
 	}
 
 	public static int hammingDistance(Bitstring a, Bitstring b)
@@ -141,4 +148,14 @@ public class Bitstring extends Organism
 		return this;
 	}
 
+	
+	public static void main(String[] args)
+	{
+		
+		Bitstring a = new Bitstring("1111");
+		Bitstring b = new Bitstring("1111");
+		System.out.println(a.equals(b));
+		
+		
+	}
 }
