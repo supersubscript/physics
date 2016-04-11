@@ -33,7 +33,7 @@ public class General
 	{
 		for (int i = 0; i < 100; i++)
 		{
-			System.out.println(geometric(.1));
+			System.out.println(geometric(1));
 		}
 	}
 }

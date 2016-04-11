@@ -6,10 +6,10 @@ import java.io.Writer;
 import java.util.Random;
 import java.util.function.DoubleUnaryOperator;
 
-public class NewtonRhapson
+public class exc_2_5
 {
 	static Random		rand			= new Random();
-	static Exercise	exc			= Exercise.exc_2_5(3.845);
+	static Exercise	exc			= Exercise.exc_2_5(3.2);
 	static Writer		writer;
 
 	public static void main(String[] args) throws IOException
@@ -18,6 +18,10 @@ public class NewtonRhapson
 				new FileOutputStream(System.getProperty("user.home") + "/nr.dat"),
 				"utf-8"));
 
+		
+		
+		
+		
 		// Init conditions
 		double[] x = new double[1];
 
@@ -29,25 +33,29 @@ public class NewtonRhapson
 			// {
 			// nr = -2 + rand.nextDouble() * 4;
 			// }
-			x[i] = .5;
+			x[i] = exc.getFct().applyAsDouble(.1);
 		}
-		for (int i = 0; i < x.length; i++)
-			System.out.print(x[i] + "\t");
+		for (int i = 0; i < x.length; i++){
+			double val = rand.nextDouble();
+			System.out.print(val + "\t" + exc.getFct().applyAsDouble(val) + "\n");
+			writer.write(val + "\t" + exc.getFct().applyAsDouble(val) + "\n");
+			}
+		writer.write("\n");
 		System.out.println();
 
-		for (int s = 0; s < 1000; s++)
-		{
-			for (int i = 0; i < x.length; i++)
-			{
-//				x[i] = newton(x[i], exc.getFct(), exc.getDerivative());
-				x[i] = exc.getFct().applyAsDouble(x[i]);
-				String outp = x[i] + "\t" + exc.getFct().applyAsDouble(x[i]) + "\t";
-				System.out.print(outp);
-				writer.write(outp);
-			}
-			System.out.println();
-			writer.write("\n");
-		}
+//		for (int s = 0; s < 200; s++)
+//		{
+//			for (int i = 0; i < x.length; i++)
+//			{
+////				x[i] = newton(x[i], exc.getFct(), exc.getDerivative());
+//				x[i] = exc.getFct().applyAsDouble(x[i]);
+//				String outp = x[i] + "\t" + exc.getFct().applyAsDouble(x[i]) + "\t";
+//				System.out.print(outp);
+//				writer.write(outp);
+//			}
+//			System.out.println();
+//			writer.write("\n");
+//		}
 		writer.close();
 
 	}

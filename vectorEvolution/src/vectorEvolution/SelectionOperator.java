@@ -135,7 +135,12 @@ public interface SelectionOperator
 			public Map<Bitstring, Double> select(Map<Bitstring, Double> pop)
 			{
 				assert N > 0 && N <= pop.size();
-
+//				System.out.println("Pop:");
+//				for (Entry<Bitstring, Double> e : pop.entrySet())
+//				{
+//					System.out.print(e.getValue() + "\t" );
+//				}
+//				System.out.println();
 				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
 				ArrayList<Bitstring> strings = new ArrayList<Bitstring>();
 				for (Bitstring b : pop.keySet())
@@ -148,6 +153,13 @@ public interface SelectionOperator
 					selection.put(b, pop.get(b));
 					strings.remove(b);
 				}
+//				System.out.println("Random:");
+//				for (Entry<Bitstring, Double> e : selection.entrySet())
+//				{
+//					System.out.print(e.getValue() + "\t" );
+//				}
+//				System.out.println();
+//				
 				return selection;
 			}
 		};
@@ -170,8 +182,6 @@ public interface SelectionOperator
 				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
 				Map<Bitstring, Double> popCopy = new HashMap<Bitstring, Double>(
 						pop);
-				// for(Entry<Bitstring, Double> e : pop.entrySet())
-				// popCopy.put(e.getKey().clone(), e.getValue());
 
 				for (int i = 0; i < N; i++)
 				{
@@ -191,6 +201,13 @@ public interface SelectionOperator
 					popCopy.remove(e.getKey());
 					it.remove();
 				}
+//				System.out.println("Tournament:");
+//				for (Entry<Bitstring, Double> e : selection.entrySet())
+//				{
+//					System.out.print(e.getValue() + "\t" );
+//				}
+//				System.out.println();
+				
 				return selection;
 			}
 		};

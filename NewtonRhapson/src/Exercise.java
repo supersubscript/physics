@@ -8,7 +8,7 @@ public class Exercise
 		return new Exercise(s ->
 		{
 			return s * s - 1;
-		}, s ->
+		} , s ->
 		{
 			return 2 * s;
 		});
@@ -19,7 +19,7 @@ public class Exercise
 		return new Exercise(s ->
 		{
 			return s * s + 1;
-		}, s ->
+		} , s ->
 		{
 			return 2 * s;
 		});
@@ -30,7 +30,7 @@ public class Exercise
 		return new Exercise(s ->
 		{
 			return s * s * s - s + Math.sqrt(2.) / 2.;
-		}, s ->
+		} , s ->
 		{
 			return 3 * s * s - 1;
 		});
@@ -41,7 +41,7 @@ public class Exercise
 		return new Exercise(r, s ->
 		{
 			return r * s * (1. - s);
-		}, s ->
+		} , s ->
 		{
 			return r - 2 * r * s;
 		});

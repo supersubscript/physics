@@ -23,7 +23,7 @@ public class MultiEvolution
 	static int												GENE_LENGTH					= 10;
 	static double											MUTATE_PROB					= 1. / GENOME_LENGTH;
 	static double											CROSS_PROB					= 0.01;
-	static Encoding										encoding						= Encoding.CONSENSUS_GRAY;
+	static Encoding										encoding						= Encoding.CONSENSUS_BINARY;
 	static ScaleFunction									scaleFunction				= ScaleFunction.LADDER;
 	static CrossoverOperator							none							= CrossoverOperator.none();
 
@@ -40,6 +40,7 @@ public class MultiEvolution
 	static ArrayList<Bitstring>						target;
 	static HashMap<String, PrintWriter>				writers;				
 	static ArrayList<HashMap<Bitstring, Double>>	simulations; 
+	static final boolean test = false; 
 	//	@formatter:on
 
 	public static void main(String[] args) throws IOException
@@ -47,18 +48,24 @@ public class MultiEvolution
 		init(args);
 		// Data needed for stat.dat
 		double totalFitness = 0;
-		double sumOfSquaredFitnesses = 0;
-		double N = 0; 
+		double sumOfSquaredShiftedFitnesses = 0;
+		double totalShiftedFitness = 0;
+		double shift = 0;
+
 		// Evolution process
 		for (int t = 0; t < NUMBER_OF_GENERATIONS; t++)
 		{
-			// System.out.print(t + "\t");
+			shift = simulations.get(0).entrySet().stream()
+					.min((e1, e2) -> e1.getValue().compareTo(e2.getValue())).get()
+					.getValue();
+			totalFitness = 0;
+			totalShiftedFitness = 0;
+			sumOfSquaredShiftedFitnesses = 0;
+
 			if (t % 10 == 0)
 			{
 				writers.get("fitness").print(t + "\t");
 				writers.get("mutation").print("\n" + t + "\t");
-				totalFitness = 0;
-				sumOfSquaredFitnesses = 0;
 			}
 			for (int s = 0; s < SIMULATIONS; s++)
 			{
@@ -69,29 +76,33 @@ public class MultiEvolution
 				HashMap<Bitstring, Double> mutStrings = new HashMap<Bitstring, Double>();
 				for (Entry<Bitstring, Double> entry : pop.entrySet())
 				{
+					// System.out.println();
+					// double fff = fitness.applyDirectly(entry.getKey());
+					// System.out.println();
 					Bitstring bb = bitMutator.mutate(entry.getKey());
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = entry.getValue();
 					double after = mutStrings.get(bb);
-					N++;
-//					if(t % 10 == 0)
-//						System.out.println(N);
 					writers.get("mutation").printf("%1.2f\t", before / after);
 				}
-//				System.out.println(pop.size());
 				pop.putAll(mutStrings);
+				assert (pop.size() == 2 * POPULATION_SIZE);
 
 				// Select
 				pop = (HashMap<Bitstring, Double>) survivalPick.select(pop);
 				simulations.set(s, pop);
+				assert (pop.size() == POPULATION_SIZE);
 
 				double bestFitness = pop.entrySet().stream()
 						.min((e1, e2) -> e1.getValue().compareTo(e2.getValue())).get()
 						.getValue();
+				bestFitness = Double.isNaN(bestFitness) ? 2000 : bestFitness;
 
 				// System.out.print(bestFitness + "\t");
+				sumOfSquaredShiftedFitnesses += (bestFitness - shift)
+						* (bestFitness - shift);
 				totalFitness += bestFitness;
-				sumOfSquaredFitnesses += bestFitness * bestFitness;
+				totalShiftedFitness += bestFitness - shift;
 
 				if (t % 10 == 0)
 					writers.get("fitness").printf("%1.2f\t", bestFitness);
@@ -103,8 +114,9 @@ public class MultiEvolution
 				writers.get("fitness").println();
 				writers.get("stat")
 						.println(t + "\t" + totalFitness / SIMULATIONS + "\t"
-								+ Math.sqrt((sumOfSquaredFitnesses
-										- totalFitness * totalFitness / SIMULATIONS)
+								+ Math.sqrt((sumOfSquaredShiftedFitnesses
+										- totalShiftedFitness * totalShiftedFitness
+												/ SIMULATIONS)
 										/ (SIMULATIONS - 1)));
 			}
 		}
@@ -214,6 +226,7 @@ public class MultiEvolution
 		{
 			GENOME_LENGTH *= 50;
 			GENE_LENGTH *= 50;
+			MUTATE_PROB /= 50;
 		}
 
 		bitMutator = MutationOperator.probFlip(MUTATE_PROB);
@@ -223,7 +236,8 @@ public class MultiEvolution
 		writers = new HashMap<String, PrintWriter>();
 		simulations = new ArrayList<HashMap<Bitstring, Double>>();
 		name = encoding.toString() + "_" + scaleFunction.toString() + "_"
-				+ MUTATE_PROB + "_test";
+				+ MUTATE_PROB;
+		name += test ? "test" : "";
 
 		// Define fitness function
 		scale = scaleFunction.getFunction();
