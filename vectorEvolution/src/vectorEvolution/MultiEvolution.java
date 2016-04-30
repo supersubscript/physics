@@ -83,7 +83,11 @@ public class MultiEvolution
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = entry.getValue();
 					double after = mutStrings.get(bb);
-					writers.get("mutation").printf("%1.2f\t", before / after);
+					
+					if(after == 0 && before == after)
+						writers.get("mutation").printf("%1.2f\t", 1.00);
+					else
+						writers.get("mutation").printf("%1.2f\t", before / after);
 				}
 				pop.putAll(mutStrings);
 				assert (pop.size() == 2 * POPULATION_SIZE);
@@ -117,7 +121,7 @@ public class MultiEvolution
 								+ Math.sqrt((sumOfSquaredShiftedFitnesses
 										- totalShiftedFitness * totalShiftedFitness
 												/ SIMULATIONS)
-										/ (SIMULATIONS - 1)));
+										/ (SIMULATIONS - 1) / SIMULATIONS));
 			}
 		}
 		// Close printer streams
@@ -193,11 +197,18 @@ public class MultiEvolution
 		return total;
 	}
 
-	public static void initDataFiles() throws IOException
+	public static void initDataFiles(String[] args) throws IOException
 	{
+      String dataFolder = null; 
+      if(args.length > 2)
+      {
+         dataFolder = args[3] + "/";
+      }
+
 		File path = new File(
-				System.getProperty("user.home") + "/evo_out/" + name);
-		path.mkdir();
+				System.getProperty("user.home") + "/evo_out/" + (dataFolder == null ? "" : dataFolder) + name);
+		// "/scratch/bob/b16_henrikahl" + "/evo_out/" + name);
+		path.mkdirs();
 
 		//@formatter:off
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness.dat", 	true))));
@@ -224,9 +235,9 @@ public class MultiEvolution
 		if (encoding.equals(Encoding.CONSENSUS_GRAY)
 				|| encoding.equals(Encoding.CONSENSUS_BINARY))
 		{
-			GENOME_LENGTH *= 50;
-			GENE_LENGTH *= 50;
-			MUTATE_PROB /= 50;
+			GENOME_LENGTH *= 100;
+			GENE_LENGTH *= 100;
+			MUTATE_PROB /= 100;
 		}
 
 		bitMutator = MutationOperator.probFlip(MUTATE_PROB);
@@ -238,6 +249,7 @@ public class MultiEvolution
 		name = encoding.toString() + "_" + scaleFunction.toString() + "_"
 				+ MUTATE_PROB;
 		name += test ? "test" : "";
+		initDataFiles(args);
 
 		// Define fitness function
 		scale = scaleFunction.getFunction();
@@ -249,21 +261,36 @@ public class MultiEvolution
 			return scale.applyAsDouble(td);
 		};
 
-		// Setup print devices
-		initDataFiles();
+
 
 		targetGenes = new ArrayList<ArrayList<Bitstring>>();
 		for (int i = 0; i < SIMULATIONS; i++)
 		{
-			targetGenes.add(new ArrayList<Bitstring>());
-			targetGenes.set(i, new Bitstring(GENOME_LENGTH).split(GENE_LENGTH));
+			// Assure that target actually codes for something
+			guarantee: while (true)
+			{
+				ArrayList<Bitstring> genes = new Bitstring(GENOME_LENGTH)
+						.split(GENE_LENGTH);
+				for (Bitstring b : genes)
+				{
+					if (b.getValue() == 10000.)
+					{
+						continue guarantee;
+					}
+				}
+				targetGenes.add(genes);
+				break;
+			}
+
 			target = targetGenes.get(i);
 			simulations.add(new HashMap<Bitstring, Double>());
+
+			// Initialize population
 			HashMap<Bitstring, Double> p = simulations.get(i);
 			for (int j = 0; j < POPULATION_SIZE; j++)
 			{
-				Bitstring b = new Bitstring(GENOME_LENGTH);
-				p.put(b, fitness.applyDirectly(b));
+				Bitstring individual = new Bitstring(GENOME_LENGTH);
+				p.put(individual, fitness.applyDirectly(individual));
 			}
 		}
 		survivalPick = SelectionOperator.tournament(fitness, POPULATION_SIZE, 2,
