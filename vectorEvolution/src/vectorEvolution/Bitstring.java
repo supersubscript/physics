@@ -16,7 +16,7 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 		this.t = new boolean[len];
 		for (int i = 0; i < t.length; i++)
 			this.t[i] = rand.nextBoolean();
-		this.value = MultiEvolution.encoding.value(this.t);
+		this.value = pathwayEvolution.encoding.value(this.t);
 	}
 
 	// Initializes bitstring with given sequence
@@ -33,7 +33,7 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 	public Bitstring(boolean[] t)
 	{
 		this.t = t;
-		this.value = MultiEvolution.encoding.value(this.t);
+		this.value = pathwayEvolution.encoding.value(this.t);
 	}
 
 	public Bitstring(boolean[] t, double value)
@@ -132,6 +132,7 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 		}
 		return temp;
 	}
+	
 
 	/* Retrieve a subsequence of a Bitstring. */
 	public static Bitstring subsequence(Bitstring b, int from, int to)
@@ -180,12 +181,16 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 	public static void main(String[] args)
 	{
 
-		Bitstring a = new Bitstring("1111");
-		Bitstring b = new Bitstring("1111");
-		System.out.println(a.equals(b));
+//		Bitstring a = new Bitstring("1111");
+//		Bitstring b = new Bitstring("1111");
+		
+	
+//		System.out.println(a.equals(b));
 
 	}
 
+	
+	
 	@Override
 	public int compareTo(Bitstring o)
 	{

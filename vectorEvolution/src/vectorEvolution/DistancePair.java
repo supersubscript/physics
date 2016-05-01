@@ -4,6 +4,7 @@ public class DistancePair
 {
 	public Bitstring	first;
 	public Bitstring	second;
+	public Integer 	third;
 	public double		distance;
 
 	public DistancePair(Bitstring first, Bitstring second, double distance)
@@ -12,6 +13,13 @@ public class DistancePair
 		this.second = second;
 		this.distance = distance;
 	}
+	public DistancePair(Bitstring first, Integer third, double distance)
+	{
+		this.first = first;
+		this.third = third;
+		this.distance = distance;
+	}
+
 
 	@Override
 	public String toString()
