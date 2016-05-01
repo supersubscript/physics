@@ -17,7 +17,7 @@ import java.util.TreeSet;
 public class pathwayEvolution
 {
 	//	@formatter:off
-	static int												SIMULATIONS					= 1;
+	static int												SIMULATIONS					= 100;
 	static int												NUMBER_OF_GENERATIONS	= 100000;
 	static int												POPULATION_SIZE			= 40;
 	static int												GENOME_LENGTH				= 100;
@@ -209,8 +209,8 @@ public class pathwayEvolution
       }
 
 		File path = new File(
-//				System.getProperty("user.home") + "/evo_out/" + (dataFolder == null ? "" : dataFolder));
-		 "/scratch/bob/b16_henrikahl" + "/evo_out/" + name);
+//				System.getProperty("user.home") + "/evo_out/" + (dataFolder == null ? "" : dataFolder) + name);
+		 "/scratch/bob/b16_henrikahl" + "/evo_out/" + (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
