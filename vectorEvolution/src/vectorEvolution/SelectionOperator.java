@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.DoubleUnaryOperator;
 
 public interface SelectionOperator
 {
@@ -13,8 +14,12 @@ public interface SelectionOperator
 
 	/**
 	 * Which Organisms to select, out of all the Organisms in the World.
+	 * 
+	 * @param scale
 	 */
 	public Map<Bitstring, Double> select(Map<Bitstring, Double> pop);
+
+	public Map<Bitstring, Double> select(Map<Bitstring, Double> pop, DoubleUnaryOperator scale);
 
 	// Returns @param:selectionSize organisms based on a roulette wheel scheme.
 	// public static SelectionOperator rouletteWheel(
@@ -59,31 +64,31 @@ public interface SelectionOperator
 	// }
 
 	// Return the best @param N individuals in a population.
-	public static SelectionOperator elitism(FitnessFunction<Bitstring> fitness,
-			int N)
-	{
-		assert (N > 0);
-
-		return new SelectionOperator()
-		{
-			@Override
-			public Map<Bitstring, Double> select(Map<Bitstring, Double> pop)
-			{
-				assert (N <= pop.size());
-				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
-				pop = General.sortByValue(pop);
-
-				Iterator<Entry<Bitstring, Double>> it = pop.entrySet().iterator();
-				for (int i = 0; i < N; i++)
-				{
-					Map.Entry<Bitstring, Double> entry = it.next();
-					selection.put(entry.getKey(), entry.getValue());
-				}
-
-				return selection;
-			}
-		};
-	}
+//	public static SelectionOperator elitism(FitnessFunction<Bitstring> fitness,
+//			int N)
+//	{
+//		assert (N > 0);
+//
+//		return new SelectionOperator()
+//		{
+//			@Override
+//			public Map<Bitstring, Double> select(Map<Bitstring, Double> pop)
+//			{
+//				assert (N <= pop.size());
+//				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
+//				pop = General.sortByValue(pop);
+//
+//				Iterator<Entry<Bitstring, Double>> it = pop.entrySet().iterator();
+//				for (int i = 0; i < N; i++)
+//				{
+//					Map.Entry<Bitstring, Double> entry = it.next();
+//					selection.put(entry.getKey(), entry.getValue());
+//				}
+//
+//				return selection;
+//			}
+//		};
+//	}
 
 	/*
 	 * Return N best elements, plus an extra number specified via another
@@ -153,13 +158,25 @@ public interface SelectionOperator
 					selection.put(b, pop.get(b));
 					strings.remove(b);
 				}
-				// System.out.println("Random:");
-				// for (Entry<Bitstring, Double> e : selection.entrySet())
-				// {
-				// System.out.print(e.getValue() + "\t" );
-				// }
-				// System.out.println();
-				//
+				return selection;
+			}
+			
+			@Override
+			public Map<Bitstring, Double> select(Map<Bitstring, Double> pop, DoubleUnaryOperator scale)
+			{
+				assert N > 0 && N <= pop.size();
+				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
+				ArrayList<Bitstring> strings = new ArrayList<Bitstring>();
+				for (Bitstring b : pop.keySet())
+					strings.add(b);
+
+				for (int i = 0; i < N; i++)
+				{
+					int pos = (int) (rand.nextDouble() * strings.size());
+					Bitstring b = strings.get(pos);
+					selection.put(b, pop.get(b));
+					strings.remove(b);
+				}
 				return selection;
 			}
 		};
@@ -201,15 +218,39 @@ public interface SelectionOperator
 					popCopy.remove(e.getKey());
 					it.remove();
 				}
-				// System.out.println("Tournament:");
-				// for (Entry<Bitstring, Double> e : selection.entrySet())
-				// {
-				// System.out.print(e.getValue() + "\t" );
-				// }
-				// System.out.println();
-
 				return selection;
 			}
+
+			@Override
+			public Map<Bitstring, Double> select(Map<Bitstring, Double> pop,
+					DoubleUnaryOperator scale)
+			{
+
+				Map<Bitstring, Double> selection = new HashMap<Bitstring, Double>();
+				Map<Bitstring, Double> popCopy = new HashMap<Bitstring, Double>(
+						pop);
+
+				for (int i = 0; i < N; i++)
+				{
+					HashMap<Bitstring, Double> subPop = (HashMap<Bitstring, Double>) SelectionOperator
+							.random(tournamentSize).select(popCopy, scale);
+					subPop = (HashMap<Bitstring, Double>) General.sortByValue(subPop,
+							scale);
+
+					int pick = (General.geometric(prob)) % tournamentSize;
+
+					Iterator<Entry<Bitstring, Double>> it = subPop.entrySet()
+							.iterator();
+					for (int j = 0; j < pick; j++)
+						it.next();
+					Entry<Bitstring, Double> e = it.next();
+					selection.put(e.getKey(), e.getValue());
+					popCopy.remove(e.getKey());
+					it.remove();
+				}
+				return selection;
+			}
+			
 		};
 	};
 }

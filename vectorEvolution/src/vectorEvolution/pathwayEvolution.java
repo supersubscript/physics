@@ -86,10 +86,12 @@ public class pathwayEvolution
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = entry.getValue();
 					double after = mutStrings.get(bb);
+					
 					if (after == 0 && before == after)
 					{
 						writers.get("mutation").printf("%1.2f\t", 1.00);
-					} else
+					} 
+					else
 					{
 						writers.get("mutation").printf("%1.2f\t", before / after);
 					}
@@ -212,14 +214,20 @@ public class pathwayEvolution
 		}
 
 		File path = new File(
+				System.getProperty("user.home") + "/evo_data/"
 				// "/home/william/b16_henrikahl" + "/evo_data/"
-				// + (dataFolder == null ? "" : dataFolder) + name);
-				"/scratch/bob/b16_henrikahl" + "/evo_out/"
-						+ (dataFolder == null ? "" : dataFolder) + name);
+				 + (dataFolder == null ? "" : dataFolder) + name);
+//				"/scratch/bob/b16_henrikahl" + "/evo_out/"
+//						+ (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness.dat", 	true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1000_mut.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_100_mut.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_10_mut.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1_mut.dat", true))));
+				
 		writers.put("mutation", new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/mutation.dat", 	true))));
 		writers.put("stat", 		new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/stat.dat", 		true))));
 		writers.get("stat").println(
