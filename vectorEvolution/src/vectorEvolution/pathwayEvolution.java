@@ -24,7 +24,7 @@ public class pathwayEvolution
 	static int												GENE_LENGTH					= 10;
 	static double											MUTATE_PROB					= 1. / GENOME_LENGTH;
 	static double											CROSS_PROB					= 0.01;
-	static Encoding										encoding						= Encoding.CONSENSUS_GRAY;
+	static Encoding										encoding						= Encoding.GRAY;
 	static ScaleFunction									scaleFunction				= ScaleFunction.LINEAR;
 	static CrossoverOperator							none							= CrossoverOperator.none();
 
@@ -63,7 +63,7 @@ public class pathwayEvolution
 			totalShiftedFitness = 0;
 			sumOfSquaredShiftedFitnesses = 0;
 
-//			System.out.print(t + "\t");
+			// System.out.print(t + "\t");
 			if (t % 10 == 0)
 			{
 				writers.get("fitness").print(t + "\t");
@@ -73,7 +73,8 @@ public class pathwayEvolution
 			{
 				HashMap<Bitstring, Double> pop = simulations.get(s);
 				targetIntegerSet = targetIntegers.get(s);
-				
+				// System.out.println(targetIntegerSet);
+
 				// Mutate
 				HashMap<Bitstring, Double> mutStrings = new HashMap<Bitstring, Double>();
 				for (Entry<Bitstring, Double> entry : pop.entrySet())
@@ -85,18 +86,20 @@ public class pathwayEvolution
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = entry.getValue();
 					double after = mutStrings.get(bb);
-					
-					if(after == 0 && before == after)
+					if (after == 0 && before == after)
+					{
 						writers.get("mutation").printf("%1.2f\t", 1.00);
-					else
+					} else
+					{
 						writers.get("mutation").printf("%1.2f\t", before / after);
+					}
 				}
 				pop.putAll(mutStrings);
 				assert (pop.size() == 2 * POPULATION_SIZE);
 
 				// Select
 				pop = (HashMap<Bitstring, Double>) survivalPick.select(pop);
-//				System.out.println(pop);
+				// System.out.println(pop);
 				simulations.set(s, pop);
 				assert (pop.size() == POPULATION_SIZE);
 
@@ -105,16 +108,16 @@ public class pathwayEvolution
 						.getValue();
 				bestFitness = Double.isNaN(bestFitness) ? 10000 : bestFitness;
 
-//System.out.print(bestFitness + "\t");
+				// System.out.print(bestFitness + "\t");
 				sumOfSquaredShiftedFitnesses += (bestFitness - shift)
 						* (bestFitness - shift);
 				totalFitness += bestFitness;
 				totalShiftedFitness += bestFitness - shift;
-
+				// System.out.println(bestFitness);
 				if (t % 10 == 0)
 					writers.get("fitness").printf("%1.2f\t", bestFitness);
 			}
-//System.out.println();
+			// System.out.println();
 
 			if (t % 10 == 0)
 			{
@@ -202,15 +205,17 @@ public class pathwayEvolution
 
 	public static void initDataFiles(String[] args) throws IOException
 	{
-      String dataFolder = null; 
-      if(args.length > 2)
-      {
-         dataFolder = args[3] + "/";
-      }
+		String dataFolder = null;
+		if (args.length > 2)
+		{
+			dataFolder = args[3] + "/";
+		}
 
 		File path = new File(
-//				System.getProperty("user.home") + "/evo_out/" + (dataFolder == null ? "" : dataFolder) + name);
-		 "/scratch/bob/b16_henrikahl" + "/evo_out/" + (dataFolder == null ? "" : dataFolder) + name);
+				// "/home/william/b16_henrikahl" + "/evo_data/"
+				// + (dataFolder == null ? "" : dataFolder) + name);
+				"/scratch/bob/b16_henrikahl" + "/evo_out/"
+						+ (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
@@ -251,7 +256,6 @@ public class pathwayEvolution
 		simulations = new ArrayList<HashMap<Bitstring, Double>>();
 		name = encoding.toString() + "_" + scaleFunction.toString() + "_"
 				+ MUTATE_PROB;
-		name += test ? "test" : "";
 		initDataFiles(args);
 
 		// Define fitness function
@@ -263,18 +267,16 @@ public class pathwayEvolution
 			td = totalDistance(targetIntegerSet, seekerGenes);
 			return scale.applyAsDouble(td);
 		};
-		
+
 		targetIntegers = new ArrayList<ArrayList<Integer>>();
-		
-		
-		
+
 		for (int i = 0; i < SIMULATIONS; i++)
 		{
 			targetIntegers.add(new ArrayList<Integer>());
 			targetIntegerSet = targetIntegers.get(i);
-			for (int j = 0; j < GENOME_LENGTH/GENE_LENGTH; j++)
+			for (int j = 0; j < GENOME_LENGTH / GENE_LENGTH; j++)
 			{
-				targetIntegerSet.add((int) rand.nextDouble()*1024);
+				targetIntegerSet.add((int) (rand.nextDouble() * 1024));
 			}
 			simulations.add(new HashMap<Bitstring, Double>());
 
