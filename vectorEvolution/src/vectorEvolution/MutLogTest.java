@@ -92,25 +92,31 @@ public class MutLogTest
 			{
 				HashMap<Bitstring, Double> pop = simulations.get(s);
 				targetIntegerSet = targetIntegers.get(s);
+				differentIndividuals1000 += 10000;
+				differentIndividuals100 += 10000;
+				differentIndividuals50 += 10000;
+				differentIndividuals25 += 10000;
+				differentIndividuals10 += 10000;
 
 				// Mutate
-
 				HashMap<Bitstring, Double> mutStrings = new HashMap<Bitstring, Double>();
 				for (Entry<Bitstring, Double> entry : pop.entrySet())
 				{
 
-					Bitstring bb = bitMutator.mutate(entry.getKey());
+					Bitstring beforeString = entry.getKey();
+					Bitstring bb = bitMutator.mutate(beforeString);
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = scale.applyAsDouble(entry.getValue());
 
+					// Log mutation effects
 					if (before < 1000 && before > 100)
 					{
-						if ((differentIndividuals1000 += 10000) < 60000)
+						if (differentIndividuals1000 <= 50000)
 						{
 							while (nr1000 < differentIndividuals1000)
 							{
-								mutStrings.put(bb, fitness.applyDirectly(bb));
-								double after = scale.applyAsDouble(mutStrings.get(bb));
+								double after = scale.applyAsDouble(fitness
+										.applyDirectly(bitMutator.mutate(beforeString)));
 								if (after == 0 && before == after)
 								{
 									writers.get("fitness_1000_mut.dat").printf("%1.2f\n",
@@ -125,12 +131,13 @@ public class MutLogTest
 						}
 					} else if (before > 50)
 					{
-						if ((differentIndividuals100 += 10000) < 60000)
+						if (differentIndividuals100 <= 50000)
 						{
 							while (nr100 < differentIndividuals100)
 							{
-								mutStrings.put(bb, fitness.applyDirectly(bb));
-								double after = scale.applyAsDouble(mutStrings.get(bb));
+								double after = scale.applyAsDouble(fitness
+										.applyDirectly(bitMutator.mutate(beforeString)));
+
 								if (after == 0 && before == after)
 								{
 									writers.get("fitness_100_mut.dat").printf("%1.2f\n",
@@ -145,12 +152,13 @@ public class MutLogTest
 						}
 					} else if (before > 25)
 					{
-						if ((differentIndividuals50 += 10000) < 60000)
+						if (differentIndividuals50 <= 50000)
 						{
 							while (nr50 < differentIndividuals50)
 							{
-								mutStrings.put(bb, fitness.applyDirectly(bb));
-								double after = scale.applyAsDouble(mutStrings.get(bb));
+								double after = scale.applyAsDouble(fitness
+										.applyDirectly(bitMutator.mutate(beforeString)));
+
 								if (after == 0 && before == after)
 								{
 									writers.get("fitness_50_mut.dat").printf("%1.2f\n",
@@ -165,13 +173,13 @@ public class MutLogTest
 						}
 					} else if (before > 10)
 					{
-						if ((differentIndividuals25 += 10000) < 60000)
+						if (differentIndividuals25 <= 50000)
 						{
 							while (nr25 < differentIndividuals25)
 							{
+								double after = scale.applyAsDouble(fitness
+										.applyDirectly(bitMutator.mutate(beforeString)));
 
-								mutStrings.put(bb, fitness.applyDirectly(bb));
-								double after = scale.applyAsDouble(mutStrings.get(bb));
 								if (after == 0 && before == after)
 								{
 									writers.get("fitness_25_mut.dat").printf("%1.2f\n",
@@ -186,12 +194,12 @@ public class MutLogTest
 						}
 					} else
 					{
-						if ((differentIndividuals10 += 10000) < 60000)
+						if (differentIndividuals10 <= 50000)
 						{
 							while (nr10 < differentIndividuals10)
 							{
-								mutStrings.put(bb, fitness.applyDirectly(bb));
-								double after = scale.applyAsDouble(mutStrings.get(bb));
+								double after = scale.applyAsDouble(fitness
+										.applyDirectly(bitMutator.mutate(beforeString)));
 								if (after == 0 && before == after)
 								{
 									writers.get("fitness_10_mut.dat").printf("%1.2f\n",
@@ -344,20 +352,20 @@ public class MutLogTest
 		}
 
 		File path = new File(
-				// System.getProperty("user.home") + "/evo_data/"
-				// "/home/william/b16_henrikahl" + "/evo_data/"
-				// + (dataFolder == null ? "" : dataFolder) + name);
-				"/scratch/bob/b16_henrikahl" + "/evo_out/"
-						+ (dataFolder == null ? "" : dataFolder) + name);
+//				System.getProperty("user.home") + "/evo_data/"
+		// "/home/william/b16_henrikahl" + "/evo_data/"
+		// + (dataFolder == null ? "" : dataFolder) + name);
+		 "/scratch/bob/b16_henrikahl" + "/evo_out/"
+				+ (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1000_mut.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_100_mut.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_50_mut.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_25_mut.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_10_mut.dat", true))));
+		writers.put("fitness_1000_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1000_mut.dat", true))));
+		writers.put("fitness_100_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_100_mut.dat", true))));
+		writers.put("fitness_50_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_50_mut.dat", true))));
+		writers.put("fitness_25_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_25_mut.dat", true))));
+		writers.put("fitness_10_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_10_mut.dat", true))));
 				
 		writers.put("mutation", new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/mutation.dat", 	true))));
 		writers.put("stat", 		new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/stat.dat", 		true))));
