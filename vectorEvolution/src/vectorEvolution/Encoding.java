@@ -76,9 +76,9 @@ public enum Encoding
 			else if (j == 3)
 				j = 1;
 		}
-		double val = result / N;
+		double val = N == 0 ? 2000 : result / N;
 		// System.out.print(N + "\t" + Math.floor(val*100)/100 +"\t");
-		return Double.isNaN(val) ? 10000 : val;
+		return val;
 	}
 
 	public static double consensusGray(boolean[] t)
@@ -103,8 +103,8 @@ public enum Encoding
 			else if (j == 3)
 				j = 1;
 		}
-		double val = result / N;
-		return Double.isNaN(val) ? 10000 : val;
+		double val = N == 0 ? 2000 : result / N;
+		return val;
 	}
 
 	//

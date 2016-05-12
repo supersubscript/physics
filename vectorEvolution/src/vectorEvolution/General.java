@@ -27,7 +27,7 @@ public class General
 	{
 		Map<K, V> result = new LinkedHashMap<>();
 		Stream<Entry<K, V>> st = map.entrySet().stream();
-		st.sorted(Comparator.comparing(e -> scale.applyAsDouble((double) e.getValue())))
+		st.sorted(Comparator.comparing(e -> scale.applyAsDouble((Double) e.getValue())))
 				.forEachOrdered(e -> result.put(e.getKey(), e.getValue()));
 		return result;
 	}

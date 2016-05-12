@@ -56,6 +56,12 @@ public class MutLogTest
 		double sumOfSquaredShiftedScaledFitnesses = 0;
 		double totalShiftedScaledFitness = 0;
 		double scaledShift = 0;
+		int nr10 = 0;
+		int nr25 = 0;
+		int nr50 = 0;
+		int nr100 = 0;
+		int nr1000 = 0;
+		
 
 		// Evolution process
 		for (int t = 0; t < NUMBER_OF_GENERATIONS; t++)
@@ -82,20 +88,19 @@ public class MutLogTest
 			{
 				HashMap<Bitstring, Double> pop = simulations.get(s);
 				targetIntegerSet = targetIntegers.get(s);
-				// System.out.println(targetIntegerSet);
 
 				// Mutate
 				HashMap<Bitstring, Double> mutStrings = new HashMap<Bitstring, Double>();
 				for (Entry<Bitstring, Double> entry : pop.entrySet())
 				{
-					// System.out.println();
-					// double fff = fitness.applyDirectly(entry.getKey());
-					// System.out.println();
 					Bitstring bb = bitMutator.mutate(entry.getKey());
 					mutStrings.put(bb, fitness.applyDirectly(bb));
 					double before = entry.getValue();
 					double after = mutStrings.get(bb);
 
+					// Print fitness intervals here.
+					
+					
 					if (after == 0 && before == after)
 					{
 						writers.get("mutation").printf("%1.2f\t", 1.00);
@@ -242,27 +247,30 @@ public class MutLogTest
 			dataFolder = args[3] + "/";
 		}
 
-		File path = new File(System.getProperty("user.home") + "/evo_data/"
-		// "/home/william/b16_henrikahl" + "/evo_data/"
-				+ (dataFolder == null ? "" : dataFolder) + name);
-		// "/scratch/bob/b16_henrikahl" + "/evo_out/"
-		// + (dataFolder == null ? "" : dataFolder) + name);
+		File path = new File(
+				// System.getProperty("user.home") + "/evo_data/"
+				// "/home/william/b16_henrikahl" + "/evo_data/"
+				// + (dataFolder == null ? "" : dataFolder) + name);
+				"/scratch/bob/b16_henrikahl" + "/evo_out/"
+						+ (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness.dat", true))));
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1000_mut.dat", true))));
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_100_mut.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_50_mut.dat", true))));
+		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_25_mut.dat", true))));
 		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_10_mut.dat", true))));
-		writers.put("fitness", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_1_mut.dat", true))));
 				
 		writers.put("mutation", new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/mutation.dat", 	true))));
 		writers.put("stat", 		new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/stat.dat", 		true))));
 		writers.get("stat").println(
-						  "#generation" + "\t" 
-						+ "fitness" + "\t" 
-						+ "stdevfitness" + "\t"
-						+ "mutation");
+						  "#generation" 	+ "\t" 
+						+ "fitness" 		+ "\t" 
+						+ "stdevfitness" 	+ "\t"
+						+ "scaledFitness" + "\t" 
+						+ "stdevScaledFitness");
 		//@formatter:on
 	}
 
