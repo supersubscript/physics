@@ -36,7 +36,7 @@ public interface MutationOperator
 				for (int i = 0; i < b.length; i++)
 					if (rand.nextDouble() < prob)
 						b[i] = !b[i];
-				return new Bitstring(b, 0);
+				return new Bitstring(b, 0, seq.getGenes());
 			}
 		};
 	}

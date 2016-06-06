@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.DoubleUnaryOperator;
 import java.util.Random;
@@ -17,14 +18,14 @@ import java.util.TreeSet;
 public class MutLogTest
 {
 	//	@formatter:off
-	static int												SIMULATIONS					= 100;
-	static int												NUMBER_OF_GENERATIONS	= 100000;
+	static int												SIMULATIONS					= 1;
+	static int												NUMBER_OF_GENERATIONS	= 10000;
 	static int												POPULATION_SIZE			= 40;
 	static int												GENOME_LENGTH				= 100;
 	static int												GENE_LENGTH					= 10;
 	static double											MUTATE_PROB					= 1. / GENOME_LENGTH;
 	static double											CROSS_PROB					= 0.01;
-	static Encoding										encoding						= Encoding.GRAY;
+	static Encoding										encoding						= Encoding.CONSENSUS_GRAY;
 	static ScaleFunction									scaleFunction				= ScaleFunction.LINEAR;
 	static CrossoverOperator							none							= CrossoverOperator.none();
 
@@ -40,7 +41,7 @@ public class MutLogTest
 	static ArrayList<ArrayList<Integer>>			targetIntegers; 
 	static ArrayList<Integer>							targetIntegerSet;
 	static HashMap<String, PrintWriter>				writers;				
-	static ArrayList<HashMap<Bitstring, Double>>	simulations; 
+	static ArrayList<HashMap<Bitstring, Double>>	simulations;
 	static final boolean test = false; 
 	//	@formatter:on
 
@@ -50,6 +51,8 @@ public class MutLogTest
 		// Data needed for stat.dat
 		double totalFitness = 0;
 		double sumOfSquaredShiftedFitnesses = 0;
+		double totalGenes = 0;
+		double sumOfSquaredGenes = 0;
 		double totalShiftedFitness = 0;
 		double shift = 0;
 		double totalScaledFitness = 0;
@@ -66,6 +69,11 @@ public class MutLogTest
 		int differentIndividuals50 = 0;
 		int differentIndividuals100 = 0;
 		int differentIndividuals1000 = 0;
+		double prior = 0;
+		double diag = 0;
+		double horiz = 0;
+		double priorFitness = 0;
+		double[] geneArray = new double[10];
 
 		// Evolution process
 		for (int t = 0; t < NUMBER_OF_GENERATIONS; t++)
@@ -81,12 +89,16 @@ public class MutLogTest
 			totalScaledFitness = 0;
 			totalShiftedScaledFitness = 0;
 			sumOfSquaredShiftedScaledFitnesses = 0;
+			totalGenes = 0;
+			sumOfSquaredGenes = 0;
 
 			// System.out.print(t + "\t");
 			if (t % 10 == 0)
 			{
 				writers.get("fitness").print(t + "\t");
 				writers.get("mutation").print("\n" + t + "\t");
+				writers.get("genes").print("\n" + t + "\t");
+
 			}
 			for (int s = 0; s < SIMULATIONS; s++)
 			{
@@ -105,114 +117,102 @@ public class MutLogTest
 
 					Bitstring beforeString = entry.getKey();
 					Bitstring bb = bitMutator.mutate(beforeString);
-					mutStrings.put(bb, fitness.applyDirectly(bb));
+					double after = fitness.applyDirectly(bb);
+					mutStrings.put(bb, after);
+					after = scale.applyAsDouble(after);
 					double before = scale.applyAsDouble(entry.getValue());
 
 					// Log mutation effects
-					if (before < 1000 && before > 100)
-					{
-						if (differentIndividuals1000 <= 50000)
-						{
-							while (nr1000 < differentIndividuals1000)
-							{
-								double after = scale.applyAsDouble(fitness
-										.applyDirectly(bitMutator.mutate(beforeString)));
-								if (after == 0 && before == after)
-								{
-									writers.get("fitness_1000_mut.dat").printf("%1.2f\n",
-											1.00);
-								} else
-								{
-									writers.get("fitness_1000_mut.dat").printf("%1.2f\n",
-											before / after);
-								}
-								nr1000++;
-							}
-						}
-					} else if (before > 50)
-					{
-						if (differentIndividuals100 <= 50000)
-						{
-							while (nr100 < differentIndividuals100)
-							{
-								double after = scale.applyAsDouble(fitness
-										.applyDirectly(bitMutator.mutate(beforeString)));
-
-								if (after == 0 && before == after)
-								{
-									writers.get("fitness_100_mut.dat").printf("%1.2f\n",
-											1.00);
-								} else
-								{
-									writers.get("fitness_100_mut.dat").printf("%1.2f\n",
-											before / after);
-								}
-								nr100++;
-							}
-						}
-					} else if (before > 25)
-					{
-						if (differentIndividuals50 <= 50000)
-						{
-							while (nr50 < differentIndividuals50)
-							{
-								double after = scale.applyAsDouble(fitness
-										.applyDirectly(bitMutator.mutate(beforeString)));
-
-								if (after == 0 && before == after)
-								{
-									writers.get("fitness_50_mut.dat").printf("%1.2f\n",
-											1.00);
-								} else
-								{
-									writers.get("fitness_50_mut.dat").printf("%1.2f\n",
-											before / after);
-								}
-								nr50++;
-							}
-						}
-					} else if (before > 10)
-					{
-						if (differentIndividuals25 <= 50000)
-						{
-							while (nr25 < differentIndividuals25)
-							{
-								double after = scale.applyAsDouble(fitness
-										.applyDirectly(bitMutator.mutate(beforeString)));
-
-								if (after == 0 && before == after)
-								{
-									writers.get("fitness_25_mut.dat").printf("%1.2f\n",
-											1.00);
-								} else
-								{
-									writers.get("fitness_25_mut.dat").printf("%1.2f\n",
-											before / after);
-								}
-								nr25++;
-							}
-						}
-					} else
-					{
-						if (differentIndividuals10 <= 50000)
-						{
-							while (nr10 < differentIndividuals10)
-							{
-								double after = scale.applyAsDouble(fitness
-										.applyDirectly(bitMutator.mutate(beforeString)));
-								if (after == 0 && before == after)
-								{
-									writers.get("fitness_10_mut.dat").printf("%1.2f\n",
-											1.00);
-								} else
-								{
-									writers.get("fitness_10_mut.dat").printf("%1.2f\n",
-											before / after);
-								}
-								nr10++;
-							}
-						}
-					}
+					// if (after < 1000)
+					// {
+					// if (before > 1000 && after > 100)
+					// {
+					// if (differentIndividuals1000 <= 50000)
+					// {
+					// for (int iter = 0; iter < 10000; iter++)
+					// {
+					// Bitstring mutant = bitMutator.mutate(bb);
+					// differentIndividuals1000++;
+					// double mutantCost = scale
+					// .applyAsDouble(fitness.applyDirectly(mutant));
+					// if (mutantCost == 0)
+					// writers.get("fitness_1000_mut.dat").printf(
+					// "%1.2f\n", Double.POSITIVE_INFINITY);
+					// else writers.get("fitness_1000_mut.dat")
+					// .printf("%1.2f\n", before / mutantCost);
+					// }
+					// }
+					// }else if (before > 100 && after > 50 && after < 100)
+					// {
+					// if (differentIndividuals100 <= 50000)
+					// {
+					// for (int iter = 0; iter < 10000; iter++)
+					// {
+					// Bitstring mutant = bitMutator.mutate(bb);
+					// differentIndividuals100++;
+					// double mutantCost = scale
+					// .applyAsDouble(fitness.applyDirectly(mutant));
+					// if (mutantCost == 0)
+					// writers.get("fitness_100_mut.dat").printf(
+					// "%1.2f\n", Double.POSITIVE_INFINITY);
+					// else writers.get("fitness_100_mut.dat")
+					// .printf("%1.2f\n", before / mutantCost);
+					// }
+					// }
+					// }else if (before > 50 && after > 25 && after < 50)
+					// {
+					// if (differentIndividuals50 <= 50000)
+					// {
+					// for (int iter = 0; iter < 10000; iter++)
+					// {
+					// Bitstring mutant = bitMutator.mutate(bb);
+					// differentIndividuals50++;
+					// double mutantCost = scale
+					// .applyAsDouble(fitness.applyDirectly(mutant));
+					// if (mutantCost == 0)
+					// writers.get("fitness_50_mut.dat").printf(
+					// "%1.2f\n", Double.POSITIVE_INFINITY);
+					// else writers.get("fitness_50_mut.dat")
+					// .printf("%1.2f\n", before / mutantCost);
+					// }
+					// }
+					// }
+					// else if (before > 25 && after > 10 && after < 25)
+					// {
+					// if (differentIndividuals25 <= 50000)
+					// {
+					// for (int iter = 0; iter < 10000; iter++)
+					// {
+					// Bitstring mutant = bitMutator.mutate(bb);
+					// differentIndividuals25++;
+					// double mutantCost = scale
+					// .applyAsDouble(fitness.applyDirectly(mutant));
+					// if (mutantCost == 0)
+					// writers.get("fitness_25_mut.dat").printf(
+					// "%1.2f\n", Double.POSITIVE_INFINITY);
+					// else writers.get("fitness_25_mut.dat")
+					// .printf("%1.2f\n", before / mutantCost);
+					// }
+					// }
+					// }else if (before > 10 && after < 10)
+					// {
+					// if (differentIndividuals10 <= 50000)
+					// {
+					// for (int iter = 0; iter < 10000; iter++)
+					// {
+					// Bitstring mutant = bitMutator.mutate(bb);
+					// differentIndividuals10++;
+					// double mutantCost = scale
+					// .applyAsDouble(fitness.applyDirectly(mutant));
+					// if (mutantCost == 0)
+					// writers.get("fitness_10_mut.dat").printf(
+					// "%1.2f\n", Double.POSITIVE_INFINITY);
+					// else writers.get("fitness_10_mut.dat")
+					// .printf("%1.2f\n", before / mutantCost);
+					// }
+					// }
+					// }
+					// }
 				}
 
 				pop.putAll(mutStrings);
@@ -224,34 +224,75 @@ public class MutLogTest
 				simulations.set(s, pop);
 				assert (pop.size() == POPULATION_SIZE);
 
+				Entry<Bitstring, Double> best = pop.entrySet().stream()
+						.min((e1, e2) -> Double.compare(
+								scale.applyAsDouble((double) (e1.getValue())),
+								scale.applyAsDouble((double) (e2.getValue()))))
+						.get();
 				double bestFitness = pop.entrySet().stream()
 						.min((e1, e2) -> Double.compare(
 								scale.applyAsDouble((double) (e1.getValue())),
 								scale.applyAsDouble((double) (e2.getValue()))))
 						.get().getValue();
 
-				bestFitness = Double.isNaN(bestFitness) ? 2000 : bestFitness;
-				double scaledBestFitness = Double.isNaN(bestFitness) ? 2000
+				bestFitness = Double.isNaN(bestFitness) ? 10000 : bestFitness;
+				double scaledBestFitness = Double.isNaN(bestFitness) ? 10000
 						: scale.applyAsDouble(bestFitness);
+
+				// for (Map.Entry<Bitstring, Double> b : pop.entrySet())
+				// {
+				// System.out.print(b.getKey().getGenes() +"\t");
+				// }
+				// System.out.println();
 
 				// System.out.print(bestFitness + "\t");
 				sumOfSquaredShiftedFitnesses += (bestFitness - shift)
 						* (bestFitness - shift);
 				totalFitness += bestFitness;
-				totalShiftedFitness += bestFitness - shift;
+				ArrayList<Bitstring> strrr = best.getKey().split(GENE_LENGTH);
+				double genes = 0;
+				boolean lol = true;
+				System.out.print(t + "\t");
+				int lll = 0;
+				for (Bitstring b : strrr)
+				{
+					genes += b.getGenes();
+					if (geneArray[lll] != b.getGenes())
+					{
+						lol = false;
+					}
+					geneArray[lll] = b.getGenes();
+					lll++;
+				}
+				System.out.println(genes + "\t" + bestFitness);
+				if (bestFitness < priorFitness && genes == prior && !lol)
+				{
+					horiz++;
+				} else if (bestFitness < priorFitness)
+					diag++;
+				priorFitness = bestFitness;
+				prior = genes;
+				genes /= 10.;
+				if (bestFitness == 0)
+					System.out.println("horizontal:" + horiz / (horiz + diag));
 
+				totalGenes += genes;
+				sumOfSquaredGenes += (genes) * (genes);
+
+				totalShiftedFitness += bestFitness - shift;
+				// System.out.print(genes + "\t");
 				// Sum over scaled variants
 				sumOfSquaredShiftedScaledFitnesses += (scaledBestFitness
 						- scaledShift) * (scaledBestFitness - scaledShift);
 				totalScaledFitness += scaledBestFitness;
 				totalShiftedScaledFitness += scaledBestFitness - scaledShift;
-
 				// System.out.println(bestFitness);
 				if (t % 10 == 0)
 				{
 					writers.get("fitness").printf("%1.2f\t", bestFitness);
 				}
 			}
+			// System.out.println();
 			// System.out.println();
 
 			if (t % 10 == 0)
@@ -267,11 +308,19 @@ public class MutLogTest
 								+ Math.sqrt((sumOfSquaredShiftedScaledFitnesses
 										- totalShiftedScaledFitness
 												* totalShiftedScaledFitness / SIMULATIONS)
-										/ (SIMULATIONS - 1) / SIMULATIONS));
+										/ (SIMULATIONS - 1) / SIMULATIONS)
+
+								+ "\t" + totalGenes / SIMULATIONS + "\t"
+								+ Math.sqrt((sumOfSquaredGenes
+										- totalGenes * totalGenes / SIMULATIONS)
+										/ (SIMULATIONS - 1) / SIMULATIONS)
+
+				);
 			}
 		}
 		// Close printer streams
 		writers.entrySet().stream().forEach(s -> s.getValue().close());
+
 	}
 
 	/*
@@ -352,11 +401,11 @@ public class MutLogTest
 		}
 
 		File path = new File(
-//				System.getProperty("user.home") + "/evo_data/"
-		// "/home/william/b16_henrikahl" + "/evo_data/"
-		// + (dataFolder == null ? "" : dataFolder) + name);
-		 "/scratch/bob/b16_henrikahl" + "/evo_out/"
-				+ (dataFolder == null ? "" : dataFolder) + name);
+				// System.getProperty("user.home") + "/evo_data/"
+				// "/home/william/b16_henrikahl" + "/evo_data/"
+				// + (dataFolder == null ? "" : dataFolder) + name);
+				"/scratch/bob/b16_henrikahl" + "/evo_out/"
+						+ (dataFolder == null ? "" : dataFolder) + name);
 		path.mkdirs();
 
 		//@formatter:off
@@ -366,7 +415,8 @@ public class MutLogTest
 		writers.put("fitness_50_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_50_mut.dat", true))));
 		writers.put("fitness_25_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_25_mut.dat", true))));
 		writers.put("fitness_10_mut.dat", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/fitness_10_mut.dat", true))));
-				
+		writers.put("genes", 	new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/genes.dat", true))));
+					
 		writers.put("mutation", new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/mutation.dat", 	true))));
 		writers.put("stat", 		new PrintWriter(new BufferedWriter(new FileWriter(path.getAbsolutePath() + "/stat.dat", 		true))));
 		writers.get("stat").println(
@@ -413,7 +463,7 @@ public class MutLogTest
 			double td = 0;
 			ArrayList<Bitstring> seekerGenes = o.split(GENE_LENGTH);
 			td = totalDistance(targetIntegerSet, seekerGenes);
-			return scale.applyAsDouble(td);
+			return td;
 		};
 
 		targetIntegers = new ArrayList<ArrayList<Integer>>();

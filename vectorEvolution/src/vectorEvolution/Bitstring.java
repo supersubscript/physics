@@ -9,6 +9,7 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 	static private final Random	rand	= new Random();
 	private boolean[]					t;
 	private double						value;
+	private int genes = 0; 
 
 	// Initializes Bitstring with specified length
 	public Bitstring(int len)
@@ -16,42 +17,48 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 		this.t = new boolean[len];
 		for (int i = 0; i < t.length; i++)
 			this.t[i] = rand.nextBoolean();
-		this.value = pathwayEvolution.encoding.value(this.t);
+		Pair<Double, Integer> vals = MutLogTest.encoding.value(this.t);
+		this.value = vals.getElement0();
+		this.genes = vals.getElement1();
 	}
 
 	// Initializes bitstring with given sequence
-	public Bitstring(String sequence)
-	{
-		char[] seq = sequence.toCharArray();
-		t = new boolean[seq.length];
-		for (int i = 0; i < t.length; i++)
-			if (seq[i] == '1')
-				t[i] = true;
-	}
+//	public Bitstring(String sequence)
+//	{
+//		char[] seq = sequence.toCharArray();
+//		t = new boolean[seq.length];
+//		for (int i = 0; i < t.length; i++)
+//			if (seq[i] == '1')
+//				t[i] = true;
+//	}
 
 	// Initializes bitstring with given sequence
 	public Bitstring(boolean[] t)
 	{
 		this.t = t;
-		this.value = pathwayEvolution.encoding.value(this.t);
+		Pair<Double, Integer> vals = MutLogTest.encoding.value(this.t);
+		this.value = vals.getElement0();
+		this.genes = vals.getElement1();
 	}
 
-	public Bitstring(boolean[] t, double value)
+	public Bitstring(boolean[] t, double value, int genes)
 	{
 		this.t = t;
 		this.value = value;
+		this.genes = genes;
 	}
 
 	@Override
 	public Bitstring clone()
 	{
-		return new Bitstring(Arrays.copyOf(this.t, this.t.length), this.value);
+		return new Bitstring(Arrays.copyOf(this.t, this.t.length), this.value, this.genes);
 	}
 
 	public Bitstring(Bitstring b)
 	{
 		this.t = b.clone().getSequence();
 		this.value = b.getValue();
+		this.genes = b.getGenes();
 	}
 
 	public boolean[] getSequence()
@@ -132,7 +139,6 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 		}
 		return temp;
 	}
-	
 
 	/* Retrieve a subsequence of a Bitstring. */
 	public static Bitstring subsequence(Bitstring b, int from, int to)
@@ -181,19 +187,26 @@ public class Bitstring extends Organism implements Comparable<Bitstring>
 	public static void main(String[] args)
 	{
 
-//		Bitstring a = new Bitstring("1111");
-//		Bitstring b = new Bitstring("1111");
-		
-	
-//		System.out.println(a.equals(b));
+		// Bitstring a = new Bitstring("1111");
+		// Bitstring b = new Bitstring("1111");
+
+		// System.out.println(a.equals(b));
 
 	}
 
-	
-	
 	@Override
 	public int compareTo(Bitstring o)
 	{
 		return (int) (this.value - o.getValue());
+	}
+
+	public int getGenes()
+	{
+		return genes;
+	}
+
+	public void setGenes(int genes)
+	{
+		this.genes = genes;
 	}
 }

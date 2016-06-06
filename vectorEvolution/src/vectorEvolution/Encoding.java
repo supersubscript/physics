@@ -6,18 +6,18 @@ public enum Encoding
 {
 	GRAY, BINARY, CONSENSUS_BINARY, CONSENSUS_GRAY;
 
-	public double value(boolean[] a)
+	public Pair<Double, Integer> value(boolean[] t)
 	{
 		switch (this)
 		{
-		case GRAY:
-			return gray(a);
-		case BINARY:
-			return binary(a);
+//		case GRAY:
+//			return gray(b.getSequence());
+//		case BINARY:
+//			return binary(b.getSequence());
 		case CONSENSUS_BINARY:
-			return consensusBinary(a);
+			return consensusBinary(t);
 		case CONSENSUS_GRAY:
-			return consensusGray(a);
+			return consensusGray(t);
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -54,7 +54,7 @@ public enum Encoding
 	static final double		length			= startSequence.length;
 	static final int			geneLength		= 10;
 
-	public static double consensusBinary(boolean[] t)
+	public static Pair<Double, Integer> consensusBinary(boolean[] t)
 	{
 		assert (t.length > length + geneLength);
 
@@ -76,13 +76,14 @@ public enum Encoding
 			else if (j == 3)
 				j = 1;
 		}
-		double val = N == 0 ? 2000 : result / N;
+		double val = N == 0 ? 2000 : Math.rint(result / N);
+		
 		// System.out.print(N + "\t" + Math.floor(val*100)/100 +"\t");
-		return val;
+		return new Pair<Double, Integer>(val, N);
 	}
 
-	public static double consensusGray(boolean[] t)
-	{
+	public static Pair<Double, Integer> consensusGray(boolean[] t)
+	{		
 		assert (t.length > length + geneLength);
 
 		double result = 0;
@@ -103,38 +104,39 @@ public enum Encoding
 			else if (j == 3)
 				j = 1;
 		}
-		double val = N == 0 ? 2000 : result / N;
-		return val;
+		
+		double val = N == 0 ? 2000 : Math.rint(result / N);
+		return new Pair<Double, Integer>(val, N);
 	}
 
 	//
-	public static void main(String[] args)
-	{
-		Bitstring t = new Bitstring(new boolean[] { false, true });
-		Bitstring tt = new Bitstring(new boolean[] { true, false });
-		//
-		// Bitstring bb = new Bitstring(
-		// "000110011000100111111101010000001111110000000");
-		// Bitstring bin = new Bitstring("0001001111");
-		// //
-		// System.out.println(binary(bin.getSequence()));
-		// System.out.println(consensusBinary(bb.getSequence()));
-		//
-		System.out.println(t + "\t" + tt);
-		System.out.println("binary\t" + binary(t.getSequence()) + "\t"
-				+ binary(tt.getSequence()));
-		System.out.println(
-				"gray\t" + gray(t.getSequence()) + "\t" + gray(tt.getSequence()));
-
-		// System.out.println("gray\t" + gray(t) + "\t" + gray(tt));
-		// // Encoding er = Encoding.BINARY;
-		// // Encoding ee = Encoding.GRAY;
-		// // System.out.println("bindist\t" + er.distance(t, tt));
-		// // System.out.println("gdist\t" + ee.distance(t, tt));
-		// // System.out.println("bindist\t" + er.signDistance(t, tt));
-		// // System.out.println("gdist\t" + ee.signDistance(t, tt));
-		//
-		// System.out.println(BitInterpreter.embeddedBinary(t, (short) 4));
-	}
+//	public static void main(String[] args)
+//	{
+//		Bitstring t = new Bitstring(new boolean[] { false, true });
+//		Bitstring tt = new Bitstring(new boolean[] { true, false });
+//		//
+//		// Bitstring bb = new Bitstring(
+//		// "000110011000100111111101010000001111110000000");
+//		// Bitstring bin = new Bitstring("0001001111");
+//		// //
+//		// System.out.println(binary(bin.getSequence()));
+//		// System.out.println(consensusBinary(bb.getSequence()));
+//		//
+//		System.out.println(t + "\t" + tt);
+//		System.out.println("binary\t" + binary(t.getSequence()) + "\t"
+//				+ binary(tt.getSequence()));
+//		System.out.println(
+//				"gray\t" + gray(t.getSequence()) + "\t" + gray(tt.getSequence()));
+//
+//		// System.out.println("gray\t" + gray(t) + "\t" + gray(tt));
+//		// // Encoding er = Encoding.BINARY;
+//		// // Encoding ee = Encoding.GRAY;
+//		// // System.out.println("bindist\t" + er.distance(t, tt));
+//		// // System.out.println("gdist\t" + ee.distance(t, tt));
+//		// // System.out.println("bindist\t" + er.signDistance(t, tt));
+//		// // System.out.println("gdist\t" + ee.signDistance(t, tt));
+//		//
+//		// System.out.println(BitInterpreter.embeddedBinary(t, (short) 4));
+//	}
 
 }

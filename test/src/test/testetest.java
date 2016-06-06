@@ -8,6 +8,9 @@ public class testetest
 	
 	public static void main(String[] args)
 	{
+		
+		System.out.printf(
+				"%1.2f\n", Double.POSITIVE_INFINITY);
 		//		Random rand = new Random(); 
 //		for (int i = 0; i < b.length; i++)
 //		{
