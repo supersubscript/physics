@@ -1,0 +1,222 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+import javax.swing.JFrame;
+
+/* Code for simulating competitive ant colonization throughout a modeled 
+ * forest. Ants can be part of either of two species, each with different 
+ * values in the likelihood to move and the potential to kill enemy ants. */
+public class Forest
+{
+   private Random rand = new Random();
+
+   private static Square[][] squares;
+   private static ArrayList<Food> food = new ArrayList<Food>();
+   private static ArrayList<Anthill> anthills = new ArrayList<Anthill>();
+
+   public static void main(String[] args)
+   {
+      Forest forr = new Forest();
+      forr.initialize();
+      int iterations = Common.ITERATIONS;
+      JFrame frame = new JFrame();
+
+      // Sets frame resolution and other parameters.
+      frame.setSize(Common.FRAMESIZE, Common.FRAMESIZE);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      AntPanel panel = new AntPanel(frame.getWidth(), frame.getHeight());
+      frame.getContentPane().add(panel);
+      frame.setVisible(true);
+      frame.setResizable(false);
+
+      // Run, forest -- run!
+      while (iterations-- > 0)
+      {
+         panel.update(squares, food, anthills);
+         frame.getContentPane().validate();
+         frame.getContentPane().repaint();
+         int spHill = 0, brHill = 0; 
+         
+         for(Anthill hill : anthills)
+            if (hill.getType() == SpeedAnt.INDEX)
+               spHill++;
+            else brHill++;
+         
+         System.out.print(Common.ITERATIONS  - iterations + "\t" + spHill + "\t" + brHill + "\t");
+         forr.timeStep();
+      }
+   }
+
+   // Take a step in time
+   public void timeStep()
+   {
+      int totSp = 0;
+      int totBr = 0;
+
+      try
+      {
+         Thread.sleep(0);
+      } catch (InterruptedException e)
+      {
+         e.printStackTrace();
+      }
+
+      // Add/increment stacks of food by given chance
+      if (rand.nextDouble() < Common.FOODCHANCE)
+         addFood();
+
+      // Resolve combats due to ants of different types on same squares
+      for (int i = 0; i < squares.length; i++)
+         for (int j = 0; j < squares[0].length; j++)
+         {
+            totSp += squares[i][j].sumAnts(0);
+            totBr += squares[i][j].sumAnts(1);
+            squares[i][j].combat();
+         }
+      System.out.println(totSp + "\t" + totBr);
+      moveAnts();
+      getFood();
+      updateAnthills();
+   }
+
+   // Randomize number of stacks, position and amount of food
+   public boolean addFood()
+   {
+      for (int i = 0; i < 1 + rand.nextInt(Common.FOODSTACKS); i++)
+      {
+         int x = rand.nextInt(squares.length);
+         int y = rand.nextInt(squares.length);
+
+         // Check if position already occupied
+         for (Food f : food)
+         {
+            if (f.getX() == x && f.getY() == y)
+            {
+               f.setAmt(f.getAmt() + rand.nextInt(Common.FOODSTACKSIZE));
+               return true;
+            }
+         }
+         food.add(new Food(x, y, rand.nextInt(Common.FOODSTACKSIZE)));
+         return true;
+      }
+      return false;
+   } 
+
+   // Migrate anthills if enough food
+   public void updateAnthills()
+   {
+      ArrayList<Anthill> temp = new ArrayList<Anthill>();
+      for (Anthill hill : anthills)
+      {
+         // Leave off food at home
+         dropFood(hill);
+         // Generate new ants
+         squares[hill.getX()][hill.getY()].addAnts(hill.getType(), 0,
+               Common.ANTGENERATION);
+
+         // If enough food and not too many anthills already
+         if (hill.getFood() > Common.MIGRATE_LIMIT
+               && anthills.size() <= Common.ANTHILL_LIMIT)
+         {
+            int x, y;
+            // Randomize new location
+            while (true)
+            {
+               x = hill.getX() - Common.ANTHILLDIST / 2
+                     + rand.nextInt(Common.ANTHILLDIST);
+               y = hill.getY() - Common.ANTHILLDIST / 2
+                     + rand.nextInt(Common.ANTHILLDIST);
+               if ((x >= 0 && x < squares.length) && y >= 0
+                     && y < squares[0].length)
+                  break;
+
+            }
+            // Add new anthill to list
+            temp.add(new Anthill(x, y, hill.getType()));
+            // Remove food from hill
+            hill.nullFood();
+            // Add new ants to anhill
+            squares[x][y].addAnts(hill.getType(), 0, Common.NEWANTHILLPOP);
+         }
+      }
+      anthills.addAll(temp);
+   }
+
+   // Check all food occupied squares and distribute food amongst present ants
+   public void getFood()
+   {
+      ArrayList<Food> foodCopy = new ArrayList<Food>();
+      Iterator<Food> i = food.iterator();
+      while (i.hasNext())
+      {
+         Food f = i.next();
+         f.setAmt(squares[f.getX()][f.getY()].getFood(f.getAmt()));
+         if (f.getAmt() < 1)
+            foodCopy.add(f);
+      }
+      food.removeAll(foodCopy);
+   }
+
+   // Initialize Forest
+   public void initialize()
+   {
+      squares = new Square[Common.MATRIXSIZE][Common.MATRIXSIZE];
+      for (int i = 0; i < squares.length; i++)
+         for (int j = 0; j < squares[0].length; j++)
+            squares[i][j] = new Square();
+
+      // Initialize anthills in opposing quadrants
+      anthills.add(new Anthill(
+            Common.MATRIXSIZE / 2 + rand.nextInt(Common.MATRIXSIZE / 2),
+            Common.MATRIXSIZE / 2 + rand.nextInt(Common.MATRIXSIZE / 2),
+            BruteAnt.INDEX));
+      anthills.add(new Anthill(rand.nextInt(Common.MATRIXSIZE / 2),
+            rand.nextInt(Common.MATRIXSIZE / 2), SpeedAnt.INDEX));
+
+      // Loop if we want to add extra ...
+      // Add starting ants to anthill
+      for (Anthill hill : anthills)
+         squares[hill.getX()][hill.getY()].anthillInit(hill.getType());
+
+      // Must start with some food, or we get silly dynamics
+      addFood();
+   }
+
+   // Loop through squares and move ants in directions udlr
+   public void moveAnts()
+   {
+      for (int i = 0; i < squares.length; i++)
+         for (int j = 0; j < squares[0].length; j++)
+         {
+            Square sq = squares[i][j];
+            int[][][] transfer = sq.move(food, anthills, i, j);
+
+            // Move ants while accounting for boundaries
+            if (j != squares.length - 1)
+               sq.transferAnts(squares[i][j + 1], transfer[0]);
+            if (j != 0)
+               sq.transferAnts(squares[i][j - 1], transfer[1]);
+            if (i != 0)
+               sq.transferAnts(squares[i - 1][j], transfer[2]);
+            if (i != squares[0].length - 1)
+               sq.transferAnts(squares[i + 1][j], transfer[3]);
+         }
+   }
+
+   public void dropFood(Anthill hill)
+   {
+      // Number of ants with food that should be dropped
+      int x = hill.getX();
+      int y = hill.getY();
+
+      int amt = squares[x][y].getAnts()[hill.getType()][1];
+
+      // Subtracts amt ants from ants with food
+      squares[x][y].addAnts(hill.getType(), 1, -amt);
+      // Adds amt ants to ants without food
+      squares[x][y].addAnts(hill.getType(), 0, amt);
+
+      hill.addFood(amt);
+   }
+
+}

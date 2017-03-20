@@ -1,0 +1,9 @@
+public class Settings
+{
+   private static final double FOODBIAS = 0.01;
+   private static final int MATRIXSIZE = 100;
+   private static final int FRAMESIZE = 1000;
+   private static int sqSize = FRAMESIZE / MATRIXSIZE;   
+   
+   
+}

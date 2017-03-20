@@ -1,0 +1,15 @@
+set t epslatex size 6,3 
+set xtics
+set format y "%.2f"
+set output "start.tex"
+set style data histogram
+set style histogram cluster gap 1.2
+set ylabel "Infected people per week [M]" 
+set xlabel "Country of initial occurrence" offset 0,-1
+set xtic font "Computer Modern, 11" rotate by -90 
+set boxwidth 0.8
+set yrange [8.3:8.4]
+set ytics .02 
+unset grid
+plot 'startcountry.dat' u (column(0)):2:xtic(1) w boxes noti
+set output

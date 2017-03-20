@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename method &apos;Forest.migrateAnthills()&apos; to &apos;updateAnthills&apos;&#x0A;- Original project: &apos;AntCol&apos;&#x0A;- Original element: &apos;Forest.migrateAnthills()&apos;&#x0A;- Renamed element: &apos;Forest.updateAnthills()&apos;&#x0A;- Update references to refactored element" delegate="false" deprecate="false" description="Rename method &apos;migrateAnthills&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.method" input="/src&lt;{Forest.java[Forest~migrateAnthills" name="updateAnthills" references="true" stamp="1443960488547" version="1.0"/>
+</session>

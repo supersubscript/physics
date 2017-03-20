@@ -1,0 +1,40 @@
+set terminal epslatex 
+
+#set xlabel 'material anisotropy'
+#set ylabel 'stress anisotropy'
+#set zlabel 'cos(angle(stress,strain))'
+
+file='enzyme_low'
+datafile=file.".dat"
+graph=file.".tex"
+
+#maxtime=400
+#maxcells=20
+#maxcons=0.12
+
+#set xrange [0:maxtime]        # Sets the range of the graph
+#set yrange [0:maxcells] 
+#set zrange [1400:2600] 
+set grid
+set output graph
+#set ztics 0,0.5,1
+#set xtics 1,1,5
+#set cbtics 0,0.5,1
+
+set xlabel "Time"
+set ylabel "Concentration"
+set format y "%0.2f"
+set key nobox opaque
+set ytics .1
+set xtics 2
+
+#set pm3d 
+#set view map
+#splot datafile using ((($1)+40)/40):3:5 title 'cos(stress,strain)' pt 1 ps 0.0
+#splot datafile using ((($1)+40)/40):((10-abs($2))/10):5 title 'cos(stress,strain)' pt 1 ps 0.0
+
+plot datafile u 2:4 w lp pi 5 t 'A', datafile u 2:5 w lp pi 5 lt 2 t 'B', datafile u 2:6 w l t 'E'
+
+set o
+
+#splot datafile using 2:3:5  pt 1 ps 0.0

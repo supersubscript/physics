@@ -1,0 +1,13 @@
+public class Settings
+{
+   public static final int ITERATIONS = 100000;
+   public static final int MATRIXSIZE = 50;
+   public static final int FRAMESIZE = 1000;
+   public static final int SQSIZE = FRAMESIZE / MATRIXSIZE;
+   public static final int ANTHILLDIST = 40 ;
+   public static final int FOODMEAN = 400;
+   public static final double FOODBIAS = 0.006;
+   public static final double HOMEBIAS = 0.5;
+   public static final double COMBATCONST = 0.001;
+   public static final double FOODCHANCE = 1/20.;
+}

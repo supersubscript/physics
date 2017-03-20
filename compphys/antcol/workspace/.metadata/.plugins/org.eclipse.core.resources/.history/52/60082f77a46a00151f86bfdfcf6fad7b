@@ -1,0 +1,230 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Square
+{
+   // Row: type
+   // Column: no food / has food
+   private int[][] ants = new int[2][2];
+   Random rand = new Random();
+
+   // Initialize square with zero ants
+   public Square()
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+            ants[i][j] = 0;
+   }
+
+   // Initialize square with ant matrix
+   public Square(int[][] ants)
+   {
+      this.ants = ants;
+   }
+
+   public void addAnts(int i, int j, int amt)
+   {
+      ants[i][j] += amt;
+   }
+
+   public void anthillInit(int type)
+   {
+      ants[type][0] = Common.ANTHILLANTS;
+   }
+
+   // Let ants not carrying food on a select square fight
+   public void combat()
+   {
+      int[] totalAntStr = { ants[0][0] * SpeedAnt.STR,
+            ants[1][0] * BruteAnt.STR };
+
+      if (totalAntStr[0] > 0 && totalAntStr[1] > 0)
+      {
+         double[] kills = { -1, -1 };
+
+         // Take number of kills from non-negative normal distribution
+         for (int j = 0; j < kills.length; j++)
+            while (kills[j] < 0) // Only take positive values
+               kills[j] = Common.COMBATCONST
+                     * (rand.nextGaussian() * Math.sqrt(totalAntStr[j])
+                           + totalAntStr[j]);
+
+         // Kill ants w/ and wo/ food fractionally. Food is lost upon kill.
+         for (int i = 0; i < ants.length; i++)
+         {
+            int temp = ants[i][0] + ants[i][1];
+            if (temp == 0)
+               System.out.println("LOLOLOLOL"   );
+            for (int j = 0; j < ants[i].length; j++)
+            {
+               ants[i][j] -= kills[(i + 1) % 2] * ants[i][j] / temp;
+               // No negative ants plz
+               if (ants[i][j] < 0)
+                  ants[i][j] = 0;
+            }
+
+         }
+      }
+   }
+
+   // Summarize total number of ants in square
+   public int sumAnts(int type)
+   {
+      int temp = 0;
+      for (int j = 0; j < ants[type].length; j++)
+         temp += ants[type][j];
+      return temp;
+   }
+
+   public int[][] getAnts()
+   {
+      return ants;
+   }
+
+   // Gives out food to unfed ants proportionally, and returns new food stock at
+   // location.
+   public int getFood(int food)
+   {
+      int unfed = ants[0][0] + ants[1][0];
+      if (unfed == 0)
+         return food;
+      if (food >= unfed)
+      {
+         ants[0][1] += ants[0][0];
+         ants[0][0] = 0;
+         ants[1][1] += ants[1][0];
+         ants[1][0] = 0;
+         return food - unfed;
+      }
+      // Categorizes ants according to available food.
+      // Logic: ants[i][(1 or 0)] (+ or -)= ants[i][0] / unfed * food;
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+            ants[i][(j + 1) % 2] += Math.pow(-1, j + 1) * ants[i][0] / unfed
+                  * food;
+      return 0; // No food left. :(
+   }
+
+   // Transfers ants from one square to another.
+   public void transferAnts(Square sq, int[][] tr)
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            ants[i][j] -= tr[i][j];
+            if (ants[i][j] < 0)
+               System.out.println(ants[i][j]);
+            sq.addAnts(i, j, tr[i][j]);
+         }
+   }
+
+   // Returns number of travelers of different groups, where first column is
+   // square in direction u/d/l/r. Calculates inclination to walk in certain
+   // direction based on positions of food (if the ants don't already carry any)
+   // or friendly anthills (if the ants carry food). Distance is based on a
+   // Pythagorean measure.
+   public int[][][] move(ArrayList<Food> food, ArrayList<Anthill> anthills,
+         int x, int y)
+
+   {
+      int[][][] directions = new int[4][2][2]; 
+      
+      
+      
+      // Return matrix
+      double speed;
+
+      for (int i = 0; i < ants.length; i++)
+      {
+         if (i == SpeedAnt.INDEX)
+            speed = SpeedAnt.SPEED;
+         else
+            speed = BruteAnt.SPEED;
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            for (int l = 0; l < ants[i][j]; l++)
+            {
+               // The higher the value of the direction, the more likely the ant
+               // is to move in that direction
+               double udlrn[] = { speed, speed, speed, speed,
+                     Common.NOTHING_DIR / speed }; // Move dirs
+               ArrayList list = (j == 0) ? food : anthills;
+
+               for (Object obj : list)
+               {
+                  double rx, ry;
+                  if (list == anthills)
+                  {
+                     if (((Anthill) obj).getType() == i)
+                     {
+                        rx = ((Anthill) obj).getX() - x;
+                        ry = ((Anthill) obj).getY() - y;
+                     } else
+                        continue;
+                  } else
+                  {
+                     rx = ((Food) obj).getX() - x;
+                     ry = ((Food) obj).getY() - y;
+                  }
+
+                  // Move according to whether we have food or not
+                  if (rx * rx + ry * ry != 0)
+                  {
+                     double add = list == anthills ? speed * Common.HOMEBIAS
+                           / Math.sqrt((rx * rx + ry * ry) * (rx * rx + ry * ry)
+                                 * (rx * rx + ry * ry))
+                           : speed * Common.FOODBIAS * ((Food) obj).getAmt()
+                                 / Math.sqrt(
+                                       (rx * rx + ry * ry) * (rx * rx + ry * ry)
+                                             * (rx * rx + ry * ry));
+
+                     // Add direction bias
+                     if (ry > 0)
+                        udlrn[0] += add * ry;
+                     else if (ry < 0)
+                        udlrn[1] += add * -ry;
+                     if (rx < 0)
+                        udlrn[2] += add * -rx;
+                     else if (rx > 0)
+                        udlrn[3] += add * rx;
+                  }
+               }
+
+               // Don't go out of limits
+               if (y == Common.MATRIXSIZE - 1)
+                  udlrn[0] = 0;
+               if (y == 0)
+                  udlrn[1] = 0;
+               if (x == 0)
+                  udlrn[2] = 0;
+               if (x == Common.MATRIXSIZE - 1)
+                  udlrn[3] = 0;
+
+               // Sum for normalizing
+               double sum = udlrn[0] + udlrn[1] + udlrn[2] + udlrn[3]
+                     + udlrn[4];
+
+               // Normalize walk bias
+               for (int k = 0; k < udlrn.length - 1; k++)
+                  udlrn[k] /= sum;
+
+               double R = rand.nextDouble();
+
+               // Randomize direction!
+               double chanceSum = 0;
+               for (int k = 0; k < udlrn.length - 1; k++)
+               {
+                  chanceSum += udlrn[k];
+                  if (R < chanceSum)
+                  {
+                     directions[k][i][j]++;
+                     break;
+                  }
+               }
+            }
+         }
+      }
+      return directions;
+   }
+}

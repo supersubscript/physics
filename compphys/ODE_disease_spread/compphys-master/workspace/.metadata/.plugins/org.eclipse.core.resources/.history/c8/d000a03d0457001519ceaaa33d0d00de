@@ -1,0 +1,27 @@
+//import java.util.ArrayList;
+
+public class Network {
+	private ArrayList<Node> nodess; 
+	private Node[] nodes;
+	private double[][] commute;
+
+	public Network() {
+	}
+
+	public Node[] getNodes(){
+		return nodes;
+	}
+	
+	public void setNodes(Node[] nodes) {
+		this.nodes = nodes;
+	}
+
+	public double[][] getCommute(){
+		return commute;
+	}
+	
+	public void setCommute(double[][] commute) {
+		this.commute = commute;
+	}
+	
+}

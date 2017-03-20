@@ -1,0 +1,181 @@
+import java.util.ArrayList;
+import java.util.Random; 
+
+public class Square
+{
+   // Row: type
+   // Column: no food / has food
+   private int[][] ants = new int[2][2];
+
+   public Square()
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+            ants[i][j] = 0;
+   }
+
+   public Square(int[][] ants)
+   {
+      this.ants = ants;
+   }
+
+   public void addAnts(int i, int j, int amt)
+   {
+      ants[i][j] += amt;
+   }
+
+   public void anthillInit(int type)
+   {
+      ants[type][0] = 2000;
+   }
+
+   public void combat()
+   {
+      if (ants[0][0] + ants[0][1] != 0 && ants[1][0] + ants[1][1] != 0)
+      {
+         int first = rand.nextGaussian();
+         
+         
+      
+      
+      }
+   }
+
+   public int sumAnts()
+   {
+      int temp = 0;
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants.length; j++)
+            temp += ants[i][j];
+      return temp;
+   }
+
+   public int[][] getAnts()
+   {
+      return ants;
+   }
+
+   public int getFood(int food)
+   {
+      int newFood = food;
+      double unfed = ants[0][0] + ants[1][0];
+      int temp = (int) (food * ants[0][0] / unfed);
+      ants[0][0] -= temp;
+      ants[0][1] += temp;
+      newFood -= temp;
+      temp = (int) (food * ants[1][0] / unfed);
+      ants[1][0] -= temp;
+      ants[1][1] += temp;
+      return newFood - temp;
+
+   }
+
+   // Fix so that both add/sub uses methods?
+   public void transferAnts(Square sq, int[][] tr)
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            ants[i][j] -= tr[i][j];
+            sq.addAnts(i, j, tr[i][j]);
+         }
+   }
+
+   // Returns number of travelers of different groups, where first column is
+   // square in dir u/d/l/r
+   public int[][][] move(ArrayList<Food> food, ArrayList<Anthill> anthills,
+         double fb, int x, int y)
+
+   {
+      double origFoodBias = fb; // saves away food bias for later use
+      double homeBias = .4;
+      int[][][] temp = new int[4][2][2]; // return matrix
+      int speed;
+      for (int i = 0; i < ants.length; i++)
+      {
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            for (int l = 0; l < ants[i][j]; l++)
+            {
+               if (i == SpeedAnt.INDEX)
+                  speed = SpeedAnt.SPEED;
+               else
+                  speed = BruteAnt.SPEED;
+               if (l == 1)
+                  fb = 0;
+               else
+                  fb = origFoodBias;
+               // the higher the value of the direction, the more likely the ant
+               // is to move in that direction
+               // TODO: Make array?
+               double up = speed, down = speed, left = speed, right = speed,
+                     nothing = 1;
+
+               // Going home?
+               if (l == 1)
+               {
+                  for (Anthill hill : anthills)
+                  {
+                     if (hill.getType() == i)
+                     {
+                        int rx = hill.getX() - x;
+                        int ry = hill.getY() - y;
+
+                        if (rx > 0)
+                           right += homeBias / (rx * rx);
+                        else if (rx < 0)
+                           left += homeBias / (rx * rx);
+                        if (ry > 0)
+                           up += homeBias / (ry * ry);
+                        else if (ry < 0)
+                           down += homeBias / (ry * ry);
+                     }
+                  }
+               }
+               // Or going for food?
+               else
+               {
+
+                  for (int k = 0; k < food.size(); k++)
+                  {
+                     // Gets are costly ...
+                     Food f = food.get(k);
+                     double add = fb * f.getAmt(); // nicer code
+                     int rx = f.getX() - x;
+                     int ry = f.getY() - y;
+                     // X dist
+                     if (rx > 0)
+                        right += add / (rx * rx);
+                     else if (rx < 0)
+                        left += add / (rx * rx);
+                     // Y dist
+                     if (ry > 0)
+                        up += add / (ry * ry);
+                     else if (ry < 0)
+                        down += add / (ry * ry);
+                  }
+               }
+               double sum = up + down + left + right + nothing;
+               up /= sum;
+               down /= sum;
+               left /= sum;
+               right /= sum;
+
+               double R = Math.random();
+
+               if (R < up)
+                  temp[0][i][j]++;
+               else if (R < up + down)
+                  temp[1][i][j]++;
+               else if (R < up + down + left)
+                  temp[2][i][j]++;
+               else if (R < up + down + left + right)
+                  temp[3][i][j]++;
+
+            }
+         }
+      }
+      return temp;
+   }
+
+}

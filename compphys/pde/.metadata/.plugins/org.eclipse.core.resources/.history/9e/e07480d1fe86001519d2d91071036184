@@ -1,0 +1,78 @@
+package pde;
+
+public class Thermos
+{
+	private static final int ITERATIONS = 3600 * 24 * 7 * 4; // Iterate over four weeks
+	private static final int OUTSIDE = -0; // Temperature outside of thermos
+	private static final int INSIDE = 90; // Initial chocolate temperature
+	private static final int N = 300; // Number of cells
+	private static final double H = 1 / 2000001.; // Step length in time
+	private static final double D = 0.14e-6; // Heat constant
+	private static final double LENGTH = 0.30; // Length of thermos in m
+	private static final double A = LENGTH / N; // Resulting step length in space
+	private static double[] T; // Temperature vector
+	private static double[][] matrix; // Computing matrix
+
+	public static void main(String[] args)
+	{
+		
+		System.out.println(H);
+		System.out.println(A*A/2);
+		
+		matrix = new double[N][N];
+		double matrixconst = H * D / (A * A);
+
+		// Set first row
+		matrix[0][0] = 1;
+		for (int i = 1; i < matrix[0].length; i++)
+			matrix[0][i] = 0;
+
+		// Set rest of matrix (but last row)
+		for (int i = 1; i < matrix.length - 1; i++)
+			for (int j = 0; j < matrix[i].length; j++)
+				if (j == i - 1 || j == i + 1)
+					matrix[i][j] = matrixconst;
+				else if (i == j)
+					matrix[i][j] = 1 - 2 * matrixconst;
+				else
+					matrix[i][j] = 0;
+
+		// Set last row
+		for (int i = 0; i < matrix.length - 3; i++)
+			matrix[N - 1][i] = 0;
+		matrix[N - 1][N - 3] = matrixconst;
+		matrix[N - 1][N - 2] = -2 * matrixconst;
+		matrix[N - 1][N - 1] = matrixconst + 1;
+
+		// Set boundary conditions
+		T = new double[N];
+		T[0] = OUTSIDE;
+		for (int i = 1; i < T.length; i++)
+			T[i] = INSIDE;
+
+		double count = 0;
+		while (ITERATIONS - count >= 0)
+		{
+			timeStep();
+			if ((count+=H) % 3600 == 0)
+			{
+				System.out.print(count / 3600 + "\t"); // Only print hours
+				// Print data
+				for (int j = 0; j < T.length; j++)
+					System.out.print(T[j] + "\t");
+				System.out.println();
+			}
+		}
+	}
+
+	// Calculates the change in temperature over a step in time
+	public static void timeStep()
+	{
+		double[] copy = new double[N];
+		for (int i = 0; i < matrix.length; i++)
+			for (int j = 0; j < matrix[i].length; j++)
+				copy[i] += matrix[i][j] * T[j];
+		T = copy;
+	}
+
+}

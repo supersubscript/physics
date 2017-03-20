@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;DISCSIZE&apos; in &apos;pde.TubeHeater&apos; to &apos;DISCRETIZATIONSIZE&apos;&#x0A;- Original project: &apos;pde&apos;&#x0A;- Original element: &apos;pde.TubeHeater.DISCSIZE&apos;&#x0A;- Renamed element: &apos;pde.TubeHeater.DISCRETIZATIONSIZE&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;DISCSIZE&apos;" flags="589830" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;pde{TubeHeater.java[TubeHeater^DISCSIZE" name="DISCRETIZATIONSIZE" references="true" setter="false" stamp="1444416717220" textual="false" version="1.0"/>
+</session>

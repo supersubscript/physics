@@ -1,0 +1,845 @@
+package pim;
+
+import java.util.Random;
+
+import javax.swing.JPanel;
+
+/**
+ * This class implements a 2-dimensional Ising magnet with quadratic lattice. It
+ * supports an arbitrary size of the magnet as well as any number of spin
+ * states. Nearest-neighbour interactions can be computed up to third order.
+ * 
+ * This is free software. Published under GPL v3 or later
+ * 
+ * @author Paul-H. Balduf, Dalby 2013.
+ * 
+ */
+public class IsingMagnet2D {
+
+	/**
+	 * The number of spins per dimension of the quadratic lattice
+	 */
+	private int n = 20;
+	private int[][] spins = null;
+	private double[][] meanfield = null;
+	/**
+	 * the coupling constant between neighbour spins.
+	 */
+	private double J1 = 1.0;
+	/** coupling constant between next nearest neighbour spins. */
+	private double J2 = 0;
+	/** coupling constant between third nearest neighbour spins. */
+	private double J3 = 0;
+	/**
+	 * The number of states a single spin can be in
+	 */
+	private int states = 2;
+	private Random rand = new Random();
+
+	/**
+	 * the current temperature
+	 */
+	private double temperature = 0;
+	/**
+	 * the current external magnetic field.
+	 */
+	private double externalField = 0;
+
+	/**
+	 * the initial magnetization
+	 */
+	private double initmag = 0;
+
+	/**
+	 * the initial magnetization
+	 */
+	private boolean kawasaki = false;
+
+
+	/**
+	 * The spins are initialized in a random manner
+	 */
+	public final static int RANDOM = 42;
+	/**
+	 * the spin sqare is divided into two halfs with one spin direction each
+	 */
+	public final static int HALF = -1;
+	/**
+	 * The lattice is initialized with horizontal stripes of alternating spins
+	 */
+	public final static int STRIPES = 1984;
+	/**
+	 * The lattice is initialized with a box with 20% of the lattice`s size.
+	 * I.e. 96% of the spins point in one direction and the 4 % in the center
+	 * point in the other direction.
+	 */
+	public final static int BOX = 12345;
+	/**
+	 * Initializes the spin lattice with an approximately round area of spins in
+	 * the center. The area has got a diameter of 20% the lattice`s size.
+	 */
+	public final static int BALL = 0;
+	/**
+	 * Initializes the lattice with all spins pointing down.
+	 */
+	public final static int DOWN = 1000;
+	/**
+	 * Initializes the lattice with all spins pointing up.
+	 */
+	public final static int UP = -8878;
+
+	/**
+	 * Creates a new 2 dimensional quadratic ising magnet model with N x N
+	 * spins. The spins are pointing DOWN after creation.
+	 * 
+	 * @param N
+	 *            is the length of a side of the quadratic lattice
+	 * @param states
+	 *            is the number of states a single spin can be in. Usually
+	 *            states=2
+	 */
+	public IsingMagnet2D(int N, int states) {
+		this.n = N;
+		this.states = states;
+		spins = new int[n][n];
+		meanfield = new double[n][n];
+		createSpinState(DOWN);
+	}
+
+	/**
+	 * Gives the number of states the single spins can be in.
+	 * 
+	 * @return the total number of states
+	 */
+	public int getStates() {
+		return states;
+	}
+
+	/**
+	 * Sets the temperature of this Ising magnet.
+	 * 
+	 * @param temp
+	 *            the new temperature. Negative values are illegal, however,
+	 *            they are not explicitly excluded.
+	 */
+	public void setTemperature(double temp) {
+		this.temperature = temp;
+	}
+
+	/**
+	 * Returns the temperature of this Ising magnet
+	 * 
+	 * @return the current temperature
+	 */
+	public double getTemperature() {
+		return temperature;
+	}
+
+	/**
+	 * Sets the initial magnetization of this Ising magnet.
+	 * 
+	 * @param mag
+	 *            Initial magnetization
+	 */
+	public void setInitMag(double mag) {
+		this.initmag = mag;
+	}
+
+	/**
+	 * Returns the initial magnetization of this Ising magnet
+	 * 
+	 * @return the initial magnetization
+	 */
+	public double getInitMag() {
+		return initmag;
+	}
+
+	/**
+	 * Sets the initial magnetization of this Ising magnet.
+	 * 
+	 * @param mag
+	 *            Initial magnetization
+	 */
+	public void setKawasaki(boolean kawa) {
+		this.kawasaki = kawa;
+	}
+
+	/**
+	 * Sets the exteral Magnetic field strength of this Ising magnet. Per
+	 * definition, it points vertically. The value may be positive or negative.
+	 * 
+	 * @param field
+	 *            the new field strength.
+	 */
+	public void setExternalField(double field) {
+		this.externalField = field;
+	}
+
+	/**
+	 * Returns the external Field currently set for this Ising magnet.
+	 * 
+	 * @return the current external magnetic field.
+	 */
+	public double getExternalField() {
+		return externalField;
+	}
+
+	/**
+	 * Produces a drawing of the current spin states as a JPanel. This is
+	 * produced totally new every time the method is invoked, i.e. it takes a
+	 * lot of time.
+	 * 
+	 * @param size
+	 *            is the length of an edge of the quadratic Drawing.
+	 * @return
+	 */
+	public synchronized JPanel getDrawing(int size, int type,
+			boolean drawSpins, boolean drawMeanfield, boolean drawBoundaries) {
+		return new IsingMagnet2Ddrawing(spins, meanfield, states, size, type,
+				drawSpins, drawMeanfield, drawBoundaries,
+				getMeanFieldMagnitude());
+	}
+
+	/**
+	 * computes the whole array of mean field values.
+	 */
+	public synchronized void computeMeanfield() {
+		int xp, yp, xm, ym, xp2, yp2, xm2, ym2;
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+
+				xp = x + 1;
+				yp = y + 1;
+				xm = x - 1;
+				ym = y - 1;
+
+				if (xp >= n) {
+					xp -= n;
+				}
+				if (yp >= n) {
+					yp -= n;
+				}
+				if (xm < 0) {
+					xm += n;
+				}
+				if (ym < 0) {
+					ym += n;
+				}
+
+				meanfield[x][y] = J1 * ((spins[xp][y] + spins[xm][y] + spins[x][yp] + spins[x][ym]) / 4d - (states - 1) / 2d);
+				
+				if (J2 != 0) {
+					meanfield[x][y] += J2 * ((spins[xp][yp] + spins[xm][yp] + spins[xp][ym] + spins[xm][ym]) / 4d - (states - 1) / 2d);
+				}
+
+				// compute extra variables only if they are needed
+				if (J3 != 0) {
+					xp2 = x + 2;
+					xm2 = x - 2;
+					yp2 = y + 2;
+					ym2 = y - 2;
+
+					if (xp2 >= n) {
+						xp2 -= n;
+					}
+					if (yp2 >= n) {
+						yp2 -= n;
+					}
+					if (xm2 < 0) {
+						xm2 += n;
+					}
+					if (ym2 < 0) {
+						ym2 += n;
+					}
+
+					meanfield[x][y] += J3
+							* ((spins[xp2][y] + spins[xm2][y] + spins[x][yp2] + spins[x][ym2]) / 4d - (states - 1) / 2d);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Performs a single Metropolis algorithm step. The mean field is used to
+	 * compute the energy difference. After the step, the mean field is updated.
+	 */
+	public synchronized void metropolisStep() {
+		int x = rand.nextInt(n);
+		int y = rand.nextInt(n);
+
+		if(!kawasaki) {
+
+			int newSpin = 0;
+			if (states == 2) {
+				// flip the spin
+				newSpin = 1 - spins[x][y];
+			} else {
+				// increase or decrease by 1
+				if (rand.nextBoolean()) {
+					newSpin = spins[x][y] + 1;
+				} else {
+					newSpin = spins[x][y] - 1;
+				}
+				// clip to allowed range, i.e. do not change the spin at all
+				if (newSpin < 0) {
+					newSpin = 0;
+				}
+				if (newSpin >= states) {
+					newSpin = states - 1;
+				}
+			}
+			int dSpin = newSpin - spins[x][y];
+			if (dSpin != 0) {
+				// meanfield 4 times (4 neighbours)
+				// the change in energy also affects the neighbours, but that is not
+				// counted (energy per pair, not per spin)
+				double dE = -(meanfield[x][y] * 4 * 4 + externalField * 2) * dSpin;	//changed from "meanfield[x][y] * 4 + externalField" by Jonas
+				// System.out.println("x: " + x + " y: " + y + " meanfield: "
+				// + meanfield[x][y] + " dE: " + dE);
+				if ((temperature > 0 && (Math.exp(-dE / temperature) >= rand
+						.nextDouble())) || (temperature == 0 & dE <= 0)) {
+					spins[x][y] = newSpin;
+
+					// |_|_|3|_|_|
+					// |_|2|1|2|_|
+					// |3|1|x|1|3|
+					// |_|2|1|2|_|
+					// |_|_|3|_|_|	
+	
+					int xp = x + 1;
+					int xm = x - 1;
+					int yp = y + 1;
+					int ym = y - 1;	
+
+					if (xp >= n) {
+						xp -= n;
+					}
+					if (xm < 0) {
+						xm += n;
+					}
+					if (yp >= n) {
+						yp -= n;
+					}
+					if (ym < 0) {
+						ym += n;
+					}
+
+					// nearest neighbours
+					meanfield[xm][y] += dSpin / 4d * J1;
+					meanfield[xp][y] += dSpin / 4d * J1;
+					meanfield[x][yp] += dSpin / 4d * J1;
+					meanfield[x][ym] += dSpin / 4d * J1;
+
+					// second-nearest neighbours
+					meanfield[xm][ym] += dSpin / 4d * J2;
+					meanfield[xm][yp] += dSpin / 4d * J2;
+					meanfield[xp][ym] += dSpin / 4d * J2;
+					meanfield[xp][yp] += dSpin / 4d * J2;	
+
+					// third-nearest neighbours
+					if (J3 != 0) {
+						xp++;
+						yp++;
+						xm--;
+						ym--;
+						if (xp >= n) {
+							xp -= n;
+						}
+						if (xm < 0) {
+							xm += n;
+						}
+						if (yp >= n) {
+							yp -= n;
+						}
+						if (ym < 0) {
+							ym += n;
+						}
+						meanfield[xm][y] += dSpin / 4d * J3;
+						meanfield[xp][y] += dSpin / 4d * J3;
+						meanfield[x][yp] += dSpin / 4d * J3;
+						meanfield[x][ym] += dSpin / 4d * J3;
+					}
+				}
+			}
+		} else { //Do a kawasaki update
+
+			int xn=x;
+			int yn=y;
+
+			if(rand.nextBoolean()) {
+				if(rand.nextBoolean()){
+					xn++;
+					if(xn>=n) xn = 0;
+				} else {
+					xn--;
+					if(xn<0) xn = n-1;
+				}
+			} else {
+				if(rand.nextBoolean()){
+					yn++;
+					if(yn>=n) yn = 0;
+				} else {
+					yn--;
+					if(yn<0) yn = n-1;
+				}
+			}
+
+			if(spins[x][y]!=spins[xn][yn]){
+				double sBA = 2.*spins[xn][yn]-2.*spins[x][y];
+				double dE = sBA * 8.*(meanfield[xn][yn]-meanfield[x][y])+4.*J1;
+				if ((temperature > 0 && (Math.exp(-dE / temperature) >= rand
+						.nextDouble())) || (temperature == 0 & dE <= 0)) {
+
+					int[] xN = {x,x+1,x,x-1};
+					int[] yN = {y+1,y,y-1,y};
+					int[] xnN = {xn,xn+1,xn,xn-1};
+					int[] ynN = {yn+1,yn,yn-1,yn};
+					
+					for(int i=0;i<4;i++){
+						if(xN[i]>=n) xN[i]=0;
+						else if(xN[i]<0) xN[i]=n-1;
+						
+						if(yN[i]>=n) yN[i]=0;
+						else if(yN[i]<0) yN[i]=n-1;
+						
+						if(xnN[i]>=n) xnN[i]=0;
+						else if(xnN[i]<0) xnN[i]=n-1;
+						
+						if(ynN[i]>=n) ynN[i]=0;
+						else if(ynN[i]<0) ynN[i]=n-1;						
+
+						meanfield[xN[i]][yN[i]]-=0.25*J1*(2.*spins[x][y]-1.);
+						meanfield[xnN[i]][ynN[i]]-=0.25*J1*(2.*spins[xn][yn]-1.);
+					}
+					
+					spins[x][y]=1-spins[x][y];
+					spins[xn][yn]=1-spins[xn][yn];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Performs as many metropolis steps as there are spins. This does of course
+	 * not mean that every spin is moved one time as they are selected randomly.
+	 */
+	public void NNsteps() {
+		steps(n * n);
+	}
+
+	/**
+	 * Performs a variable number of metropolis steps.
+	 * 
+	 * @param nr
+	 *            the number of steps to perform
+	 */
+	public void steps(int nr) {
+		for (int index = 0; index < nr; index++) {
+			metropolisStep();
+		}
+	}
+
+	/**
+	 * Counts the number of spins in a given state
+	 * 
+	 * @param state
+	 *            the state of interest
+	 * @return the number of spins currently in that state
+	 */
+	public int getSpins(int state) {
+		int erg = 0;
+		for (int[] column : spins) {
+			for (int i : column) {
+				if (i == state) {
+					erg++;
+				}
+			}
+		}
+		return erg;
+	}
+
+	/**
+	 * computes the total magnetisation of the magnet
+	 * 
+	 * @return
+	 */
+	public double getMagnetisation() {
+		double erg = 0;
+		for (int[] column : spins) {
+			for (int i : column) {
+				erg += i - (states - 1) / 2d;
+			}
+		}
+		erg *= 2; //Added by Jonas
+		return erg;
+	}
+
+	/**
+	 * returns the magnetisation per spin, i.e getMagnetisation()/N^2
+	 * 
+	 * @return
+	 */
+	public double getAverageMagnetisation() {
+		return getMagnetisation() / (n * n);
+	}
+
+	/**
+	 * returns the total energy of the current configuration
+	 * 
+	 * @return
+	 */
+	public double getEnergy() {
+		double erg = 0;
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				erg -= (spins[x][y] - (states - 1) / 2d)
+						* (meanfield[x][y] * 2 * 4 + externalField * 2);
+			}
+		}
+		
+		return erg;
+	}
+
+	/**
+	 * returns the energy per spin
+	 * 
+	 * @return
+	 */
+	public double getAverageEnergy() {
+		return getEnergy() / (n * n);
+	}
+
+	public double getBoundaryLength() {
+		double erg = 0;
+		int xp, ym;
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				xp = x + 1;
+				ym = y - 1;
+				if (xp >= n) {
+					xp -= n;
+				}
+				if (ym < 0) {
+					ym += n;
+				}
+				if (spins[x][y] != spins[xp][y]) {
+					erg += .5;
+				}
+				if (spins[x][y] != spins[x][ym]) {
+					erg += .5;
+				}
+			}
+		}
+		return erg;
+	}
+
+	public double getAverageBoundaryLength() {
+		return getBoundaryLength() / (n * n);
+	}
+
+	/**
+	 * returns the current coupling strength between second-nearest neighbours
+	 * 
+	 * @return J2
+	 */
+	public double getJ2() {
+		return J2;
+	}
+
+	/**
+	 * sets the coupling strength between second-nearest neighbours.
+	 * 
+	 * @param J2
+	 *            the new coupling strength
+	 */
+	public void setJ2(double J2) {
+		this.J2 = J2;
+	}
+
+	/**
+	 * returns the current coupling strength between nearest neighbours
+	 * 
+	 * @return J
+	 */
+	public double getJ1() {
+		return J1;
+	}
+
+	/**
+	 * sets the coupling strength between nearest neighbours.
+	 * 
+	 * @param J
+	 *            the new coupling strength
+	 */
+	public void setJ1(double J1) {
+		this.J1 = J1;
+	}
+
+	/**
+	 * returns the current coupling strength between third-nearest neighbours
+	 * 
+	 * @return J3
+	 */
+	public double getJ3() {
+		return J3;
+	}
+
+	/**
+	 * sets the coupling strength between third-nearest neighbours.
+	 * 
+	 * @param J3
+	 *            the new coupling strength
+	 */
+	public void setJ3(double J3) {
+		this.J3 = J3;
+	}
+
+	/**
+	 * returns the maximum mean field strength. The current field is evaluated
+	 * as is, it is not re-computed
+	 * 
+	 * @return the largest value occuring in the mean field.
+	 */
+	public double getMaxMeanField() {
+		double max = -100000;
+		for (double[] column : meanfield) {
+			for (int index = 0; index < n; index++) {
+				max = Math.max(max, column[index]);
+			}
+
+		}
+		return max;
+	}
+
+	/**
+	 * Computes a simple estimate of the spin correlation, that is a function of
+	 * how strongly spins in a certain distance are correlated. Gives -1 if all
+	 * spins in this distance point in opposite directions and +1 if all are
+	 * aligned.
+	 */
+	public double[] getSpinCorrelationFunction() {
+		double[] res = new double[(int) (n / 2)];
+		for (int x1 = 0; x1 < n; x1++) {
+			for (int y1 = 0; y1 < n; y1++) {
+
+				for (int x2 = x1 - n / 2 + 1; x2 <= x1 + n / 2 - 1; x2++) {
+					if (x2 < 0) {
+						res[Math.abs(x2 - x1)] += Math.abs(spins[x1][y1]
+								- spins[x2 + n][y1]);
+					} else if (x2 >= n) {
+						res[Math.abs(x2 - x1)] += Math.abs(spins[x1][y1]
+								- spins[x2 - n][y1]);
+					} else {
+
+						res[Math.abs(x2 - x1)] += Math.abs(spins[x1][y1]
+								- spins[x2][y1]);
+					}
+				}
+
+				for (int y2 = y1 - n / 2 + 1; y2 <= y1 + n / 2 - 1; y2++) {
+					if (y2 < 0) {
+						res[Math.abs(y2 - y1)] += Math.abs(spins[x1][y1]
+								- spins[x1][y2 + n]);
+					} else if (y2 >= n) {
+						res[Math.abs(y2 - y1)] += Math.abs(spins[x1][y1]
+								- spins[x1][y2 - n]);
+					} else {
+
+						res[Math.abs(y2 - y1)] += Math.abs(spins[x1][y1]
+								- spins[x1][y2]);
+					}
+				}
+
+			}
+		}
+		// the central point is just computed once, whereas all other points are
+		// computed twice.
+		res[0] *= 2;
+		for (int index = 0; index < res.length; index++) {
+			// normalize to one spin
+			res[index] /= (n * n * 2d);
+			// normalize to [-1, 1]
+			res[index] /= (states - 1);
+			// flip so that 1=totally correlated, 0= uncorrelated, -1=opposite
+			// sign
+			res[index] = 1 - res[index];
+			
+		}
+
+		return res;
+	}
+
+	/**
+	 * Returns a copy of the 2-dimensional vector of all spins, i.e. the
+	 * complete description of the current state of the magnet. Changes on the
+	 * array given do not affect the magnet.
+	 * 
+	 * @return the spin states. This is a vector of doubles, because the spins
+	 *         may have values 0, 1, ... or even 1/2, 3/2 ...
+	 */
+	public float[][] getState() {
+		float[][] res = new float[n][n];
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				res[x][y] = spins[x][y] - (states - 1) / 2f;
+			}
+		}
+
+		return res;
+	}
+
+	/**
+	 * Gives the length of a side of the magnet
+	 * 
+	 * @return
+	 */
+	public int getSize() {
+		return spins.length;
+	}
+
+	/**
+	 * returns the minimum mean field strength. The current field is evaluated
+	 * as is, it is not re-computed
+	 * 
+	 * @return the smallest value occuring in the mean field.
+	 */
+	public double getMinMeanField() {
+		double min = 100000;
+		for (double[] column : meanfield) {
+			for (int index = 0; index < n; index++) {
+				min = Math.min(min, column[index]);
+			}
+
+		}
+		return min;
+	}
+
+	/**
+	 * Returns the magnitude of the mean field, this is the maximum value it can
+	 * take. Since it is symmentric, the minimum value is
+	 * -getManFieldMagnitude()
+	 * 
+	 * @return
+	 */
+	public double getMeanFieldMagnitude() {
+		return (states - 1) / 2d * (Math.abs(J1) + Math.abs(J2) + Math.abs(J3));
+	}
+
+	/**
+	 * Initializes the Ising magnet with spin values according to the given
+	 * type. Types are constants in IsingMagnet2D.
+	 * 
+	 * @param type
+	 *            is defined as a constant.
+	 */
+	public synchronized void createSpinState(int type) {
+		switch (type) {
+		case RANDOM:
+			
+			int most = 0;
+			int least = 1;
+
+			if(initmag>0) {
+				most = 1;
+				least = 0;
+			}
+
+			for (int x = 0; x < n; x++) {
+				for (int y = 0; y < n; y++) {
+					spins[x][y] = most;
+				}
+			}
+
+			int nFlip = 0;
+			float fnflipMax = (float) ((1.0-Math.abs(initmag))/2.0)*n*n;
+			int nFlipMax = Math.round(fnflipMax);
+
+			while(nFlip<nFlipMax){
+				int x = rand.nextInt(n);
+				int y = rand.nextInt(n);
+				if(spins[x][y]==most){
+					spins[x][y]=least;
+					nFlip++;
+				}
+
+			}
+
+			break;
+		case HALF:
+			for (int[] column : spins) {
+				for (int i = 0; i < n / 2; i++) {
+					column[i] = states - 1;
+				}
+				for (int i = n / 2; i < n; i++) {
+					column[i] = 0;
+				}
+			}
+			break;
+		case STRIPES:
+			for (int[] column : spins) {
+				for (int i = 0; i < n; i += 2) {
+					column[i] = states - 1;
+				}
+				for (int i = 1; i < n; i += 2) {
+					column[i] = 0;
+				}
+			}
+			break;
+		case BOX:
+			int border1 = (int) (n * 2f / 5);
+			int border2 = (int) (n * 3f / 5);
+
+			for (int x = 0; x < n; x++) {
+				for (int y = 0; y < n; y++) {
+					if (x > border1 && x < border2) {
+						if (y > border1 && y < border2) {
+							spins[x][y] = states - 1;
+						} else {
+							spins[x][y] = 0;
+						}
+					} else {
+						spins[x][y] = 0;
+					}
+				}
+			}
+			break;
+		case BALL:
+			float distanceSq = n * n * (1f + (float)initmag)*0.159155f;
+
+			//double dist=Math.sqrt(distanceSq);
+			//System.out.println(dist);
+
+			int center = n / 2;
+			int nCount = 0;			
+
+			for (int x = 0; x < n; x++) {
+				for (int y = 0; y < n; y++) {
+					if ((x - center) * (x - center) + (y - center)
+							* (y - center) <= distanceSq) {
+						spins[x][y] = states - 1;
+					} else {
+						spins[x][y] = 0;
+					}
+				}
+			}
+			break;
+		case DOWN:
+			for (int x = 0; x < n; x++) {
+				for (int y = 0; y < n; y++) {
+					spins[x][y] = 0;
+				}
+			}
+			break;
+		case UP:
+			for (int x = 0; x < n; x++) {
+				for (int y = 0; y < n; y++) {
+					spins[x][y] = states - 1;
+				}
+			}
+
+			break;
+		}
+		computeMeanfield();
+	}
+
+}

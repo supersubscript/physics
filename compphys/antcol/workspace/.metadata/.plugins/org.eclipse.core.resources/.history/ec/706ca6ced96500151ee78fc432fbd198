@@ -1,0 +1,43 @@
+public class Anthill
+{
+   private int x;
+   private int y;
+   private int food = 0;
+   private int type = -1;
+
+   public Anthill(int x, int y, int type)
+   {
+      this.x = x;
+      this.y = y;
+      this.type = type;
+   }
+   
+   
+   
+
+   public int getX()
+   {
+      return x;
+   }
+
+   public int getY()
+   {
+      return y;
+   }
+
+   public int getFood()
+   {
+      food++;
+      return food;
+   }
+   public nullFood()
+   {
+      food = 0;
+   }   
+
+   public int getType()
+   {
+      return type;
+   }
+
+}

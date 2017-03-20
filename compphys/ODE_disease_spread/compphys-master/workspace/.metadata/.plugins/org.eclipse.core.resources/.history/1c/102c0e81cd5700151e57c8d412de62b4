@@ -1,0 +1,11 @@
+
+public class Disease {
+	static final double ALPHA = 0.33; // recovery rate
+	static final double BETA = 0.8	; // infection rate
+	static final double GAMMA = 0.0002; // vaccination rate
+
+		public Disease(double a, double b, double c) {
+		};
+	}
+
+}

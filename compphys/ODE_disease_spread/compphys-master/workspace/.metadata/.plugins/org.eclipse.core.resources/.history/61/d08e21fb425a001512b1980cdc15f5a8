@@ -1,0 +1,143 @@
+/* ODE solver utilizing a fourth-order Runge-Kutta method */
+public final class ODEsolver
+{
+	private ODEsolver()
+	{
+	}
+	
+	// Calcuates the # of people in {S, I ,R} that travels to the node w/ index
+	 // n
+	private static double travelSum(double[][] commute, double[] numppl, int n)
+	{
+		double sum = 0;
+		for (int m = 0; m < numppl.length; m++)
+		{
+			sum += commute[m][n] * numppl[m] - commute[n][m] * numppl[n];
+		}
+		return sum;
+	}
+	
+	/*
+	 * Takes in a network and a disease, utilizing these to compute a timeStep
+	 * through solving the to the model inherent ODE.
+	 */
+	public static Network timeStep(Network network, Disease disease, double h)
+	{
+		double alpha = disease.getAlpha();
+		double beta = disease.getBeta();
+		double gamma = disease.getGamma();
+		Node[] nodes = network.getNodes(); // nodes with initial values
+		double[][] commute = network.getCommute();
+		int nlen = nodes.length; // used a lot
+		
+		// Could much rather be a matrices ...
+		double[][] kS = new double[4][nlen], kI = new double[4][nlen],
+		      kR = new double[4][nlen];
+		double[] tempS = new double[nlen], tempI = new double[nlen],
+		      tempR = new double[nlen], tempN = new double[nlen];
+		double[] svals = new double[nlen], ivals = new double[nlen],
+		      rvals = new double[nlen];
+			
+		// Saves away values for later use
+		for (int i = 0; i < nlen; i++)
+		{
+			svals[i] = nodes[i].getS();
+			ivals[i] = nodes[i].getI();
+			rvals[i] = nodes[i].getR();
+			tempS[i] = svals[i];
+			tempI[i] = ivals[i];
+			tempR[i] = rvals[i];
+			tempN[i] = svals[i] + ivals[i] + rvals[i];
+		}
+		
+		// First iteration
+		for (int i = 0; i < nlen; i++)
+		{
+			kS[0][i] = h
+			      * (-tempS[i] * (beta * tempI[i] + gamma * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempS, i));
+			kI[0][i] = h
+			      * (tempI[i] * (beta * tempS[i] - alpha * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempI, i));
+			kR[0][i] = h * (gamma * tempS[i] + alpha * tempI[i]
+			      + travelSum(commute, tempR, i));
+		}
+		
+		// Calculates the new values of the temp arrays (for calculation of k2)
+		for (int i = 0; i < nlen; i++)
+		{
+			tempS[i] = svals[i] + .5 * kS[0][i];
+			tempI[i] = ivals[i] + .5 * kI[0][i];
+			tempR[i] = rvals[i] + .5 * kR[0][i];
+			tempN[i] = tempS[i] + tempI[i] + tempR[i];
+		}
+		
+		// Second iteration
+		for (int i = 0; i < nlen; i++)
+		{
+			kS[1][i] = h
+			      * (-tempS[i] * (beta * tempI[i] + gamma * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempS, i));
+			kI[1][i] = h
+			      * (tempI[i] * (beta * tempS[i] - alpha * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempI, i));
+			kR[1][i] = h * (gamma * tempS[i] + alpha * tempI[i]
+			      + travelSum(commute, tempR, i));
+		}
+		
+		for (int i = 0; i < nlen; i++)
+		{
+			tempS[i] = svals[i] + .5 * kS[1][i];
+			tempI[i] = ivals[i] + .5 * kI[1][i];
+			tempR[i] = rvals[i] + .5 * kR[1][i];
+			tempN[i] = tempS[i] + tempI[i] + tempR[i];
+		}
+		
+		// Third iteration
+		for (int i = 0; i < nlen; i++)
+		{
+			kS[2][i] = h
+			      * (-tempS[i] * (beta * tempI[i] + gamma * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempS, i));
+			kI[2][i] = h
+			      * (tempI[i] * (beta * tempS[i] - alpha * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempI, i));
+			kR[2][i] = h * (gamma * tempS[i] + alpha * tempI[i]
+			      + travelSum(commute, tempR, i));
+		}
+		
+		for (int i = 0; i < nlen; i++)
+		{
+			tempS[i] = svals[i] + kS[2][i];
+			tempI[i] = ivals[i] + kI[2][i];
+			tempR[i] = rvals[i] + kR[2][i];
+			tempN[i] = tempS[i] + tempI[i] + tempR[i];
+		}
+		
+		// Fourth iteration
+		for (int i = 0; i < nlen; i++)
+		{
+			kS[3][i] = h
+			      * (-tempS[i] * (beta * tempI[i] + gamma * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempS, i));
+			kI[3][i] = h
+			      * (tempI[i] * (beta * tempS[i] - alpha * tempN[i]) / tempN[i]
+			            + travelSum(commute, tempI, i));
+			kR[3][i] = h * (gamma * tempS[i] + alpha * tempI[i]
+			      + travelSum(commute, tempR, i));
+		}
+		
+		// Calculates the values for the next timestep
+		for (int i = 0; i < nlen; i++)
+		{
+			nodes[i].setS(svals[i] + kS[0][i] / 6 + kS[1][i] / 3 + kS[2][i] / 3
+			      + kS[3][i] / 6);
+			nodes[i].setI(ivals[i] + kI[0][i] / 6 + kI[1][i] / 3 + kI[2][i] / 3
+			      + kI[3][i] / 6);
+			nodes[i].setR(rvals[i] + kR[0][i] / 6 + kR[1][i] / 3 + kR[2][i] / 3
+			      + kR[3][i] / 6);
+		}
+		network.setNodes(nodes);
+		return network;
+	}
+}

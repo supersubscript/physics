@@ -1,0 +1,106 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+public class DiseaseSpread {
+	private final static double h = 1; // size of the timestep
+
+	public static void main(String[] args) throws FileNotFoundException {
+		Network europe = new Network();
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		BufferedReader br = new BufferedReader(new FileReader(args[0]));
+
+		double[][] commute = new double[28][28];
+
+		// Reads data from file, calculating information about inter-European
+		// travel
+		try {
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			Set<String> seen = new HashSet<String>();
+			while (line != null) {
+				try {
+					line = br.readLine();
+					if (line == null)
+						break;
+					String fields[] = line.split("\t");
+					if (!seen.contains(fields[0])) {
+						seen.add(fields[0]);
+						nodes.add(new Node(fields[0], Double.parseDouble(fields[3]), 0, 0));
+						for (int i = 0; i < commute[0].length; i++) {
+							if (nodes.size() - 1 == i)
+								commute[nodes.size() - 1][i] = 0;
+							else {
+								line = br.readLine();
+								String innerfields[] = line.split("\t");
+								commute[nodes.size() - 1][i] = Double.parseDouble(innerfields[2])
+										/ Double.parseDouble(innerfields[3]);
+							}
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// for writing outputs in files
+		europe.setNodes(nodes);
+		PrintWriter[] w = new PrintWriter[europe.getNodes().length];
+
+		// -- prints to console --
+		System.out.println("t \t\tSusceptible \tInfected \tRecovered"); //
+
+		// saves initial values
+		for (int i = 0; i < europe.getNodes().length; i++) {
+			w[i] = new PrintWriter(new FileOutputStream(europe.getNodes()[i].getName() + ".dat"), true);
+			w[i].println("t \t\tSusceptible \tInfected \tRecovered");
+			w[i].println("0 \t\t" + (int) (europe.getNodes()[i].getS() + .5) + "\t\t"
+					+ (int) (europe.getNodes()[i].getI() + .5) + "\t\t" + (int) (europe.getNodes()[i].getR() + .5));
+
+			// -- prints to console --
+			System.out.println("0 \t\t" + (int) (europe.getNodes()[i].getS() + .5) + "\t\t" //
+					+ (int) (europe.getNodes()[i].getI() + .5) + "\t\t" //
+					+ (int) (europe.getNodes()[i].getR() + .5)); //
+		}
+
+		for (int i = 0; i < 100; i++) {
+			Network newNetwork;
+			newNetwork = ODEsolver.timeStep(europe, Jeff.ALPHA, Jeff.BETA, Jeff.GAMMA, h);
+			europe.setNodes(newNetwork.getNodes());
+
+			// saves calculated values to file
+			for (int j = 0; j < newNetwork.getNodes().length; j++) {
+				w[j].println((i + 1) + "\t\t" + (int) (europe.getNodes()[j].getS() + .5) + "\t\t"
+						+ (int) (europe.getNodes()[j].getI() + .5) + "\t\t" + (int) (europe.getNodes()[j].getR() + .5));
+
+				// -- prints to console --
+				System.out.println((i + 1) + "\t\t" + (int) (europe.getNodes()[j].getS() + .5) + "\t\t" //
+						+ (int) (europe.getNodes()[j].getI() + .5) + "\t\t" //
+						+ (int) (europe.getNodes()[j].getR() + .5)); //
+			}
+
+		}
+
+		for (int i = 0; i < w.length; i++) {
+			/*
+			 * for checking current update in dat files w[i].println();
+			 * w[i].println("Version: Jeff 1.1.1.1"); /
+			 **/
+			w[i].close(); // closes output files
+		}
+
+	}
+}

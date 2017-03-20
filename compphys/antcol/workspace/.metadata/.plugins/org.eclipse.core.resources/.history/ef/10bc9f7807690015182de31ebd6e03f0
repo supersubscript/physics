@@ -1,0 +1,51 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.JPanel;
+
+public class AntPanel extends JPanel
+{
+   // private Image screenBuffer;
+   Random rand = new Random();
+
+   public AntPanel(final int width, final int height)
+   {
+   }
+
+   // Takes in squares (thank God for pointers),
+   public void paint(Square[][] sq, int sqSize, ArrayList<Food> foodPos,
+         ArrayList<Anthill> anthills, Graphics g)
+   {
+      // screenBuffer = createImage(sq.length * sqSize, sq[0].length * sqSize);
+
+      // Draw all ants
+      for (int i = 0; i < sq.length; i++)
+         for (int j = 0; j < sq.length; j++)
+         {
+            int[][] ants = sq[i][j].getAnts();
+
+            
+            // Draw first ant type
+            g.setColor(Color.BLUE);
+            for (int k = 0; k < ants[0][0] + ants[0][1]; k++)
+               g.drawOval(sqSize * i + rand.nextInt(sqSize),
+                     sqSize * j + rand.nextInt(sqSize), 1, 1);
+
+            // Draw secondant type
+            g.setColor(Color.GREEN);
+            for (int k = 0; k < ants[1][0] + ants[1][1]; k++)
+               g.drawOval(sqSize * i + rand.nextInt(sqSize),
+                     sqSize * j + rand.nextInt(sqSize), 1, 1);
+
+         }
+   }
+   // Draw all food
+
+   // Draw all anthills
+
+   // Update(?)
+
+}

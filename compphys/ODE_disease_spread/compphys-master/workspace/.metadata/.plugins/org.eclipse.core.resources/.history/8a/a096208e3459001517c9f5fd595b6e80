@@ -1,0 +1,97 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+public class DiseaseSpread {
+
+	private final static double h = 1; // size of the timestep
+
+	public static void main(String[] args) throws FileNotFoundException {
+		Network europe = new Network();
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		Disease disease = new Disease(0.33, 0.8, 0.0002);
+		BufferedReader br = new BufferedReader(new FileReader(args[0]));
+		double[][] commute = new double[28][28]; // travel weights
+		int iterations = 200;
+
+		// Reads data from file, calculating information about inter-European
+		// travel
+		try {
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Set<String> seen = new HashSet<String>();
+			while (line != null) {
+				try {
+					String fields[] = line.split("\t");
+					if (!seen.contains(fields[0])) {
+						seen.add(fields[0]);
+						nodes.add(new Node(fields[0], Double.parseDouble(fields[3]), 0, 0));
+						for (int i = 0; i < commute[0].length; i++) {
+							if (nodes.size() - 1 == i)
+								commute[nodes.size() - 1][i] = 0;
+							else {
+								line = br.readLine();
+								if (line == null)
+									continue;
+								String innerfields[] = line.split("\t");
+								commute[nodes.size() - 1][i] = Double.parseDouble(innerfields[2])
+										/ Double.parseDouble(innerfields[3]) / 52;
+							}
+						}
+						line = br.readLine();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		europe.setNodes(nodes);
+		europe.setCommute(commute);
+		Node[] nodearr = europe.getNodes(); // Used a lot
+		PrintWriter[] w = new PrintWriter[europe.getNodes().length];
+		nodes.get(24).setI(1); // Set initial infected
+
+		System.out.println("t \tSusceptible \tInfected \tRecovered"); //
+		for (int i = 0; i < nodearr.length; i++) {
+			w[i] = new PrintWriter(new FileOutputStream(nodearr[i].getName() + ".dat"), true);
+			w[i].println("#t \tSusceptible \tInfected \tRecovered");
+			w[i].println("0 \t" + (int) (nodearr[i].getS() + .5) + "\t" + (int) (nodearr[i].getI() + .5) + "\t"
+					+ (int) (nodearr[i].getR() + .5));
+
+			System.out.println("0 \t" + (int) (nodearr[i].getS() + .5) + "\t" + (int) (nodearr[i].getI() + .5) + "\t"
+					+ (int) (nodearr[i].getR() + .5));
+		}
+
+		for (int i = 0; i < iterations; i++) {
+			Network newNetwork;
+			newNetwork = ODEsolver.timeStep(europe, disease, h);
+			europe.setNodes(newNetwork.getNodes());
+
+			// Saves values to file and prints to console
+			for (int j = 0; j < newNetwork.getNodes().length; j++) {
+				w[j].println((i + 1) + "\t" + (int) (nodearr[j].getS() + .5) + "\t" + (int) (nodearr[j].getI() + .5)
+						+ "\t" + (int) (nodearr[j].getR() + .5));
+
+				System.out.println((i + 1) + "\t" + (int) (nodearr[j].getS() + .5) + "\t"
+						+ (int) (nodearr[j].getI() + .5) + "\t" + (int) (nodearr[j].getR() + .5));
+			}
+		}
+
+		for (int i = 0; i < w.length; i++) {
+			w[i].close(); // closes output files
+		}
+
+	}
+}

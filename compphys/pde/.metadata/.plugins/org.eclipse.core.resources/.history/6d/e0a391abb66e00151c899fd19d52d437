@@ -1,0 +1,84 @@
+package pde;
+
+public class TubeHeater {
+
+	static final int ITERATIONS = 10000000;
+	static final int OUTSIDE = 21;
+	static final int INSIDE = 8;
+	static final double D = 0.02;
+	static final double LENGTH = 30;
+	static final int N = 100;
+	static final double DISCSIZE = LENGTH / N;
+	static final double STEPSIZE = 1;
+	private static double[] T;
+	private static double[][] matrix;
+
+	public static void main(String[] args) {
+
+		matrix = new double[N][N];
+		double matrixconst = STEPSIZE * D / (DISCSIZE * DISCSIZE);
+
+		// Set first row
+		matrix[0][0] = 1;
+		for (int i = 1; i < matrix[0].length; i++)
+			matrix[0][i] = 0;
+
+		// Set rest of matrix (but last row)
+		for (int i = 1; i < matrix.length - 1; i++)
+			for (int j = 0; j < matrix[i].length; j++)
+				if (j == i - 1 || j == i + 1)
+					matrix[i][j] = matrixconst;
+				else if (i == j)
+					matrix[i][j] = 1 - 2 * matrixconst;
+				else
+					matrix[i][j] = 0;
+
+		// Set last row
+		for (int i = 0; i < matrix.length - 3; i++)
+			matrix[N - 1][i] = 0;
+		matrix[N - 1][N - 3] = matrixconst;
+		matrix[N - 1][N - 2] = -2 * matrixconst;
+		matrix[N - 1][N - 1] = matrixconst + 1;
+
+		// Set boundary conditions
+		T = new double[N];
+		T[0] = OUTSIDE;
+		for (int i = 1; i < T.length; i++)
+			T[i] = INSIDE;
+
+		// Commence, explicit Euler!
+	/*	for (int i = 0; i < ITERATIONS; i++) {
+			for (int j = 0; j < T.length; j++) {
+				System.out.print(T[j] + "\t");
+			}
+			timeStep();
+			System.out.println();
+		}*/
+		int count = 0; 
+		while (T[N-1] <= 20.9) {
+			
+			timeStep();
+			System.out.print(count++ + "\t");
+			for (int j = 0; j < T.length; j++) {
+				System.out.print(T[j] + "\t");
+			}
+			System.out.println();
+		}
+
+		/*
+		 * for (int i = 0; i < matrix.length; i++) { for (int j = 0; j <
+		 * matrix[i].length; j++) { System.out.print(matrix[i][j] + "\t"); }
+		 * System.out.println(); }
+		 */
+
+	}
+
+	public static void timeStep() {
+		double[] copy = new double[N];
+		for (int i = 0; i < matrix.length; i++)
+			for (int j = 0; j < matrix[i].length; j++)
+				copy[i] += matrix[i][j] * T[j];
+		T = copy;
+	}
+
+}

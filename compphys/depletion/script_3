@@ -1,0 +1,14 @@
+set t epslatex color 
+reset
+
+set xlabel "$\\Delta x$" 
+set ylabel "$\\Delta y$" 
+
+datafile="rt"
+set output "exc3.tex" 
+
+set xrange [:]
+p datafile u 2:3 title '' w d 
+
+set o
+

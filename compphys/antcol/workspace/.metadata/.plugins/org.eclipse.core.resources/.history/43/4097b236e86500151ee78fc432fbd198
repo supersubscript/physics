@@ -1,0 +1,12 @@
+
+public class Pair
+{
+   private int N;
+   private int[][] matrix;
+
+   public int getN()
+   {
+      return N;
+   }
+
+}

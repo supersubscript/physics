@@ -1,0 +1,63 @@
+import java.util.ArrayList;
+
+public abstract class Ant
+{
+   protected static int move(ArrayList<Food> food, double fb, int x, int y,
+         int speed)
+
+   {// ,
+    // boolean hasFood, Anthill[] anthills) {
+    // the higher the value of the direction, the more likely the ant is to
+    // move in that direction
+      double up = speed, down = speed, left = speed, right = speed, nothing = 1;
+
+      if (true)
+      {// hasFood) {
+       // for (Anthill hill : anthills)
+       // if (hill.correctType() == true)
+       // hill.calculateDist();
+
+      }
+
+      for (int i = 0; i < food.length; i++)
+      {
+         double add = fb * food[i].getAmt(); // nicer code
+         int rx = food[i].getX() - x;
+         int ry = food[i].getY() - y;
+         // X dist
+         if (rx > 0)
+         {
+            right += add / rx * rx;
+         } else if (rx < 0)
+         {
+            left += add / rx * rx;
+         }
+         // Y dist
+         if (ry < 0)
+         {
+            up += add / ry * ry;
+         } else
+         {
+            down += add / ry * ry;
+         }
+      }
+      double sum = up + down + left + right + nothing;
+      up /= sum;
+      down /= sum;
+      left /= sum;
+      right /= sum;
+
+      double R = Math.random();
+
+      if (R < up)
+         return 1;
+      else if (R < up + down)
+         return 2;
+      else if (R < up + down + left)
+         return 3;
+      else if (R < up + down + left + down)
+         return 4;
+      else
+         return 0;
+   }
+}

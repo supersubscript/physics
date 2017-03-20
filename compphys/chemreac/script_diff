@@ -1,0 +1,41 @@
+set terminal epslatex color 
+
+#set xlabel 'material anisotropy'
+#set ylabel 'stress anisotropy'
+#set zlabel 'cos(angle(stress,strain))'
+
+file='diff'
+datafile=file.".dat"
+graph=file.".tex"
+
+#maxtime=400
+#maxcells=20
+#maxcons=0.12
+
+#set xrange [0:maxtime]        # Sets the range of the graph
+#set yrange [0:maxcells] 
+#set zrange [1400:2600] 
+#set grid
+unset grid
+set output graph
+#set ztics 0,0.5,1
+#set xtics 1,1,5
+#set cbtics 0,0.5,1
+
+set key nobox opaque
+
+set pm3d 
+set map
+set view map
+set hidden3d
+set grid x,y
+unset grid
+set xlabel "Time"
+set ylabel "Cell"
+set zlabel "Concentration"
+#splot datafile using ((($1)+40)/40):3:5 title 'cos(stress,strain)' pt 1 ps 0.0
+#splot datafile using ((($1)+40)/40):((10-abs($2))/10):5 title 'cos(stress,strain)' pt 1 ps 0.0
+
+splot datafile using 2:3:4 w d noti
+
+set o

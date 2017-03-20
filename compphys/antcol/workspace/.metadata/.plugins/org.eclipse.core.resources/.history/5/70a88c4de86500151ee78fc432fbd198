@@ -1,0 +1,20 @@
+
+public class Pair
+{
+   private int N;
+   private int[][] matrix;
+
+   public int getN()
+   {
+      return N;
+   }
+   public int getMatrix(){return matrix;}
+   
+   
+   public void setN(int N){
+      this.N = N; 
+      
+   }
+   
+   
+}

@@ -1,0 +1,32 @@
+reset
+set xrange [0:52]
+set t wxt
+set key outside
+plot \
+for[j=2:4] 'AT.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'BE.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'CY.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'CZ.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'DE.dat' u 1:j w lp lt 2 lc rgb 'red' t 'DE',\
+for[j=2:4] 'DK.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'EE.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'EL.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'ES.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'FI.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'FR.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'HR.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'HU.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'IE.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'IT.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'LT.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'LU.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'LV.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'MT.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'NL.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'PL.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'PT.dat' u 1:j w lp lt 3 lc rgb 'violet' t 'PT',\
+for[j=2:4] 'RO.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'SE.dat' u 1:j w lp lt 1 lc rgb 'blue' t 'SE',\
+for[j=2:4] 'SI.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'SK.dat' u 1:j w l lt 0 t '',\
+for[j=2:4] 'UK.dat' u 1:j w lp lt 4 lc rgb 'green' t 'UK'

@@ -1,0 +1,996 @@
+package pim;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
+/**
+ * A numerically inefficient implementation of the Ising spin model for
+ * education purposes. Allows drawing of the current state and tuning of several
+ * parameters.
+ * 
+ * This is free software. Published under GPL v3 or later
+ * 
+ * @author Paul Balduf, Dalby 2013
+ * paul-hermann.balduf (at) uni-jena.de 
+ * 
+ */
+public class PIsingModel extends JFrame implements ActionListener {
+	private static final long serialVersionUID = -7833410606952507624L;
+
+	private final String version = "7";
+
+	GridBagConstraints cons = new GridBagConstraints();
+
+	private IsingMagnet2D mag = new IsingMagnet2D(10, 2);
+	private JPanel drawing = null;
+
+	private JLabel lSpinNr = new JLabel("Side length");
+	private SpinnerNumberModel mSpinNr = new SpinnerNumberModel(10, 2, 1000, 2);
+	private JSpinner sSpinNr = new JSpinner(mSpinNr);
+	private JLabel lSpinStates = new JLabel("Nr. of states");
+	private SpinnerNumberModel mSpinStates = new SpinnerNumberModel(2, 2, 20, 1);
+	private JSpinner sSpinStates = new JSpinner(mSpinStates);
+	private JButton bCreate = new JButton("create new magnet");
+
+	private JLabel lShow = new JLabel("show");
+
+	private JCheckBox tBoundaries = new JCheckBox("Boundaries");
+	private JCheckBox tSpins = new JCheckBox("Spins as...", true);
+	private JCheckBox tMeanField = new JCheckBox("Field");
+	private JRadioButton rSpinBox = new JRadioButton("small boxes");
+	private JRadioButton rSpinLine = new JRadioButton("Lines with dots");
+	private JRadioButton rSpinBigBox = new JRadioButton("filled cells", true);
+	private ButtonGroup gSpin = new ButtonGroup();
+	private JButton bShow = new JButton("draw current state");
+
+	private JCheckBox tKawasaki = new JCheckBox("Fixed Magnetization");
+	private JLabel lInitMag = new JLabel("Initial magnetisation");
+	private SpinnerNumberModel mInitMag = new SpinnerNumberModel(0, -1, 1, .001);
+	private JSpinner sInitMag = new JSpinner(mInitMag);
+
+
+	private JLabel lCreate = new JLabel("create state");
+	private JButton bRandom = new JButton("random");
+	private JButton bUp = new JButton("all up");
+	private JButton bDown = new JButton("all down");
+	private JButton bBox = new JButton("box");
+	private JButton bBall = new JButton("circle");
+	private JButton bStripes = new JButton("stripes");
+	private JButton bHalf = new JButton("half");
+
+	private JButton bSaveImage = new JButton("Save image");
+	private JButton bSaveMagnet = new JButton("save magnet");
+	private JButton bSaveCorrelation = new JButton("save correlation");
+
+	private JButton b1Step = new JButton("one step");
+	private JButton bNNstep = new JButton("N x N steps");
+	private SpinnerNumberModel mStep = new SpinnerNumberModel(1000, 100,
+			100000000, 100);
+	private JSpinner sStep = new JSpinner(mStep);
+	private JButton bStep = new JButton("steps");
+	private SpinnerNumberModel mRepeat = new SpinnerNumberModel(100, 2, 10000,
+			1);
+	private JSpinner sRepeat = new JSpinner(mRepeat);
+	private JButton bRepeat = new JButton("repeat");
+
+	private JCheckBox tAutoShow = new JCheckBox("draw afterwards");
+	private JProgressBar progress = new JProgressBar(0, 100);
+
+	private SpinnerNumberModel mTemp = new SpinnerNumberModel(1, 0, 100, .01);
+	private JSpinner sTemp = new JSpinner(mTemp);
+	private JLabel lTemp = new JLabel("Temperature");
+	private SpinnerNumberModel mField = new SpinnerNumberModel(0, -10, 10, .01);
+	private JSpinner sField = new JSpinner(mField);
+	private JLabel lField = new JLabel("ext. Field");
+	private SpinnerNumberModel mJ1 = new SpinnerNumberModel(1, -10, 10, .01);
+	private JSpinner sJ1 = new JSpinner(mJ1);
+	private JLabel lJ1 = new JLabel("coupling strenght");
+	private SpinnerNumberModel mJ2 = new SpinnerNumberModel(0, -10, 10, .01);
+	private JSpinner sJ2 = new JSpinner(mJ2);
+	private JLabel lJ2 = new JLabel("coupling strenght 2");
+	private SpinnerNumberModel mJ3 = new SpinnerNumberModel(0, -10, 10, .01);
+	private JSpinner sJ3 = new JSpinner(mJ3);
+	private JLabel lJ3 = new JLabel("coupling strenght 3");
+	private JButton bSet = new JButton("set");
+
+	private JTextArea tStates = new JTextArea("Spin numbers...");
+	private JScrollPane sStates = new JScrollPane(tStates);
+
+	private JLabel lMagnetisation = new JLabel("current magnetisation");
+	private JTextField tMagnetisation = new JTextField("to be computed...");
+
+	private JLabel lEnergy = new JLabel("current energy");
+	private JTextField tEnergy = new JTextField("to be computed...");
+
+	private JLabel lBoundaryLength = new JLabel("current boundary length");
+	private JTextField tBoundaryLength = new JTextField("to be computed...");
+
+	private JButton bResetAverage = new JButton("reset averages");
+
+	private JTextField tAverage = new JTextField("0 states");
+
+	private JLabel lAverageEnergy = new JLabel("average energy");
+	private JTextField tAverageEnergy = new JTextField("to be computed...");
+
+	private JLabel lAverageMagnetisation = new JLabel("average magnetisation");
+	private JTextField tAverageMagnetisation = new JTextField(
+			"to be computed...");
+
+	private ArrayList<Double> averageMagnetisation = new ArrayList<Double>(100);
+	private ArrayList<Double> averageEnergy = new ArrayList<Double>(100);
+
+	private Font statisticFont = new Font(Font.SANS_SERIF, Font.BOLD, 15);
+
+	private JButton bComputeCorrelation = new JButton("estimate corr.");
+	private ArrayPlot aPlot = new ArrayPlot();
+
+	private JFileChooser jfc = new JFileChooser();
+	private JFileChooser fText = new JFileChooser();
+
+	/**
+	 * The only constructor. Creates basically the frame.
+	 */
+	public PIsingModel() {
+		  
+		// jfc.addChoosableFileFilter(new PngFilter());
+		jfc.setAcceptAllFileFilterUsed(true);
+		jfc.setFileFilter(new PngFilter());
+
+		fText.setAcceptAllFileFilterUsed(true);
+		fText.setFileFilter(new TxtFilter());
+
+		setTitle("PIsingModel version " + version);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(1100, 600);
+
+		setLayout(new GridBagLayout());
+
+		cons.gridx = 0;
+		cons.gridy = 0;
+		cons.weightx = 1;
+		cons.weighty = 1;
+		cons.gridheight = 15;
+		cons.gridwidth = 1;
+		cons.anchor = GridBagConstraints.CENTER;
+		cons.fill = GridBagConstraints.BOTH;
+		cons.insets = new Insets(2, 2, 2, 2);
+
+		drawing = mag.getDrawing(550, IsingMagnet2Ddrawing.BIG_BOXES, true,
+				false, false);
+		this.add(drawing, cons);
+
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridx = 1;
+		cons.weighty = .1;
+		cons.weightx = .01;
+		cons.gridheight = 1;
+
+		add(lSpinNr, cons);
+		cons.gridx++;
+		add(sSpinNr, cons);
+		cons.gridx--;
+		sSpinNr.setToolTipText("This is N. The new magnet will have NxN spins");
+
+//		cons.gridy++;
+//		add(lSpinStates, cons);
+//		cons.gridx++;
+//		add(sSpinStates, cons);
+//		sSpinStates
+//				.setToolTipText("The new magnet will have this number of spin states, all in a distance of 1 from each other, e.g. -1, 0, +1 or -1/2, +1/2");
+//		cons.gridx--;
+
+		cons.gridy++;
+		cons.gridwidth = 2;
+		cons.fill = GridBagConstraints.NONE;
+		add(bCreate, cons);
+		bCreate.setToolTipText("Create a magnet with the properties stated above. The old magnet will be deleted.");
+		bCreate.addActionListener(this);
+
+		cons.gridy++;
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		add(new Hline(), cons);
+		cons.fill = GridBagConstraints.NONE;
+		cons.gridy++;
+		add(lShow, cons);
+
+		cons.anchor = GridBagConstraints.WEST;
+		cons.gridy++;
+		add(tBoundaries, cons);
+		tBoundaries
+				.setToolTipText("Mark the cell boundaries where tow adjacent spins do not have the same state.");
+		cons.gridy++;
+		add(tMeanField, cons);
+		tMeanField
+				.setToolTipText("Show the field strength caused by the other spins around each cell. This is affected by the coupling strenghts set right.");
+		cons.gridy++;
+		add(tSpins, cons);
+		tSpins.setToolTipText("Show the spin state of each cell");
+
+		cons.gridy++;
+		add(rSpinBox, cons);
+		rSpinBox.setToolTipText("Show the spin state as gray level of a box smaller than the cell. The field in the background will be visible if painted");
+		cons.gridy++;
+		add(rSpinBigBox, cons);
+		rSpinBigBox
+				.setToolTipText("show the spin state as gray level of a box that fills the cell. This will occlude the Field, even if painted");
+		cons.gridy++;
+		add(rSpinLine, cons);
+		rSpinLine
+				.setToolTipText("Show the spin state as arrow-like lines. This uses way more ressources to compute, i.e. the painting process will be significantly slower");
+		gSpin.add(rSpinBox);
+		gSpin.add(rSpinLine);
+		gSpin.add(rSpinBigBox);
+		cons.anchor = GridBagConstraints.CENTER;
+
+		cons.gridy++;
+		add(bShow, cons);
+		bShow.setToolTipText("Draw the magnet in the current state with the settings above");
+		bShow.addActionListener(this);
+
+		cons.gridy++;
+		cons.gridy++;
+		cons.gridy++;
+		cons.gridy++;
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridwidth = 7;
+		add(new Hline(), cons);
+
+		cons.gridy++;
+		cons.gridwidth = 1;
+		cons.fill = GridBagConstraints.NONE;
+		add(bComputeCorrelation, cons);
+		bComputeCorrelation
+				.setToolTipText("Estimate the correlation between pairs of spins depending on the distance. For big magnets, this takes long.");
+		bComputeCorrelation.addActionListener(this);
+		cons.gridx++;
+
+		cons.fill = GridBagConstraints.BOTH;
+		cons.gridwidth = 6;
+		add(aPlot, cons);
+
+		cons.gridx = 3;
+		cons.gridwidth = 1;
+		cons.gridy = 0;
+		cons.fill = GridBagConstraints.VERTICAL;
+		cons.gridheight = 14;
+		add(new Vline(), cons);
+
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridx++;
+		cons.gridheight = 1;
+		add(lCreate, cons);
+		cons.gridy++;
+		add(bUp, cons);
+		bUp.setToolTipText("All Spins are in the highest possible state");
+		bUp.addActionListener(this);
+		cons.gridy++;
+		add(bDown, cons);
+		bDown.setToolTipText("All Spins are in the lowest possible state");
+		bDown.addActionListener(this);
+		cons.gridy++;
+		add(bHalf, cons);
+		bHalf.setToolTipText("The upper half of the magnet is in the highest, the lower half in the lowest possible state");
+		bHalf.addActionListener(this);
+		cons.gridy++;
+		add(bStripes, cons);
+		bStripes.setToolTipText("Adjacent horizontal rows of spins are in the opposite state");
+		bStripes.addActionListener(this);
+		cons.gridy++;
+		add(bBox, cons);
+		bBox.setToolTipText("A box of 0.2 times the side length, located in the center, is in UP state, the rest in DOWN");
+		bBox.addActionListener(this);
+		cons.gridy++;
+		add(bBall, cons);
+		bBall.setToolTipText("A round area in the center with 0.2 the magnets side length in diameter is UP, the rest DOWN");
+		bBall.addActionListener(this);
+		cons.gridy++;
+		add(bRandom, cons);
+		bRandom.setToolTipText("All spins are in a random state between the minimal and maximal value they can assume");
+		bRandom.addActionListener(this);
+
+		cons.gridy++;
+		add(lInitMag, cons);
+		cons.gridy++;
+		add(sInitMag, cons);
+		sInitMag.setToolTipText("This sets the initial value of M/V for a random inital state.");
+
+		cons.gridy++;
+		add(new Hline(), cons);
+
+		cons.gridy++;
+		add(bSaveImage, cons);
+		bSaveImage
+				.setToolTipText("Save the current state of the magnet as a .png picture with the settings to the left. The picture may be rendered in any choosen resolution, this can take long.");
+		bSaveImage.addActionListener(this);
+
+		cons.gridy++;
+		add(bSaveMagnet, cons);
+		bSaveMagnet
+				.setToolTipText("Save the current state of the magnet as a plain text file with all spin values");
+		bSaveMagnet.addActionListener(this);
+		cons.gridy++;
+		add(bSaveCorrelation, cons);
+		bSaveCorrelation
+				.setToolTipText("Compute and saves an estimate of the correlation function as a plain text file");
+		bSaveCorrelation.addActionListener(this);
+
+		cons.gridx++;
+		cons.gridy = 0;
+		cons.fill = GridBagConstraints.VERTICAL;
+		cons.gridheight = 14;
+		add(new Vline(), cons);
+
+		cons.gridx++;
+		cons.fill = GridBagConstraints.NONE;
+		cons.gridheight = 1;
+		cons.gridwidth = 2;
+
+		add(b1Step, cons);
+		b1Step.setToolTipText("Perform one single Metropolis step.");
+		b1Step.addActionListener(this);
+		cons.gridy++;
+		add(bNNstep, cons);
+		bNNstep.setToolTipText("Perform as many steps as there are spins. This does not mean that every single spin is tested once as they are selected by chance.");
+		bNNstep.addActionListener(this);
+		cons.gridy++;
+		cons.gridwidth = 1;
+		cons.anchor = GridBagConstraints.WEST;
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		add(sStep, cons);
+		sStep.setToolTipText("The number of Metropolis steps to perform");
+		cons.gridx++;
+		add(bStep, cons);
+		bStep.setToolTipText("Perform the number of Metropolis steps choosen to the left.");
+		bStep.addActionListener(this);
+		cons.gridx--;
+		cons.gridy++;
+
+		add(sRepeat, cons);
+		sRepeat.setToolTipText("The number of repetitions to perform");
+		cons.gridx++;
+		add(bRepeat, cons);
+		bRepeat.setToolTipText("Repeat as often as selected the number of steps chosen above. If \"draw afterwards\" is selected, the magnet will be drawn after every repetition");
+		bRepeat.addActionListener(this);
+		cons.gridx--;
+
+		cons.gridwidth = 2;
+
+		cons.gridy++;
+		add(tAutoShow, cons);
+		tAutoShow
+				.setToolTipText("Draw the magnet after the desired number of Metropolis steps have been performed. This usually slows down the repetition significantly.");
+		cons.gridy++;
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		add(progress, cons);
+
+		cons.gridy++;
+		add(new Hline(), cons);
+
+		cons.gridy++;
+		cons.fill = GridBagConstraints.NONE;
+
+		cons.gridwidth = 1;
+		add(lTemp, cons);
+		cons.gridx++;
+		add(sTemp, cons);
+		sTemp.setToolTipText("The temperature in arbitrary units");
+		cons.gridx--;
+
+		cons.gridy++;
+		add(lField, cons);
+		cons.gridx++;
+		add(sField, cons);
+		sField.setToolTipText("The external field strength. This will not be drawn in the magnet");
+		cons.gridx--;
+
+		cons.gridy++;
+		add(lJ1, cons);
+		cons.gridx++;
+		add(sJ1, cons);
+		sJ1.setToolTipText("The coupling strenght between nearest neighbours.");
+		cons.gridx--;
+//		cons.gridy++;
+//		add(lJ2, cons);
+//		cons.gridx++;
+//		add(sJ2, cons);
+//		sJ2.setToolTipText("The coupling strength between next nearest neighbours, i.e. diagonal neighbours.");
+//		cons.gridx--;
+//		cons.gridy++;
+//		add(lJ3, cons);
+//		cons.gridx++;
+//		add(sJ3, cons);
+//		sJ3.setToolTipText("The coupling strength between third nearest neighbours.");
+//		cons.gridx--;
+
+		cons.gridy++;
+		add(tKawasaki, cons);
+		tKawasaki
+				.setToolTipText("Perform updates without changing the total magnetisation.");
+
+		cons.gridwidth = 2;
+		cons.gridy++;
+		cons.anchor = GridBagConstraints.CENTER;
+		add(bSet, cons);
+		bSet.setToolTipText("Feed the parameters stated above into the magnet. Note that even if this is possible during an ongoing computation, it is not recommanded since it causes instability");
+		bSet.addActionListener(this);
+
+		cons.gridx = 8;
+		cons.gridwidth = 1;
+		cons.gridy = 0;
+ 		cons.gridheight = 16;
+		cons.fill = GridBagConstraints.VERTICAL;
+		add(new Vline(), cons);
+
+		cons.gridx = 9;
+		cons.gridheight = 3;
+		cons.weightx = .5;
+		cons.fill = GridBagConstraints.BOTH;
+		add(sStates, cons);
+		sStates.setToolTipText("The number of spins in any of the possible states");
+		tStates.setEditable(false);
+
+		cons.gridy = 3;
+		cons.gridheight = 1;
+		add(lMagnetisation, cons);
+		cons.gridy++;
+		add(tMagnetisation, cons);
+		tMagnetisation
+				.setToolTipText("The current magnetisation per spin, i.e. the average over the whole magnet");
+		tMagnetisation.setEditable(false);
+		tMagnetisation.setBackground(Color.WHITE);
+		tMagnetisation.setFont(statisticFont);
+
+		cons.gridy++;
+		add(lEnergy, cons);
+		cons.gridy++;
+		add(tEnergy, cons);
+		tEnergy.setToolTipText("The current energy of the magnet divided by the number of spins");
+		tEnergy.setEditable(false);
+		tEnergy.setBackground(Color.WHITE);
+		tEnergy.setFont(statisticFont);
+
+		cons.gridy++;
+		add(lBoundaryLength, cons);
+		cons.gridy++;
+		add(tBoundaryLength, cons);
+		tBoundaryLength
+				.setToolTipText("The total lenth of all Boundaries inside the magnet, divided by the number of spins");
+		tBoundaryLength.setEditable(false);
+		tBoundaryLength.setBackground(Color.WHITE);
+		tBoundaryLength.setFont(statisticFont);
+
+		cons.gridy++;
+		cons.fill = GridBagConstraints.NONE;
+		add(bResetAverage, cons);
+		bResetAverage
+				.setToolTipText("Reset the averages below. Note that the averages are computed over all states without \"weighting\", i.e. it is not taken into account how many Steps have been computed between those states");
+		bResetAverage.addActionListener(this);
+
+		cons.fill = GridBagConstraints.BOTH;
+		cons.gridy++;
+		add(tAverage, cons);
+		tAverage.setToolTipText("The number of states the averages are computed from");
+		tAverage.setBackground(Color.WHITE);
+		tAverage.setEditable(false);
+		tAverage.setFont(statisticFont);
+
+		cons.fill = GridBagConstraints.BOTH;
+		cons.gridy++;
+		add(lAverageMagnetisation, cons);
+		cons.gridy++;
+		add(tAverageMagnetisation, cons);
+		tAverageMagnetisation
+				.setToolTipText("The average magnetisation per spin. The standard deviation is given in parentheses.");
+		tAverageMagnetisation.setEditable(false);
+		tAverageMagnetisation.setBackground(Color.WHITE);
+		tAverageMagnetisation.setFont(statisticFont);
+
+		cons.gridy++;
+		add(lAverageEnergy, cons);
+		cons.gridy++;
+		add(tAverageEnergy, cons);
+		tAverageEnergy
+				.setToolTipText("The average energy of per spin with standard deviation in parentheses.");
+		tAverageEnergy.setEditable(false);
+		tAverageEnergy.setBackground(Color.WHITE);
+		tAverageEnergy.setFont(statisticFont);
+
+		setParameters();
+		pack();
+		setVisible(true);
+	}
+
+	/**
+	 * Handles the pressing of a button
+	 * 
+	 * @param b
+	 *            the button that has been pressed
+	 */
+	private void buttonPressed(JButton b) {
+		if (b == bShow) {
+			repaintMagnet();
+		} else if (b == bComputeCorrelation) {
+			setGUIEditable(false);
+			progress.setIndeterminate(true);
+			double[] func = mag.getSpinCorrelationFunction();
+			aPlot.setData(func);
+			progress.setIndeterminate(false);
+			setGUIEditable(true);
+		} else if (b == b1Step) {
+			mag.metropolisStep();
+			computeStatistics();
+			if (tAutoShow.isSelected()) {
+				repaintMagnet();
+			}
+		} else if (b == bNNstep) {
+			setGUIEditable(false);
+			progress.setValue(0);
+			progress.setIndeterminate(true);
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+
+					mag.NNsteps();
+					computeStatistics();
+					if (tAutoShow.isSelected()) {
+						repaintMagnet();
+					}
+					progress.setIndeterminate(false);
+					setGUIEditable(true);
+				}
+			});
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+
+		} else if (b == bStep) {
+			setGUIEditable(false);
+			progress.setValue(0);
+			progress.setIndeterminate(true);
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+
+					mag.steps(mStep.getNumber().intValue());
+					computeStatistics();
+					if (tAutoShow.isSelected()) {
+						repaintMagnet();
+					}
+					progress.setIndeterminate(false);
+					setGUIEditable(true);
+				}
+			});
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		} else if (b == bRepeat) {
+			setGUIEditable(false);
+			progress.setIndeterminate(false);
+			final int n = mRepeat.getNumber().intValue();
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					long starttime, resttime;
+					for (int nr = 0; nr < n; nr++) {
+						if (tAutoShow.isSelected()) {
+							starttime = System.currentTimeMillis();
+
+							mag.steps(mStep.getNumber().intValue());
+							progress.setValue((int) ((double) nr / n * 100));
+							computeStatistics();
+							// if the computation was faster than 1/10 s, wait
+							// the rest time.
+							resttime = 100 - (System.currentTimeMillis() - starttime);
+							if (resttime > 5) {
+								try {
+
+									Thread.sleep((int) resttime);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+									break;
+								}
+							}
+							repaintMagnet();
+						} else {
+
+							mag.steps(mStep.getNumber().intValue());
+							progress.setValue((int) ((double) nr / n * 100));
+							computeStatistics();
+
+						}
+					}
+					setGUIEditable(true);
+					progress.setValue(0);
+				}
+			});
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
+		} else if (b == bUp) {
+			mag.createSpinState(IsingMagnet2D.UP);
+			computeStatistics();
+		} else if (b == bDown) {
+			mag.createSpinState(IsingMagnet2D.DOWN);
+			computeStatistics();
+		} else if (b == bHalf) {
+			mag.createSpinState(IsingMagnet2D.HALF);
+			computeStatistics();
+		} else if (b == bStripes) {
+			mag.createSpinState(IsingMagnet2D.STRIPES);
+			computeStatistics();
+		} else if (b == bBox) {
+			mag.createSpinState(IsingMagnet2D.BOX);
+			computeStatistics();
+		} else if (b == bBall) {
+			mag.setInitMag(mInitMag.getNumber().doubleValue());
+			mag.createSpinState(IsingMagnet2D.BALL);
+			computeStatistics();
+		} else if (b == bRandom) {
+			mag.setInitMag(mInitMag.getNumber().doubleValue());
+			mag.createSpinState(IsingMagnet2D.RANDOM);
+			computeStatistics();
+		} else if (b == bCreate) {
+			mag = new IsingMagnet2D(mSpinNr.getNumber().intValue(), mSpinStates
+					.getNumber().intValue());
+			setParameters();
+			repaintMagnet();
+		} else if (b == bSet) {
+			setParameters();
+		} else if (b == bSaveImage) {
+			try {
+
+				int value = jfc.showSaveDialog(this);
+				if (value == JFileChooser.APPROVE_OPTION) {
+					progress.setIndeterminate(true);
+					setGUIEditable(false);
+					String path = jfc.getSelectedFile().getAbsolutePath();
+					if (!path.endsWith(".png")) {
+						path = path + ".png";
+					}
+					File file = new File(path);
+
+					String input = JOptionPane
+							.showInputDialog(
+									this,
+									"type the length of a side of the generated image (whole number of pixels)",
+									"desired size",
+									JOptionPane.QUESTION_MESSAGE);
+
+					int size = Integer.parseInt(input);
+
+					if (size > 0 && size < 10000) {
+						JPanel panel = null;
+						if (rSpinBox.isSelected()) {
+							panel = mag.getDrawing(size,
+									IsingMagnet2Ddrawing.BOXES,
+									tSpins.isSelected(),
+									tMeanField.isSelected(),
+									tBoundaries.isSelected());
+						} else if (rSpinLine.isSelected()) {
+							panel = mag.getDrawing(size,
+									IsingMagnet2Ddrawing.LINES,
+									tSpins.isSelected(),
+									tMeanField.isSelected(),
+									tBoundaries.isSelected());
+						} else if (rSpinBigBox.isSelected()) {
+							panel = mag.getDrawing(size,
+									IsingMagnet2Ddrawing.BIG_BOXES,
+									tSpins.isSelected(),
+									tMeanField.isSelected(),
+									tBoundaries.isSelected());
+						}
+
+						panel.setSize(panel.getPreferredSize());
+						BufferedImage bimage = new BufferedImage(size, size,
+								BufferedImage.TYPE_INT_RGB);
+						Graphics g = bimage.getGraphics();
+						// The following two operations take long time and lead
+						// to exceptions from time to time. A more elaborate
+						// implementation should take care of this.
+						panel.paint(g);
+						try {
+							ImageIO.write(bimage, "png", file);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					progress.setIndeterminate(false);
+					setGUIEditable(true);
+					progress.setValue(0);
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (b == bSaveMagnet) {
+			setGUIEditable(false);
+			progress.setIndeterminate(true);
+			int value = fText.showSaveDialog(this);
+			if (value == JFileChooser.APPROVE_OPTION) {
+
+				File file = fText.getSelectedFile();
+				BufferedWriter bw = null;
+				try {
+					bw = new BufferedWriter(new FileWriter(file));
+
+					float[][] spins = mag.getState();
+					String line = "";
+
+					// progress.setIndeterminate(false);
+
+					if (spins != null && bw != null) {
+
+						for (int y = 0; y < mag.getSize(); y++) {
+							for (int x = 0; x < mag.getSize(); x++) {
+								line = line
+										+ String.format("; %2.1f", spins[x][y]);
+							}
+							line.replaceAll(",", ".");
+							line = line.substring(2);
+							bw.write(line);
+							bw.newLine();
+							line = "";
+							// progress.setValue((int) (100 * y / (float) mag
+							// .getSize()));
+						}
+
+					}
+					bw.flush();
+					bw.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+
+				} finally {
+					try {
+						bw.close();
+					} catch (IOException e) {
+
+						e.printStackTrace();
+					}
+				}
+
+				progress.setValue(0);
+
+			}
+			setGUIEditable(true);
+			progress.setIndeterminate(false);
+
+		} else if (b == bSaveCorrelation) {
+
+			progress.setIndeterminate(true);
+			setGUIEditable(false);
+			int value = fText.showSaveDialog(this);
+			if (value == JFileChooser.APPROVE_OPTION) {
+
+				File file = fText.getSelectedFile();
+				BufferedWriter bw = null;
+				try {
+					bw = new BufferedWriter(new FileWriter(file));
+
+					double[] function = mag.getSpinCorrelationFunction();
+
+					if (function != null && bw != null) {
+						bw.write("distance;correlation");
+						bw.newLine();
+						for (int dist = 0; dist < function.length; dist++) {
+							//bw.write(dist + " ; " + function[dist]);
+							bw.write(dist + "    " + function[dist]);		//Changed by Jonas
+							bw.newLine();
+						}
+
+					}
+					bw.flush();
+					bw.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+
+				} finally {
+					try {
+						bw.close();
+					} catch (IOException e) {
+
+						e.printStackTrace();
+					}
+				}
+
+				progress.setValue(0);
+
+			}
+			setGUIEditable(true);
+			progress.setIndeterminate(false);
+
+		}
+
+		else if (b == bResetAverage) {
+			averageEnergy.clear();
+			averageMagnetisation.clear();
+			tAverageEnergy.setText("to be computed...");
+			tAverageMagnetisation.setText("to be computed...");
+			tAverage.setText("0 states");
+		}
+	}
+
+	/**
+	 * Sets the possiblilty of creating a new magnet etc.
+	 * 
+	 * @param editable
+	 *            if several buttons should be clickable
+	 */
+	private void setGUIEditable(boolean editable) {
+		bShow.setEnabled(editable);
+		bCreate.setEnabled(editable);
+		bRepeat.setEnabled(editable);
+		bStep.setEnabled(editable);
+		b1Step.setEnabled(editable);
+		bNNstep.setEnabled(editable);
+		bStep.setEnabled(editable);
+		sStep.setEnabled(editable);
+		sRepeat.setEnabled(editable);
+		bSaveImage.setEnabled(editable);
+		bComputeCorrelation.setEnabled(editable);
+		sInitMag.setEnabled(editable);
+	}
+
+	/**
+	 * Reads the parameters from the GUI and feeds them into the magnet.
+	 */
+	private void setParameters() {
+		mag.setExternalField(mField.getNumber().doubleValue());
+		mag.setTemperature(mTemp.getNumber().doubleValue());
+		mag.setJ1(mJ1.getNumber().doubleValue());
+		mag.setJ2(mJ2.getNumber().doubleValue());
+		mag.setJ3(mJ3.getNumber().doubleValue());
+
+		mag.setInitMag(mInitMag.getNumber().doubleValue());
+		mag.setKawasaki(tKawasaki.isSelected());
+
+		mag.computeMeanfield();
+	}
+
+	/**
+	 * Computes several properties of the magnet and writes them in the
+	 * corresponding text fields. Keeps also track of averages.
+	 */
+	private void computeStatistics() {
+		tStates.setText("");
+		for (int state = 0; state < mag.getStates(); state++) {
+			tStates.append("State " + state + ": " + mag.getSpins(state) + "\n");
+		}
+		tMagnetisation.setText(String.format("%7.5f",
+				mag.getAverageMagnetisation()));
+		tEnergy.setText(String.format("%7.5f", mag.getAverageEnergy()));
+		tBoundaryLength.setText(String.format("%5.5f",
+				mag.getAverageBoundaryLength()));
+
+		averageEnergy.add(mag.getAverageEnergy());
+		averageMagnetisation.add(mag.getAverageMagnetisation());
+
+		double mean = mean(averageEnergy);
+		tAverageEnergy.setText(String.format("%5.4f (%5.4f)", mean,
+				stdDev(averageEnergy, mean)));
+
+		mean = mean(averageMagnetisation);
+		tAverageMagnetisation.setText(String.format("%5.4f (%5.4f)", mean,
+				stdDev(averageMagnetisation, mean)));
+
+		tAverage.setText(averageEnergy.size() + " states");
+	}
+
+	/**
+	 * Repaints the magnet, i.e. lets the magnet create a new drawing in the
+	 * size currently desirable and adds it to the frame.
+	 */
+	private void repaintMagnet() {
+		// compute the actual sice of the drawing to produce the new one
+		// directly in the required resolution
+		Dimension aktSize = drawing.getSize();
+		int newSize = Math.min(aktSize.height, aktSize.width);
+
+		this.remove(drawing);
+		if (rSpinBox.isSelected()) {
+			drawing = mag.getDrawing(newSize, IsingMagnet2Ddrawing.BOXES,
+					tSpins.isSelected(), tMeanField.isSelected(),
+					tBoundaries.isSelected());
+		} else if (rSpinLine.isSelected()) {
+			drawing = mag.getDrawing(newSize, IsingMagnet2Ddrawing.LINES,
+					tSpins.isSelected(), tMeanField.isSelected(),
+					tBoundaries.isSelected());
+		} else if (rSpinBigBox.isSelected()) {
+			drawing = mag.getDrawing(newSize, IsingMagnet2Ddrawing.BIG_BOXES,
+					tSpins.isSelected(), tMeanField.isSelected(),
+					tBoundaries.isSelected());
+		}
+		cons.gridx = 0;
+		cons.gridy = 0;
+		cons.weightx = 1;
+		cons.weighty = 1;
+		cons.gridheight = 15;
+		cons.gridwidth = 1;
+		cons.fill = GridBagConstraints.BOTH;
+
+		this.add(drawing, cons);
+
+		this.revalidate();
+
+	}
+
+	/**
+	 * Computes the mean value of an ArrayList
+	 * 
+	 * @param list
+	 *            an arbitrary list of double values
+	 * @return the mean value
+	 */
+	private double mean(ArrayList<Double> list) {
+		double res = 0;
+		for (double d : list) {
+			res += d;
+		}
+		res /= list.size();
+
+		return res;
+	}
+
+	/**
+	 * Computes the standard deviation of an Array List, given the mean value
+	 * 
+	 * @param list
+	 *            an arbitrary list of double values
+	 * @param mean
+	 *            the mean of the above list
+	 * @return the standard deviation of the list
+	 */
+	private double stdDev(ArrayList<Double> list, double mean) {
+		double res = 0;
+		for (double d : list) {
+			res += (d - mean) * (d - mean);
+		}
+		res /= list.size();
+
+		return Math.sqrt(res);
+	}
+
+	/**
+	 * Program starting point. Creates a new instance of this class.
+	 * 
+	 * @param args
+	 *            ignored
+	 */
+	public static void main(String[] args) {
+		new PIsingModel();
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() instanceof JButton) {
+			buttonPressed((JButton) e.getSource());
+		}
+
+	}
+
+}

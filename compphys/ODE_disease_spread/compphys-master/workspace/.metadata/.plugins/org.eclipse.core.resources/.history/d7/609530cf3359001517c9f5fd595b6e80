@@ -1,0 +1,44 @@
+import java.util.ArrayList;
+
+//import java.util.ArrayList;
+
+public class Network {
+	private ArrayList<Node> nodes;
+	private double[][] commute;
+
+	public Network() {
+	}
+
+	public Node[] getNodes() {
+		Node[] nodearr = new Node[nodes.size()];
+
+		for (int i = 0; i < nodes.size(); i++) {
+			nodearr[i] = nodes.get(i);
+		}
+		return nodearr;
+	}
+
+	public void setNodes(Node[] nodearr) {
+		ArrayList<Node> newNodes = new ArrayList<Node>();
+		for (Node node : nodearr)
+			newNodes.add(node);
+		nodes = newNodes;
+	}
+
+	public void setNodes(ArrayList<Node> nodes) {
+		this.nodes = nodes;
+	}
+
+		nodes.add(node);
+		public void addNode(Node node) {
+	}
+
+	public double[][] getCommute() {
+		return commute;
+	}
+
+	public void setCommute(double[][] commute) {
+		this.commute = commute;
+	}
+
+}

@@ -1,0 +1,46 @@
+
+set t epslatex color 
+
+set xlabel "$r$" 
+set ylabel "$-\ln(H(r))+\ln(r^2)$" 
+
+datafile="pmf_gigaball"
+grapha="pmfa_gigaball.tex"
+graphb="pmfb_gigaball.tex"
+set output grapha
+
+Rs=30.
+lr=2.
+Rb=20.
+N=50.
+
+f(D)= -pi*(Rs-lr)*((2.*lr-D)*(Rs+Rb-lr+D/2)+(2.*lr-Rs+Rb)*(Rs+Rb)*log((Rs-Rb-D)/(Rs-Rb-2.*lr)))
+g(x) = f(Rs-Rb-x)
+h(x) = (x>(Rs-Rb-2*lr) && x<(Rs-Rb)) ? g(x) : 1/0
+
+c1=(N/(4./3.*pi*(Rs-lr)**3))
+j(x) = c1*h(x)+b
+fit [x=(Rs-Rb-2*lr):(Rs-Rb)] j(x) datafile u 1:($2+log($1**2)) via b
+
+c2=(N/(4./3.*pi*((Rs-lr)**3-(Rb+lr)**3)))
+i(x) = c2*h(x)+a 
+fit [x=(Rs-Rb-2*lr):(Rs-Rb)] i(x) datafile u 1:($2+log($1**2)) via a
+
+set xrange [Rs-Rb-2*lr:Rs-Rb]
+p datafile u 1:($2+log($1**2)) title 'Simulation results' ps 2 lw 2,\
+j(x) title '$V_{big}$ omitted' lc rgb 'black' lw 3,\
+i(x)  title '$V_{big}$ not omitted' lc rgb 'green' lw 3
+
+set t epslatex color 
+set output grapha
+         
+pause -1
+replot  
+
+set t epslatex color 
+set output graphb
+         
+pause -1 
+replot
+
+set o

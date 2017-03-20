@@ -1,0 +1,12 @@
+public class BruteAnt extends Ant {
+	static final int INDEX = 1; // index for keeping track of the ant races
+	static final int STR = 2;
+	static final int SPEED = 1;
+
+	public BruteAnt() {
+	}
+
+	public static oid move(Food[] food, double fb, int x, int y) {
+		super.move(food, fb, x, y, SPEED);
+	}
+}

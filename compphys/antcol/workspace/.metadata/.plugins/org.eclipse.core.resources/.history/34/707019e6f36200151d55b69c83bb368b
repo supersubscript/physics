@@ -1,0 +1,23 @@
+public class Square {
+	// Row: type
+	// Column: no food / has food
+	private int[][] ants = new int[2][2];
+
+	public Square(int[][] ants) {
+		this.ants = ants;
+	}
+
+	public void combat() {
+		if (ants[0][0] + ants[0][1] != 0 && ants[1][0] + ants[1][1] != 0) {
+			//FIGHT!
+		}
+	}
+
+	public int[][] getAnts() {
+		return ants;
+	}
+
+	public void getFood() {
+
+	}
+}

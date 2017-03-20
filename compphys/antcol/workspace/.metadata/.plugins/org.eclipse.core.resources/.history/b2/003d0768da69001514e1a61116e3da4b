@@ -1,0 +1,220 @@
+import java.util.ArrayList;
+import java.util.Random;
+
+public class Square
+{
+   // Row: type
+   // Column: no food / has food
+   private int[][] ants = new int[2][2];
+   Random rand = new Random();
+
+   // Initialize square with zero ants
+   public Square()
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+            ants[i][j] = 0;
+   }
+
+   // Initialize square with ant matrix
+   public Square(int[][] ants)
+   {
+      this.ants = ants;
+   }
+
+   public void addAnts(int i, int j, int amt)
+   {
+      ants[i][j] += amt;
+   }
+
+   public void anthillInit(int type)
+   {
+      ants[type][0] = Settings.ANTHILLANTS;
+   }
+
+   // Let ants not carrying food on a select square fight
+   public void combat()
+   {
+      int[] totalAntStr = { ants[0][0] * SpeedAnt.STR,
+            ants[1][0] * BruteAnt.STR };
+
+      if (totalAntStr[0] != 0 && totalAntStr[1] != 0)
+      {
+         double[] kills = { -1, -1 };
+
+         for (int j = 0; j < kills.length; j++)
+            while (kills[j] < 0) // Only take positive values
+               kills[j] = Settings.COMBATCONST
+                     * (rand.nextGaussian() * Math.sqrt(totalAntStr[j])
+                           + totalAntStr[j]);
+
+         // Kill ants w/ and wo/ food fractionally. Food is lost upon kill.
+         for (int i = 0; i < ants.length; i++)
+            for (int j = 0; j < ants[i].length; j++)
+            {
+               ants[i][j] -= kills[(i + 1) % 2] * ants[i][j]
+                     / (ants[i][j] + ants[i][(j + 1) % 2]);
+               // No negative ants plz
+               if (ants[i][j] < 0)
+                  ants[i][j] = 0;
+            }
+      }
+   }
+
+   public int sumAnts()
+   {
+      int temp = 0;
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants.length; j++)
+            temp += ants[i][j];
+      return temp;
+   }
+
+   public int[][] getAnts()
+   {
+      return ants;
+   }
+
+   // Gives out food to unfed ants proportionally, and returns new food stock at
+   // location.
+   public int getFood(int food)
+   {
+      int unfed = ants[0][0] + ants[1][0];
+      if (unfed == 0)
+         return food;
+      if (food >= unfed)
+      {
+         ants[0][1] += ants[0][0];
+         ants[0][0] = 0;
+         ants[1][1] += ants[1][0];
+         ants[1][0] = 0;
+         return food - unfed;
+      }
+      // Distributes ants according to available food.
+      // Logic: ants[i][(1 or 0)] (+ or -)= ants[i][0] / unfed * food;
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+            ants[i][(j + 1) % 2] += Math.pow(-1, j + 1) * ants[i][0] / unfed
+                  * food;
+      return food - (ants[0][0] + ants[1][0] / unfed);
+   }
+
+   // TODO: Fix so that both add/sub uses methods?
+   public void transferAnts(Square sq, int[][] tr)
+   {
+      for (int i = 0; i < ants.length; i++)
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            ants[i][j] -= tr[i][j];
+            sq.addAnts(i, j, tr[i][j]);
+         }
+   }
+
+   // Returns number of travelers of different groups, where first column is
+   // square in dir u/d/l/r
+   public int[][][] move(ArrayList<Food> food, ArrayList<Anthill> anthills,
+         int x, int y)
+
+   {
+      int[][][] temp = new int[4][2][2]; // Return matrix
+      int speed;
+
+      for (int i = 0; i < ants.length; i++)
+      {
+         for (int j = 0; j < ants[i].length; j++)
+         {
+            for (int l = 0; l < ants[i][j]; l++)
+            {
+               if (i == SpeedAnt.INDEX)
+                  speed = SpeedAnt.SPEED;
+               else
+                  speed = BruteAnt.SPEED;
+               // The higher the value of the direction, the more likely the ant
+               // is to move in that direction
+               // TODO: Make array?
+               double up = speed, down = speed, left = speed, right = speed,
+                     nothing = 1;
+
+               // Going home? ...
+               if (j == 1)
+               {
+                  for (Anthill hill : anthills)
+                  {
+                     if (hill.getType() == i) // Only go to own anthills
+                     {
+                        int rx = hill.getX() - x;
+                        int ry = hill.getY() - y;
+
+                        double add = speed * Settings.HOMEBIAS
+                              / (Math.sqrt((rx * rx + ry * ry)*(rx * rx + ry * ry)*(rx * rx + ry * ry)));
+                        System.out.println(add);
+                        if (ry > 0)
+                           up = add * ry;
+                        else if (ry < 0)
+                           down = add * ry;
+                        if (rx < 0)
+                           left += add * rx;
+                        else if (rx > 0)
+                           right += add * rx;
+                     }
+                  }
+               }    
+               // ... Or going for food?
+               else
+               {
+                  for (int k = 0; k < food.size(); k++)
+                  {
+                     // Gets are costly ...
+                     Food f = food.get(k);
+                     int rx = f.getX() - x;
+                     int ry = f.getY() - y;
+                     double add = speed * Settings.FOODBIAS * f.getAmt()
+                           / (Math.sqrt((rx * rx + ry * ry)*(rx * rx + ry * ry)*(rx * rx + ry * ry)));
+                     if (ry > 0)
+                        up = add * ry;
+                     else if (ry < 0)
+                        down = add * ry;
+                     if (rx < 0)
+                        left += add * rx;
+                     else if (rx > 0)
+                        right += add * rx;
+                  }
+               }
+
+               double sum = up + down + left + right + nothing;
+
+               // Account for standing next to a border and then calculate walk
+               // bias
+               if (y != Settings.MATRIXSIZE-1)
+                  up /= sum;
+               else
+                  up = 0;
+               if (y != 0)
+                  down /= sum;
+               else
+                  down = 0;
+               if (x != 0)
+                  left /= sum;
+               else
+                  left = 0;
+               if (x != Settings.MATRIXSIZE-1)
+                  right /= sum;
+               else
+                  right = 0;
+
+               double R = Math.random();
+
+               if (R < up)
+                  temp[0][i][j]++;
+               else if (R < up + down)
+                  temp[1][i][j]++;
+               else if (R < up + down + left)
+                  temp[2][i][j]++;
+               else if (R < up + down + left + right)
+                  temp[3][i][j]++;
+            }
+         }
+      }
+      return temp;
+   }
+}

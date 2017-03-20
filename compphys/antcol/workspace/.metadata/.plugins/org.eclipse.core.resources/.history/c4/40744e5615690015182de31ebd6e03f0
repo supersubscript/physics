@@ -1,0 +1,9 @@
+public class Settings
+{
+   public static final int MATRIXSIZE = 100;
+   public static final int FRAMESIZE = 1000;
+   public static int SQSIZE = FRAMESIZE / MATRIXSIZE;
+   public static final double FOODBIAS = 0.01;
+   public static final double HOMEBIAS = 0.4;
+
+}

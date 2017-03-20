@@ -1,0 +1,13 @@
+public class Anthill {
+	private int x;
+	private int y;
+	private int food = 0;
+
+	public int getFood() {
+		return food;
+	}
+
+	public void migrate() {
+
+	}
+}

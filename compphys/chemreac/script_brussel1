@@ -1,0 +1,34 @@
+set terminal epslatex color 
+reset
+#set xlabel 'material anisotropy'
+#set ylabel 'stress anisotropy'
+#set zlabel 'cos(angle(stress,strain))'
+
+file='brussel1'
+datafile=file.".dat"
+graph=file.".tex"
+
+#maxtime=400
+#maxcells=20
+#maxcons=0.12
+
+#set xrange [0:maxtime]        # Sets the range of the graph
+#set yrange [0:maxcells] 
+#set zrange [1400:2600] 
+#set grid
+set grid
+set output graph
+#set ztics 0,0.5,1
+#set xtics 1,1,5
+#set cbtics 0,0.5,1
+
+set key nobox opaque
+
+set xlabel "Time"
+set ylabel "Concentration"
+#splot datafile using ((($1)+40)/40):3:5 title 'cos(stress,strain)' pt 1 ps 0.0
+#splot datafile using ((($1)+40)/40):((10-abs($2))/10):5 title 'cos(stress,strain)' pt 1 ps 0.0
+
+plot datafile using 2:5 w l lt -1 t 'X', '' u 2:4 w l lt 1 lc rgb 'black' t 'Y'
+
+set o

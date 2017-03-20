@@ -1,0 +1,84 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.JPanel;
+
+public class AntPanel extends JPanel
+{
+   // private Image screenBuffer;
+   Random rand = new Random();
+   Square[][] squares;
+   private ArrayList<Food> food;
+   private ArrayList<Anthill> anthills;
+
+   public AntPanel(final int width, final int height)
+   {
+   }
+
+   public void update(Square[][] squares, ArrayList<Food> food,
+         ArrayList<Anthill> anthills)
+   {
+      this.squares = squares;
+      this.food = food;
+      this.anthills = anthills;
+   }
+
+   public void paintComponent(Graphics g)
+   {
+      super.paintComponent(g);
+      // Draw all ants
+      for (int i = 0; i < squares.length; i++)
+         for (int j = 0; j < squares.length; j++)
+         {
+            int[][] ants = squares[i][j].getAnts();
+
+            // Draw first ant typese
+            g.setColor(Color.BLUE);
+            for (int k = 0; k < ants[0][0] + ants[0][1]; k++)
+               g.drawOval(Settings.SQSIZE* i + rand.nextInt(Settings.SQSIZE),
+                     sqSize * j + rand.nextInt(sqSize), 1, 1);
+
+            // Draw second ant type
+            g.setColor(Color.BLACK);
+            for (int k = 0; k < ants[1][0] + ants[1][1]; k++)
+               g.drawOval(sqSize * i + rand.nextInt(sqSize),
+                     sqSize * j + rand.nextInt(sqSize), 1, 1);
+         }
+
+      // Draw all food
+      g.setColor(Color.GREEN);
+      for (Food f : food)
+      {
+         g.drawOval((int) (f.getX() * sqSize + sqSize / 2.),
+               (int) (f.getY() * sqSize + sqSize / 2.),
+               (int) Math.sqrt(f.getAmt()), (int) Math.sqrt(f.getAmt()));
+      }
+
+      // Draw all anthills
+      for (Anthill hill : anthills)
+      {
+         if (hill.getType() == 0)
+            g.setColor(Color.RED);
+         else
+            g.setColor(Color.MAGENTA);
+
+         g.drawRect((int) (hill.getX() * sqSize + sqSize / 2.),
+               (int) (hill.getY() * sqSize + sqSize / 2.), 3, 3);
+      }
+
+   }
+
+   }
+
+   // Takes in squares (thank God for pointers),
+   public void paint(Square[][] squares, int sqSize, ArrayList<Food> food,
+         ArrayList<Anthill> anthills, Graphics g)
+   {
+      // screenBuffer = createImage(squares.length * sqSize, squares[0].length * sqSize);
+
+
+
+}

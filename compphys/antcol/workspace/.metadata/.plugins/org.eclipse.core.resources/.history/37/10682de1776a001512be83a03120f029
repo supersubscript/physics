@@ -1,0 +1,32 @@
+public class Common
+{
+   public static final int ITERATIONS = 100000;
+   public static final int ANTHILLANTS = 10000;
+   public static final int NEWANTHILLPOP = 200;
+   public static final int MATRIXSIZE = 100;
+   public static final int FRAMESIZE = 1000;
+   public static final int SQSIZE = FRAMESIZE / MATRIXSIZE;
+   public static final int ANTHILLDIST = 40;
+   public static final int FOODSTACKS = 40;
+   public static final int FOODSTACKSIZE = 400;
+   public static final int MIGRATELIMIT = 1500;
+   public static final int ANTHILL_LIMIT= 1500;
+   public static final int ANTGENERATION= 10;
+   public static final double FOODBIAS = 3;
+   public static final double HOMEBIAS = 10000;
+   public static final double COMBATCONST = 0.001;
+   public static final double FOODCHANCE = 1 / 100.;
+   
+
+   // Carmack's fast inverse square root
+   public static double invSqrt(double x)
+   {
+      double xhalf = 0.5d * x;
+      long i = Double.doubleToLongBits(x);
+      i = 0x5fe6ec85e7de30daL - (i >> 1);
+      x = Double.longBitsToDouble(i);
+      x = x * (1.5d - xhalf * x * x);
+      return x;
+
+   }
+}

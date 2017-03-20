@@ -1,0 +1,9 @@
+set t pngcairo enhanced font "Computer Modern, 12"
+set pm3d
+set hidden3d
+unset map
+set xlabel "Time" rotate parallel offset -1,-1
+set ylabel "Position" rotate parallel offset .5,-.5
+set zlabel "Temperature" rotate parallel
+set o "test.png"
+splot 'script/test.dat' u 1:2:3 w d noti

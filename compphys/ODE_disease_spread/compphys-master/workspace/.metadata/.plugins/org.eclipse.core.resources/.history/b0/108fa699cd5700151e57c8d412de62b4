@@ -1,0 +1,10 @@
+
+public class Disease {
+	private double alpha = 0.33; // recovery rate
+	private double beta = 0.8; // infection rate
+	private double gamma = 0.0002; // vaccination rate
+
+	public Disease(double a, double b, double c) {
+		
+	};
+}

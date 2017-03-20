@@ -1,0 +1,170 @@
+\documentclass[a4paper,12pt]{article}
+   % Packages and definitions:
+   % {
+      \usepackage{float}
+      \usepackage[english]{babel}
+      \usepackage[utf8]{inputenc}
+      \usepackage{amsmath}
+      \usepackage{amssymb}
+      \usepackage{color}
+      \usepackage{subcaption}
+      \usepackage{booktabs}
+      \usepackage{tikz}
+      \usepackage{multirow}
+      \usetikzlibrary{decorations.pathreplacing}
+      \usepackage{graphicx,epstopdf}
+      \usepackage{cleveref}
+      \usepackage{collcell} % loads array
+      \usepackage{listings}
+      \usepackage{algorithm}
+      \usepackage{algpseudocode}
+      \newcolumntype{m}{>{$} r <{$}}
+      \newcolumntype{u}{>{$[\collectcell\si} l <{\endcollectcell]$}}
+      \newcommand{\approxtext}[1]{\ensuremath{\stackrel{\text{#1}}{=}}}
+      \newcommand{\matr}[1]{\mathbf{#1}}
+      \newcommand{\partt}[2]{\ensuremath{\dfrac{\d {#1}}{\partial {#2}}}}
+      \renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}} % non-italized differentials
+      \newcommand{\h}[0]{\ensuremath{\hbar}} % hbar
+      \newcommand{\qed}[0]{\ensuremath{\tag*{$\square$}}} % QED square
+      \def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+      \let\endchangemargin=\endlist 
+      \usepackage{amsthm}
+      \theoremstyle{plain}
+      \newtheorem{thm}{theorem} % reset theorem numbering for each chapter
+      \theoremstyle{definition}
+      \newtheorem{defn}[thm]{definition} % definition numbers are dependent on theorem numbers
+      \newtheorem{exmp}[thm]{example} % same for example numbers
+      \bibliographystyle{natbib}
+      \renewcommand{\theequation}{\thesection.\arabic{equation}}
+      \newcommand{\ts}{\textsuperscript} 
+
+      \definecolor{dkgreen}{rgb}{0,0.6,0}
+      \definecolor{gray}{rgb}{0.5,0.5,0.5}
+      \definecolor{mauve}{rgb}{0.58,0,0.82}
+
+      \lstset{frame=tb,
+        language=Java,
+        aboveskip=3mm,
+        belowskip=3mm,
+        showstringspaces=false,
+        columns=flexible,
+        basicstyle={\small\ttfamily},
+        numbers=none,
+        numberstyle=\tiny\color{gray},
+        keywordstyle=\color{blue},
+        commentstyle=\color{dkgreen},
+        stringstyle=\color{mauve},
+        breaklines=true,
+        breakatwhitespace=true,
+        tabsize=3
+      }
+% }
+\title
+{
+	\textbf
+	{
+   On the warring of ants: Modelling competitive ant colonization through random walks
+   }
+}
+
+\author{Henrik Åhl\\
+\small{in collaboration with Denhanh Huynh}}
+\date{\today}
+
+\begin{document}
+\begin{titlepage}
+	
+   \maketitle 
+	\begin{center}
+		\phantom{a}
+		{Department of Astronomy and Theoretical Physics, Lund University}
+		\\[2cm]
+		{Project supervised by Tobias Ambjörnsson}
+		\vfill
+		\includegraphics[height=4cm]{logocLUeng.pdf}
+	\end{center}
+	\thispagestyle{empty} % do not count pages just yet
+
+\end{titlepage}
+
+\section{Introduction}
+
+\newpage
+
+\section{Creating a model for colonization}
+	\setcounter{equation}{0}
+   \subsection{Problem description}
+   
+
+\section{Results and conclusions}
+   
+%      \begin{figure}[H]
+%         \vspace*{1cm}
+%         \hspace*{-2cm}
+%         \centering
+%         \begin{minipage}[t]{.6\textwidth}		
+%            \vspace{0pt}
+%            \centering
+%            \resizebox{\columnwidth}{!}{\input{lower.tex}}
+%            \caption{Comparison of dynamics between matrix with side 5 and side
+%            25.}
+%             \label{fig:lower}
+%         \end{minipage}~\hspace*{1em}
+%         \begin{minipage}[t]{.6\textwidth}		
+%            \vspace{0pt}
+%            \centering
+%            \resizebox{\columnwidth}{!}{\input{higher.tex}}
+%            \caption{Comparison between matrix with side 50 and side 100}
+%            \label{fig:higher}
+%         \end{minipage}
+%      \end{figure}
+      
+
+%      \begin{figure}[H]
+%         \centering
+%         \includegraphics[width=.8\textwidth]{5050foodhunt.png}
+%         \caption{Snapshot of simulation in a $50 \times 50$ matrix.
+%            \texttt{speedAnts} are represented with blue dots (black anthills), while
+%            \texttt{bruteAnts} are seen as red (magenta anthills). In this capture, ants are seen
+%            having just finished a source of food, and are returning homeward.} 
+%         \label{fig:graph}            
+%      \end{figure}
+
+
+\newpage
+
+\begin{thebibliography}{99}
+   \bibitem{lecnotes}
+     Tobias Ambjörnsson,
+     \emph{Lecture notes, Computational Physics},
+     Department of Astronomy and Theoretical Physics,
+     Lund University,
+     2015.
+  \bibitem{midges}
+      A. Attanasi et al,
+      \emph{Collective Behaviour without Collective Order in Wild Swarms of
+      Midges},
+      PLoS Computational Biology: 10(7),
+      2014.
+   \bibitem{ants}
+      D. Jin et al,
+      \emph{Ant Colony Optimization with a new Random Walk Model for Community
+      Detection in Complex Networks},
+      Jilin University,
+      2013.
+\end{thebibliography}
+\newpage
+\appendix
+\section{Code}
+ %  \label{sec:code}
+ %  \lstinputlisting[language=Java]{Common.java}
+ %  \lstinputlisting[language=Java]{Forest.java}
+ %  \lstinputlisting[language=Java]{Square.java}
+ %  \lstinputlisting[language=Java]{Food.java}
+ %  \lstinputlisting[language=Java]{Anthill.java}
+ %  \lstinputlisting[language=Java]{AntPanel.java}
+ %  \lstinputlisting[language=Java]{Ant.java}
+ %  \lstinputlisting[language=Java]{SpeedAnt.java}
+ %  \lstinputlisting[language=Java]{BruteAnt.java}
+\end{document}
+

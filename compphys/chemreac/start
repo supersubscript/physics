@@ -1,0 +1,7 @@
+set t wxt
+set pm3d
+set map
+set view map
+set hidden3d
+unset grid
+splot 'test.dat' u 2:3:4 w d noti

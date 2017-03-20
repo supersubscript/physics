@@ -1,0 +1,158 @@
+% GNUPLOT: LaTeX picture with Postscript
+\begingroup
+  \makeatletter
+  \providecommand\color[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package color not loaded in conjunction with
+      terminal option `colourtext'%
+    }{See the gnuplot documentation for explanation.%
+    }{Either use 'blacktext' in gnuplot or load the package
+      color.sty in LaTeX.}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\includegraphics[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package graphicx or graphics not loaded%
+    }{See the gnuplot documentation for explanation.%
+    }{The gnuplot epslatex terminal needs graphicx.sty or graphics.sty.}%
+    \renewcommand\includegraphics[2][]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \@ifundefined{ifGPcolor}{%
+    \newif\ifGPcolor
+    \GPcolorfalse
+  }{}%
+  \@ifundefined{ifGPblacktext}{%
+    \newif\ifGPblacktext
+    \GPblacktexttrue
+  }{}%
+  % define a \g@addto@macro without @ in the name:
+  \let\gplgaddtomacro\g@addto@macro
+  % define empty templates for all commands taking text:
+  \gdef\gplbacktext{}%
+  \gdef\gplfronttext{}%
+  \makeatother
+  \ifGPblacktext
+    % no textcolor at all
+    \def\colorrgb#1{}%
+    \def\colorgray#1{}%
+  \else
+    % gray or color?
+    \ifGPcolor
+      \def\colorrgb#1{\color[rgb]{#1}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color[rgb]{1,0,0}}%
+      \expandafter\def\csname LT1\endcsname{\color[rgb]{0,1,0}}%
+      \expandafter\def\csname LT2\endcsname{\color[rgb]{0,0,1}}%
+      \expandafter\def\csname LT3\endcsname{\color[rgb]{1,0,1}}%
+      \expandafter\def\csname LT4\endcsname{\color[rgb]{0,1,1}}%
+      \expandafter\def\csname LT5\endcsname{\color[rgb]{1,1,0}}%
+      \expandafter\def\csname LT6\endcsname{\color[rgb]{0,0,0}}%
+      \expandafter\def\csname LT7\endcsname{\color[rgb]{1,0.3,0}}%
+      \expandafter\def\csname LT8\endcsname{\color[rgb]{0.5,0.5,0.5}}%
+    \else
+      % gray
+      \def\colorrgb#1{\color{black}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color{black}}%
+      \expandafter\def\csname LT1\endcsname{\color{black}}%
+      \expandafter\def\csname LT2\endcsname{\color{black}}%
+      \expandafter\def\csname LT3\endcsname{\color{black}}%
+      \expandafter\def\csname LT4\endcsname{\color{black}}%
+      \expandafter\def\csname LT5\endcsname{\color{black}}%
+      \expandafter\def\csname LT6\endcsname{\color{black}}%
+      \expandafter\def\csname LT7\endcsname{\color{black}}%
+      \expandafter\def\csname LT8\endcsname{\color{black}}%
+    \fi
+  \fi
+  \setlength{\unitlength}{0.0500bp}%
+  \begin{picture}(8640.00,4320.00)%
+    \gplgaddtomacro\gplbacktext{%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,968){\makebox(0,0)[r]{\strut{}8.30}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,1585){\makebox(0,0)[r]{\strut{}8.32}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,2203){\makebox(0,0)[r]{\strut{}8.34}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,2820){\makebox(0,0)[r]{\strut{}8.36}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,3438){\makebox(0,0)[r]{\strut{}8.38}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(946,4055){\makebox(0,0)[r]{\strut{}8.40}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(1325,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}AT}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(1572,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}BE}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(1819,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}BG}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(2066,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}CY}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(2313,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}CZ}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(2560,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}DE}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(2807,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}DK}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(3055,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}EE}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(3302,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}EL}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(3549,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}ES}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(3796,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}FI}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4043,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}FR}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4290,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}HR}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4537,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}HU}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4784,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}IE}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(5031,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}IT}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(5278,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}LT}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(5525,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}LU}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(5772,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}LV}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(6019,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}MT}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(6266,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}NL}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(6514,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}PL}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(6761,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}PT}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(7008,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}RO}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(7255,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}SE}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(7502,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}SI}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(7749,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}SK}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(7996,836){\rotatebox{-90}{\makebox(0,0)[l]{\strut{}UK}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(176,2511){\rotatebox{-270}{\makebox(0,0){\strut{}Infected people per week [M]}}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4660,154){\makebox(0,0){\strut{}Country of initial occurence}}%
+      \colorrgb{0.42,0.42,0.42}%
+      \put(4660,3945){\makebox(0,0){\strut{}}}%
+    }%
+    \gplgaddtomacro\gplfronttext{%
+    }%
+    \gplbacktext
+    \put(0,0){\includegraphics{test}}%
+    \gplfronttext
+  \end{picture}%
+\endgroup

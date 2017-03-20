@@ -1,0 +1,11 @@
+public class SpeedAnt extends Ant
+{
+   static final int INDEX = 0; // index for keeping track of the ant races
+   static final int STR = 1;
+   static final int SPEED = 2;
+
+   public static int move(ArrayList<Food> food, double fb, int x, int y)
+   {
+      Ant.move(food, fb, x, y, SPEED);
+   }
+}

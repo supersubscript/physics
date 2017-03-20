@@ -1,0 +1,125 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+/* Main method simulating the spreading of a disease over a network 
+ * consisting of a set of nodes. */
+public class DiseaseSpread {
+	private final static double h = 0.01; // size of the timestep
+
+	public static void main(String[] args) throws FileNotFoundException {
+		for (int itr = 0; itr < 28; itr++) {
+		Network europe = new Network();
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		Disease disease = new Disease(1, 2.5, .002);
+		BufferedReader br = new BufferedReader(
+				new FileReader("/home/henrik/gitter/ODE_disease_spread/data/traveldata.dat"));
+		double[][] commute = new double[28][28]; // travel weights
+		int iterations = 52;
+		ODEsolver solver = new ODEsolver();
+
+			// Read from file and compute
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Set<String> seen = new HashSet<String>();
+			while (line != null) {
+				String[] fields = line.split("\t");
+				if (!seen.contains(fields[0])) {
+					seen.add(fields[0]);
+					nodes.add(new Node(fields[0], Double.parseDouble(fields[3]), 0, 0));
+				}
+				// Set commute
+				for (int i = 0; i < 28; i++) {
+					if (nodes.size() - 1 == i)
+						continue;
+
+					String[] innerFields = line.split("\t");
+					commute[nodes.size() - 1][i] = Double.parseDouble(innerFields[2])
+							/ Double.parseDouble(innerFields[3]) / 52.;
+					try {
+						line = br.readLine();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			for (int i = 0; i < commute.length; i++) {
+				for (int j = 0; j < commute.length; j++) {
+				//System.out.print(commute[i][j] + "\t");
+				if(commute[i][j] != commute[j][i])
+				
+				}
+				System.out.println();
+			}
+
+			europe.setCommute(commute);
+			nodes.get(0).setI(1); // Set initial infected
+			europe.setNodes(nodes);
+			Node[] nodearr = europe.getNodes(); // Used a lot
+			PrintWriter[] w = new PrintWriter[europe.getNodes().length];
+			File dir = new File(
+					"/home/henrik/gitter/ODE_disease_spread/compphys-master/workspace/Copy of Jeff/datafiles/"
+							+ nodearr[itr].getName());
+			if (!dir.exists()) {
+				try {
+					dir.mkdir();
+				} catch (SecurityException se) {
+					se.printStackTrace();
+				}
+			}
+			boolean lol = false;
+			if (lol) {
+				System.out.println("#Week \tSusceptible \tInfected \tRecovered");
+				for (int i = 0; i < nodearr.length; i++) {
+					w[i] = new PrintWriter(new FileOutputStream(
+							"datafiles/" + nodearr[itr].getName() + "/" + nodearr[i].getName() + ".dat"), true);
+					w[i].println("#t \tSusceptible \tInfected \tRecovered");
+					w[i].println("0 \t" + (int) (nodearr[i].getS() + .5) + "\t" + (int) (nodearr[i].getI() + .5) + "\t"
+							+ (int) (nodearr[i].getR() + .5));
+
+					System.out.println("0 \t" + (int) (nodearr[i].getS() + .5) + "\t" + (int) (nodearr[i].getI() + .5)
+							+ "\t" + (int) (nodearr[i].getR() + .5));
+
+				}
+			}
+
+			for (int i = 0; i < iterations / h; i++) {
+				Network test = new Network();
+				test.setCommute(europe.getCommute());
+				test.setNodes(europe.getNodes());
+				europe = solver.timeStep(europe, disease, 100 * h);
+				test = solver.timeStep(test, disease, 0.01 * h);
+				if (lol) {
+					System.out.println(europe.getNodes()[0].getR() - test.getNodes()[0].getR());
+
+					// Saves values to files and prints to console
+					for (int j = 0; j < europe.getNodes().length; j++) {
+						w[j].println(((i + 1) * h) + "\t" + (int) (nodearr[j].getS() + .5) + "\t"
+								+ (int) (nodearr[j].getI() + .5) + "\t" + (int) (nodearr[j].getR() + .5));
+
+						// System.out.println((i + 1) * h + "\t" + (int)
+						// (nodearr[j].getS() + .5) + "\t"
+						// + (int) (nodearr[j].getI() + .5) + "\t" + (int)
+						// (nodearr[j].getR() + .5));
+					}
+				}
+
+			}
+			// Close output
+			if (lol) {
+				for (int i = 0; i < w.length; i++)
+					w[i].close();
+			}
+		}
+	}
+}

@@ -1,0 +1,53 @@
+
+public class Test
+{
+  
+   public class Pair
+   {
+      private int N;
+      private int[][] matrix;
+
+      public int getN()
+      {
+         return N;
+      }
+
+      public int[][] getMatrix()
+      {
+         return matrix;
+      }
+
+      public void setN(int N)
+      {
+         this.N = N;
+      }
+
+      public void setMatrix(int[][] matrix)
+      {
+         this.matrix = matrix;
+      }
+
+   }
+
+   
+   public Pair Function(){
+      Pair p = new Pair(); 
+      int someValue = 3; 
+      /* Modify matrix etc. */
+      int[][] matrix = new matrix[2][2];
+      // set value
+      p.setN(someValue);
+      p.setMatrix()
+      
+      
+      
+      
+      
+      
+      
+      
+   }
+   
+   
+   
+}

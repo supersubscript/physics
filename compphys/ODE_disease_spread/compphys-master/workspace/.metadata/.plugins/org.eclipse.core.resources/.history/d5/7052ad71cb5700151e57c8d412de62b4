@@ -1,0 +1,8 @@
+public final class Jeff {
+	static final double ALPHA = 0.33; // recovery rate
+	static final double BETA = 0.5; // infection rate
+	static final double GAMMA = 0.02; // vaccination rate
+
+	private Jeff() {
+	};
+}

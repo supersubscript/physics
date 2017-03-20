@@ -1,0 +1,21 @@
+set t epslatex color 
+
+set xlabel "$r$" 
+set ylabel "$-\ln(H(r))+\ln(r^2)$" 
+
+datafile="pmf_exc2_smaller_big_more_layers_2"
+set output "exc2.tex" 
+
+Rs=22.
+lr=1.5
+Rb=11.
+N=50.
+
+set xrange [:11]
+p datafile u 1:($2+log($1**2)) title '' w lp ps 2 pi 5
+
+set o
+
+# If you want to convert the file to pdf
+#!epstopdf pmf1a.eps
+#!epstopdf pmf1as.eps
