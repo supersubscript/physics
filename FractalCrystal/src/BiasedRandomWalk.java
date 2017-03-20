@@ -160,7 +160,7 @@ public class BiasedRandomWalk
 			}
 			crystal.println();
 		}
-		boxDim.println(VOLTAGE_CONSTANT + "\t" + boxDim(grid, 100, 1));
+		boxDim.println(VOLTAGE_CONSTANT + "\t" + boxDim(grid, 50, 2));
 		boxDim.close();
 		crystal.close();
 	}
