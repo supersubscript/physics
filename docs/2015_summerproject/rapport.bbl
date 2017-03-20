@@ -1,0 +1,773 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{sudoku}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Hu}{H.}%
+     {Yucheng}{Y.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Yang}{Y.}%
+     {Gongrong}{G.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{HYYG1}
+  \strng{fullhash}{HYYG1}
+  \field{number}{00}
+  \field{pages}{1\bibrangedash 11}
+  \field{title}{Sequence Evolution Under Constraints: Lessons Learned from
+  Sudoku}
+  \field{volume}{23}
+  \field{journaltitle}{Journal of Computational Biology}
+  \field{year}{2016}
+\endentry
+
+\entry{tutorial}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Whitley}{W.}%
+     {Darrell}{D.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{WD1}
+  \strng{fullhash}{WD1}
+  \field{number}{00}
+  \field{pages}{65\bibrangedash 75}
+  \field{title}{A Genetic Algorithm Tutorial}
+  \field{volume}{4}
+  \field{journaltitle}{Statistics and Computing}
+  \field{year}{1994}
+\endentry
+
+\entry{virtual_alphabets}{unpublished}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Goldberg}{G.}%
+     {David~E.}{D.~E.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{GDE1}
+  \strng{fullhash}{GDE1}
+  \field{title}{The Theory of Virtual Alphabets}
+\endentry
+
+\entry{real_coded_goldberg}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Goldberg}{G.}%
+     {David~E.}{D.~E.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{GDE1}
+  \strng{fullhash}{GDE1}
+  \field{title}{Real-coded Genetic Algorithms, Virtual Alphabets, and Blocking}
+  \field{volume}{90001}
+  \field{journaltitle}{IlliGAL Report}
+  \field{year}{1990}
+\endentry
+
+\entry{ga_vs_sa}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Manikas}{M.}%
+     {Theodore~W.}{T.~W.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Cain}{C.}%
+     {James~T.}{J.~T.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{MTWCJT1}
+  \strng{fullhash}{MTWCJT1}
+  \field{number}{101}
+  \field{title}{Genetic Algorithms vs Simulated Annealing: A Comparison of
+  Approaches for Solving the Circuit Partitioning Problem}
+  \field{volume}{96}
+  \field{journaltitle}{Technical Report}
+  \field{year}{1996}
+\endentry
+
+\entry{Man96}{inbook}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Mann}{M.}%
+     {John~W.}{J.~W.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Smith}{S.}%
+     {George~D.}{G.~D.}%
+     {}{}%
+     {}{}}%
+  }
+  \name{editor}{4}{}{%
+    {{}%
+     {Rayward-Smith}{R.-S.}%
+     {V.J.}{V.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Osman}{O.}%
+     {C.}{C.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Reeves}{R.}%
+     {C.R.}{C.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Smith}{S.}%
+     {G.D.}{G.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Wiley}%
+  }
+  \strng{namehash}{MJWSGD1}
+  \strng{fullhash}{MJWSGD1}
+  \field{isbn}{0471962805}
+  \field{pages}{235\bibrangedash 254}
+  \field{title}{A Comparison of Heuristics for Telecommunications Traffic
+  Routing}
+  \field{journaltitle}{Modern Heuristic Search Methods}
+  \field{year}{1996}
+\endentry
+
+\entry{ga_bad}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Jennison}{J.}%
+     {Christopher}{C.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Sheehan}{S.}%
+     {Nuala}{N.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{JCSN1}
+  \strng{fullhash}{JCSN1}
+  \field{number}{00}
+  \field{pages}{296\bibrangedash 318}
+  \field{title}{Theoretical and Empirical Properties of the Genetic Algorithm
+  as a Numerical Optimizer}
+  \field{volume}{4}
+  \field{journaltitle}{Journal of Computational and Graphical Statistics}
+  \field{year}{1995}
+\endentry
+
+\entry{grammatical_evolution}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {O'Neill}{O.}%
+     {Michael}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Ryan}{R.}%
+     {Conor}{C.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{OMRC1}
+  \strng{fullhash}{OMRC1}
+  \field{number}{4}
+  \field{pages}{349\bibrangedash 358}
+  \field{title}{Grammatical Evolution: Evolving Programs for an Arbitrary
+  Language}
+  \field{volume}{5}
+  \field{journaltitle}{IEEE Transactions on Evolutionary Computation}
+  \field{year}{2001}
+\endentry
+
+\entry{evol_of_communication}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Levin}{L.}%
+     {Michael}{M.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{LM1}
+  \strng{fullhash}{LM1}
+  \field{number}{00}
+  \field{pages}{167\bibrangedash 178}
+  \field{title}{The Evolution of Understanding: A Genetic Algorithm Model of
+  the Evolution of Communication}
+  \field{volume}{36}
+  \field{journaltitle}{BioSystems}
+  \field{year}{1995}
+\endentry
+
+\entry{evol_of_female_preference}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Beck}{B.}%
+     {Christopher~W.}{C.~W.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Shapiro}{S.}%
+     {Beth}{B.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Semil}{S.}%
+     {Choksi}{C.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Promislow}{P.}%
+     {Daniel~E.L.}{D.~E.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{BCW+1}
+  \strng{fullhash}{BCWSBSCPDE1}
+  \field{number}{00}
+  \field{pages}{275\bibrangedash 292}
+  \field{title}{A Genetic Algorithm Approach to Study the Evolution of Female
+  Preference Based on Male Age}
+  \field{volume}{4}
+  \field{journaltitle}{Evolutionary Ecology Research}
+  \field{year}{2002}
+\endentry
+
+\entry{evol_of_evol}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Wagner}{W.}%
+     {G{\"u}nter~P.}{G.~P.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Altenberg}{A.}%
+     {Lee}{L.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{WGPAL1}
+  \strng{fullhash}{WGPAL1}
+  \field{number}{3}
+  \field{pages}{967\bibrangedash 976}
+  \field{title}{Complex Adaptations and the Evolution of Evolvability}
+  \field{volume}{50}
+  \field{journaltitle}{Evolution}
+  \field{year}{1996}
+\endentry
+
+\entry{evol_of_evol_in_gp}{unpublished}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Altenberg}{A.}%
+     {Lee}{L.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{AL1}
+  \strng{fullhash}{AL1}
+  \field{title}{The Evolution of Evolvability in Genetic Programming}
+\endentry
+
+\entry{topology_of_the_possible}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Stadler}{S.}%
+     {Bärbel M.~R.}{B.~M.~R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Stadler}{S.}%
+     {Peter~F.}{P.~F.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Wagner}{W.}%
+     {G{\"u}nther~P.}{G.~P.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Fontana}{F.}%
+     {Walter}{W.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{SBMR+1}
+  \strng{fullhash}{SBMRSPFWGPFW1}
+  \field{number}{00}
+  \field{pages}{241\bibrangedash 274}
+  \field{title}{The Topology of the Possible: Formal Spaces Underlying Patterns
+  of Evolutionary Change}
+  \field{volume}{213}
+  \field{journaltitle}{Journal of Theoretical Biology}
+  \field{year}{2001}
+\endentry
+
+\entry{transforming_the_ss_with_gray}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Mathias}{M.}%
+     {Keith~E.}{K.~E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Whitley}{W.}%
+     {Darrell~L.}{D.~L.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{MKEWDL1}
+  \strng{fullhash}{MKEWDL1}
+  \field{number}{00}
+  \field{pages}{1\bibrangedash 11}
+  \field{title}{Sequence Evolution Under Constraints: Lessons Learned from
+  Sudoku}
+  \field{volume}{23}
+  \field{journaltitle}{Journal of Computational Biology}
+  \field{year}{2016}
+\endentry
+
+\entry{intro_to_evol_alg}{book}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Yu}{Y.}%
+     {Xinjie}{X.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Gen}{G.}%
+     {Mitsuo}{M.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Springer Publishing Company, Incorporated}%
+  }
+  \strng{namehash}{YXGM1}
+  \strng{fullhash}{YXGM1}
+  \field{isbn}{144712569X, 9781447125693}
+  \field{title}{Introduction to Evolutionary Algorithms}
+  \field{year}{2012}
+\endentry
+
+\entry{Shipman2000}{article}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Shipman}{S.}%
+     {R.}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Shackleton}{S.}%
+     {M.}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Harvey}{H.}%
+     {I.}{I.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{SRSMHI1}
+  \strng{fullhash}{SRSMHI1}
+  \verb{doi}
+  \verb 10.1023/A:1026714927227
+  \endverb
+  \field{number}{4}
+  \field{pages}{103\bibrangedash 111}
+  \field{title}{The Use of Neutral Genotype-Phenotype Mappings for Improved
+  Evolutionary Search}
+  \field{volume}{18}
+  \field{journaltitle}{BT Technology Journal}
+  \field{year}{2000}
+\endentry
+
+\entry{no_free_lunch}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Wolpert}{W.}%
+     {D.~H.}{D.~H.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Macready}{M.}%
+     {W.~G.}{W.~G.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{WDHMWG1}
+  \strng{fullhash}{WDHMWG1}
+  \field{number}{1}
+  \field{pages}{67\bibrangedash 82}
+  \field{title}{No Free Lunch Theorems for Optimization}
+  \verb{url}
+  \verb http://dx.doi.org/10.1109/4235.585893
+  \endverb
+  \field{volume}{1}
+  \field{journaltitle}{Trans. Evol. Comp}
+  \field{year}{1997}
+\endentry
+
+\entry{Goldberg_GA_book}{book}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Goldberg}{G.}%
+     {David~E.}{D.~E.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Addison-Wesley Longman Publishing Co., Inc.}%
+  }
+  \strng{namehash}{GDE1}
+  \strng{fullhash}{GDE1}
+  \field{edition}{1st}
+  \field{isbn}{0201157675}
+  \field{title}{Genetic Algorithms in Search, Optimization and Machine
+  Learning}
+  \list{location}{1}{%
+    {Boston, MA, USA}%
+  }
+  \field{year}{1989}
+\endentry
+
+\entry{varlen}{inbook}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Poli}{P.}%
+     {Riccardo}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Rowe}{R.}%
+     {Jonathan~E.}{J.~E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Stephens}{S.}%
+     {Christopher~R.}{C.~R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Wright}{W.}%
+     {Alden~H.}{A.~H.}%
+     {}{}%
+     {}{}}%
+  }
+  \name{editor}{5}{}{%
+    {{}%
+     {Foster}{F.}%
+     {James~A.}{J.~A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Lutton}{L.}%
+     {Evelyne}{E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Miller}{M.}%
+     {Julian}{J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Ryan}{R.}%
+     {Conor}{C.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Tettamanzi}{T.}%
+     {Andrea}{A.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Springer Berlin Heidelberg}%
+  }
+  \strng{namehash}{PR+1}
+  \strng{fullhash}{PRRJESCRWAH1}
+  \field{chapter}{Allele Diffusion in Linear Genetic Programming and
+  Variable-Length Genetic Algorithms with Subtree Crossover}
+  \verb{doi}
+  \verb 10.1007/3-540-45984-7_21
+  \endverb
+  \field{isbn}{978-3-540-45984-2}
+  \field{pages}{212\bibrangedash 227}
+  \field{title}{Genetic Programming: 5th European Conference, EuroGP 2002
+  Kinsale, Ireland, April 3--5, 2002 Proceedings}
+  \verb{url}
+  \verb http://dx.doi.org/10.1007/3-540-45984-7_21
+  \endverb
+  \list{location}{1}{%
+    {Berlin, Heidelberg}%
+  }
+  \field{year}{2002}
+\endentry
+
+\entry{varlen2}{article}{}
+  \name{author}{6}{}{%
+    {{}%
+     {Srikanth}{S.}%
+     {R.}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {George}{G.}%
+     {R.}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Warsi}{W.}%
+     {N.}{N.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Prabhu}{P.}%
+     {D.}{D.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Petry}{P.}%
+     {F.E.}{F.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Buckles}{B.}%
+     {B.P.}{B.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{SR+1}
+  \strng{fullhash}{SRGRWNPDPFBB1}
+  \verb{doi}
+  \verb http://dx.doi.org/10.1016/0167-8655(95)00043-G
+  \endverb
+  \field{number}{8}
+  \field{pages}{789\bibrangedash 800}
+  \field{title}{A Variable-length Genetic Algorithm for Clustering and
+  Classification}
+  \field{volume}{16}
+  \field{journaltitle}{Pattern Recognition Letters}
+  \field{year}{1995}
+\endentry
+
+\entry{HELGA}{article}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Patrascu}{P.}%
+     {Monica}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Florentina~Stancu}{F.~S.}%
+     {Alexandra}{A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Pop}{P.}%
+     {Florin}{F.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{PMFSAPF1}
+  \strng{fullhash}{PMFSAPF1}
+  \field{number}{12}
+  \field{pages}{2565\bibrangedash 2576}
+  \field{title}{HELGA: A Heterogeneous Encoding Lifelike Genetic Algorithm for
+  Population Evolution Modeling and Simulation}
+  \field{volume}{18}
+  \field{journaltitle}{Soft Computing}
+  \field{year}{2014}
+\endentry
+
+\entry{theory_of_ga}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Schmitt}{S.}%
+     {Lothar~M.}{L.~M.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{SLM1}
+  \strng{fullhash}{SLM1}
+  \verb{doi}
+  \verb http://dx.doi.org/10.1016/S0304-3975(00)00406-0
+  \endverb
+  \field{number}{1–2}
+  \field{pages}{1\bibrangedash 61}
+  \field{title}{Theory of genetic algorithms}
+  \field{volume}{259}
+  \field{journaltitle}{Theoretical Computer Science}
+  \field{year}{2001}
+\endentry
+
+\entry{holland}{book}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Holland}{H.}%
+     {John~H.}{J.~H.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {MIT Press}%
+  }
+  \strng{namehash}{HJH1}
+  \strng{fullhash}{HJH1}
+  \field{isbn}{0262082136}
+  \field{title}{Adaptation in Natural and Artificial Systems: An Introductory
+  Analysis with Applications to Biology, Control and Artificial Intelligence}
+  \list{location}{1}{%
+    {Cambridge, MA, USA}%
+  }
+  \field{year}{1992}
+\endentry
+
+\entry{pheno_acc}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {J.~Maynard~Smith}{J.~M.~S.}%
+     {S.~Kauffman P. Alberch J. Campbell B. Goodwin R. Lande D. Raup
+  L.~Wolpert}{S.~K. P. A. J. C. B. G. R. L. D. R. L.~W.}%
+     {}{}%
+     {R.~Burian}{R.~B.}}%
+  }
+  \list{publisher}{1}{%
+    {University of Chicago Press}%
+  }
+  \strng{namehash}{JMSRBSKPAJCBGRLDRLW1}
+  \strng{fullhash}{JMSRBSKPAJCBGRLDRLW1}
+  \field{number}{3}
+  \field{pages}{265\bibrangedash 287}
+  \field{title}{Developmental Constraints and Evolution: A Perspective from the
+  Mountain Lake Conference on Development and Evolution}
+  \field{volume}{60}
+  \field{journaltitle}{The Quarterly Review of Biology}
+  \field{year}{1985}
+\endentry
+
+\entry{pheno_acc2}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Fontana}{F.}%
+     {Walter}{W.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Schuster}{S.}%
+     {Peter}{P.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {American Association for the Advancement of Science}%
+  }
+  \strng{namehash}{FWSP1}
+  \strng{fullhash}{FWSP1}
+  \verb{doi}
+  \verb 10.1126/science.280.5368.1451
+  \endverb
+  \field{number}{5368}
+  \field{pages}{1451\bibrangedash 1455}
+  \field{title}{Continuity in Evolution: On the Nature of Transitions}
+  \field{volume}{280}
+  \field{journaltitle}{Science}
+  \field{year}{1998}
+\endentry
+
+\entry{pheno_acc3}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Draghil}{D.}%
+     {Jeremy~A.}{J.~A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Parsons}{P.}%
+     {Todd~L.}{T.~L.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Wagner}{W.}%
+     {G{\"u}nter~P.}{G.~P.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Plotikin}{P.}%
+     {Joshua~B}{J.~B.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Macmillan Publishers Limited}%
+  }
+  \strng{namehash}{DJA+1}
+  \strng{fullhash}{DJAPTLWGPPJB1}
+  \verb{doi}
+  \verb doi:10.1038/nature08694
+  \endverb
+  \field{number}{1}
+  \field{pages}{353\bibrangedash 355}
+  \field{title}{Mutational Robustness can Facilitate Adaptation}
+  \field{volume}{463}
+  \field{journaltitle}{Nature}
+  \field{year}{2010}
+\endentry
+
+\entry{cons_seq}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Lo}{L.}%
+     {Kiersten}{K.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Smale}{S.}%
+     {Stephen~T.}{S.~T.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{LKSST1}
+  \strng{fullhash}{LKSST1}
+  \verb{doi}
+  \verb http://dx.doi.org/10.1016/S0378-1119(96)00438-6
+  \endverb
+  \field{issn}{0378-1119}
+  \field{number}{1–2}
+  \field{pages}{13 \bibrangedash  22}
+  \field{title}{Generality of a Functional Initiator Consensus Sequence}
+  \field{volume}{182}
+  \field{journaltitle}{Gene}
+  \field{year}{1996}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

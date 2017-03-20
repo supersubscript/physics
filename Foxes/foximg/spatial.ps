@@ -1,0 +1,1090 @@
+%!PS-Adobe-3.0
+%%Title: projects/Foxes/src/spatial.java
+%%For: b16_henrikahl
+%%Creator: VIM - Vi IMproved 7.4 (2013 Aug 10)
+%%CreationDate: Tue Mar  1 20:24:15 2016
+%%DocumentData: Clean8Bit
+%%Orientation: Portrait
+%%Pages: (atend)
+%%PageOrder: Ascend
+%%BoundingBox: 59 49 564 800
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%DocumentSuppliedResources: procset VIM-Prolog 1.4 1
+%%+ encoding VIM-latin1 1.0 0
+%%Requirements: duplex collate color
+%%EndComments
+%%BeginDefaults
+%%PageResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-Oblique
+%%+ font Courier-BoldOblique
+%%PageMedia: A4
+%%EndDefaults
+%%BeginProlog
+%%BeginResource: procset VIM-Prolog
+%%BeginDocument: /usr/share/vim/current/print/prolog.ps
+%!PS-Adobe-3.0 Resource-ProcSet
+%%Title: VIM-Prolog
+%%Version: 1.4 1
+%%EndComments
+% Editing of this file is NOT RECOMMENDED.  You run a very good risk of causing
+% all PostScript printing from VIM failing if you do.  PostScript is not called
+% a write-only language for nothing!
+/packedarray where not{userdict begin/setpacking/pop load def/currentpacking
+false def end}{pop}ifelse/CP currentpacking def true setpacking
+/bd{bind def}bind def/ld{load def}bd/ed{exch def}bd/d/def ld
+/db{dict begin}bd/cde{currentdict end}bd
+/T true d/F false d
+/SO null d/sv{/SO save d}bd/re{SO restore}bd
+/L2 systemdict/languagelevel 2 copy known{get exec}{pop pop 1}ifelse 2 ge d
+/m/moveto ld/s/show ld /ms{m s}bd /g/setgray ld/r/setrgbcolor ld/sp{showpage}bd
+/gs/gsave ld/gr/grestore ld/cp/currentpoint ld
+/ul{gs UW setlinewidth cp UO add 2 copy newpath m 3 1 roll add exch lineto
+stroke gr}bd
+/bg{gs r cp BO add 4 -2 roll rectfill gr}bd
+/sl{90 rotate 0 exch translate}bd
+L2{
+/sspd{mark exch{setpagedevice}stopped cleartomark}bd
+/nc{1 db/NumCopies ed cde sspd}bd
+/sps{3 db/Orientation ed[3 1 roll]/PageSize ed/ImagingBBox null d cde sspd}bd
+/dt{2 db/Tumble ed/Duplex ed cde sspd}bd
+/c{1 db/Collate ed cde sspd}bd
+}{
+/nc{/#copies ed}bd
+/sps{statusdict/setpage get exec}bd
+/dt{statusdict/settumble 2 copy known{get exec}{pop pop pop}ifelse
+statusdict/setduplexmode 2 copy known{get exec}{pop pop pop}ifelse}bd
+/c{pop}bd
+}ifelse
+/ffs{findfont exch scalefont d}bd/sf{setfont}bd
+/ref{1 db findfont dup maxlength dict/NFD ed{exch dup/FID ne{exch NFD 3 1 roll
+put}{pop pop}ifelse}forall/Encoding findresource dup length 256 eq{NFD/Encoding
+3 -1 roll put}{pop}ifelse NFD dup/FontType get 3 ne{/CharStrings}{/CharProcs}
+ifelse 2 copy known{2 copy get dup maxlength dict copy[/questiondown/space]{2
+copy known{2 copy get 2 index/.notdef 3 -1 roll put pop exit}if pop}forall put
+}{pop pop}ifelse dup NFD/FontName 3 -1 roll put NFD definefont pop end}bd
+CP setpacking
+(\004)cvn{}bd
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%BeginResource: encoding VIM-latin1
+%%BeginDocument: /usr/share/vim/current/print/latin1.ps
+%!PS-Adobe-3.0 Resource-Encoding
+%%Title: VIM-latin1
+%%Version: 1.0 0
+%%EndComments
+/VIM-latin1[
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quotesingle
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash
+/zero /one /two /three /four /five /six /seven
+/eight /nine /colon /semicolon /less /equal /greater /question
+/at /A /B /C /D /E /F /G
+/H /I /J /K /L /M /N /O
+/P /Q /R /S /T /U /V /W
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
+/grave /a /b /c /d /e /f /g
+/h /i /j /k /l /m /n /o
+/p /q /r /s /t /u /v /w
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis]
+/Encoding defineresource pop
+% vim:ff=unix:
+%%EOF
+%%EndDocument
+%%EndResource
+%%EndProlog
+%%BeginSetup
+595 842 0 sps
+1 nc
+T F dt
+T c
+%%IncludeResource: font Courier
+/_F0 /VIM-latin1 /Courier ref
+/F0 10 /_F0 ffs
+%%IncludeResource: font Courier-Bold
+/_F1 /VIM-latin1 /Courier-Bold ref
+/F1 10 /_F1 ffs
+%%IncludeResource: font Courier-Oblique
+/_F2 /VIM-latin1 /Courier-Oblique ref
+/F2 10 /_F2 ffs
+%%IncludeResource: font Courier-BoldOblique
+/_F3 /VIM-latin1 /Courier-BoldOblique ref
+/F3 10 /_F3 ffs
+/UO -1 d
+/UW 0.5 d
+/BO -2.5 d
+%%EndSetup
+%%Page: 1 1
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(projects/Foxes/src/spatial.java                                               Page 1)59.5 792.4 ms
+F0 sf
+(import java.io.FileNotFoundException;)59.5 772.4 ms
+(import java.io.PrintWriter;)59.5 762.4 ms
+(import java.io.UnsupportedEncodingException;)59.5 752.4 ms
+(import java.util.Random;)59.5 742.4 ms
+F1 sf
+0 1 0 r
+(public)59.5 722.4 ms
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(class)s
+F0 sf
+0 g
+( spatial)s
+({)59.5 712.4 ms
+(   )59.5 702.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  S1       = .4;          // fox log)s
+(   )59.5 692.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  S2       = 0.7;         // fox feedmax)s
+(   )59.5 682.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  S3       = 0.04;        // rabbit log)s
+(   )59.5 672.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  S4       = 4;           // rabbit feedmax)s
+(   )59.5 662.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  S5       = 0.3;         // grass log)s
+(   )59.5 642.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a1       = 2;           // fox grow)s
+(   )59.5 632.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a2       = .8;          // fox death)s
+(   )59.5 622.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a3       = .2;          // foxes eat rabbits)s
+(   )59.5 612.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a4       = .25;         // rabbit growth)s
+(   )59.5 602.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a5       = .4;          // rabbit decay)s
+(   )59.5 592.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a6       = .39;         // grass eaten by rabbits)s
+(   )59.5 582.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  a7       = .2;          // grass growth)s
+(   )59.5 562.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  D_F      = 0.1;)s
+(   )59.5 552.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  D_R      = .001;)s
+(   )59.5 542.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  DELTA_T  = 1;)s
+(   )59.5 532.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  DELTA_X  = 1;)s
+(   )59.5 522.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(final)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(  TTOT     = 10000;)s
+(   )59.5 502.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+(        t;)s
+(   )59.5 492.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][]    fvals;)s
+(   )59.5 482.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][]    rvals;)s
+(   )59.5 472.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][]    gvals;)s
+(   )59.5 462.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([]      totalInd;)s
+(   )59.5 452.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+(           HEIGHT   = 30;)s
+(   )59.5 442.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+(           WIDTH    = 30;)s
+(   )59.5 432.4 ms
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( Random        RAND     = new Random\(\);)s
+(   )59.5 412.4 ms
+F1 sf
+0 1 0 r
+(public)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(void)s
+F0 sf
+0 g
+( main\(String[] args\))s
+(         )59.5 402.4 ms
+F1 sf
+0 1 0 r
+(throws)s
+F0 sf
+0 g
+( FileNotFoundException, UnsupportedEncodingException)s
+(   {)59.5 392.4 ms
+(      // Initialization)59.5 382.4 ms
+(      t = 0;)59.5 372.4 ms
+(      fvals = new )59.5 362.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(      rvals = new )59.5 352.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(      gvals = new )59.5 342.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(      for \()59.5 322.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( i = 0; i < HEIGHT; i++\))s
+(         for \()59.5 312.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( j = 0; j < WIDTH; j++\))s
+(         {)59.5 302.4 ms
+(            fvals[i][j] = RAND.nextDouble\(\);)59.5 292.4 ms
+(            rvals[i][j] = RAND.nextDouble\(\) * 2;)59.5 282.4 ms
+(            gvals[i][j] = RAND.nextDouble\(\) * 10;)59.5 272.4 ms
+(         })59.5 262.4 ms
+(      while \(t < TTOT\))59.5 242.4 ms
+(      {)59.5 232.4 ms
+(         t += DELTA_T;)59.5 222.4 ms
+(         )59.5 212.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] tempf = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(         )59.5 202.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] tempr = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(         )59.5 192.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] tempg = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([HEIGHT][WIDTH];)s
+(         totalInd = new )59.5 172.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([3];)s
+(         for \()59.5 152.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( i = 0; i < HEIGHT; i++\))s
+(            for \()59.5 142.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( j = 0; j < WIDTH; j++\))s
+(            {)59.5 132.4 ms
+(               // Make grid periodic/toroidal)59.5 122.4 ms
+(               )59.5 112.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( nexti = 0, previ = 0, nextj = 0, prevj = 0;)s
+(               if \(i == 0\))59.5 102.4 ms
+(                  previ = HEIGHT - 1;)59.5 92.4 ms
+(               else if \(i == HEIGHT - 1\))59.5 82.4 ms
+(                  nexti = 0;)59.5 72.4 ms
+(               else)59.5 62.4 ms
+(               {)59.5 52.4 ms
+re sp
+%%PageTrailer
+%%Page: 2 2
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(projects/Foxes/src/spatial.java                                               Page 2)59.5 792.4 ms
+F0 sf
+(                  nexti = i + 1;)59.5 772.4 ms
+(                  previ = i - 1;)59.5 762.4 ms
+(               })59.5 752.4 ms
+(               if \(j == 0\))59.5 742.4 ms
+(                  prevj = WIDTH - 1;)59.5 732.4 ms
+(               else if \(j == WIDTH - 1\))59.5 722.4 ms
+(                  nextj = 0;)59.5 712.4 ms
+(               else)59.5 702.4 ms
+(               {)59.5 692.4 ms
+(                  nextj = j + 1;)59.5 682.4 ms
+(                  prevj = j - 1;)59.5 672.4 ms
+(               })59.5 662.4 ms
+(               // Calculate increment)59.5 652.4 ms
+(               tempf[i][j] = fvals[i][j] + DELTA_T * \(D_F / \(DELTA_X * DELTA_X\))59.5 642.4 ms
+(                     * \(fvals[i][nextj] + fvals[i][prevj] + fvals[nexti][j])59.5 632.4 ms
+(                           + fvals[previ][j] - 4 * fvals[i][j]\))59.5 622.4 ms
+(                     + a1 * fvals[i][j] * rvals[i][j] * \(1 - S1 * fvals[i][j]\))59.5 612.4 ms
+(                           / \(1 + S2 * rvals[i][j]\))59.5 602.4 ms
+(                     - a2 * fvals[i][j]\);)59.5 592.4 ms
+(               totalInd[0] += tempf[i][j];)59.5 582.4 ms
+(               tempr[i][j] = rvals[i][j] + DELTA_T * \(D_R / \(DELTA_X * DELTA_X\))59.5 562.4 ms
+(                     * \(rvals[i][nextj] + rvals[i][prevj] + rvals[nexti][j])59.5 552.4 ms
+(                           + rvals[previ][j] - 4 * rvals[i][j]\))59.5 542.4 ms
+(                     - a3 * fvals[i][j] * rvals[i][j] * \(1 - S1 * fvals[i][j]\))59.5 532.4 ms
+(                           / \(1 + S2 * rvals[i][j]\))59.5 522.4 ms
+(                     + a4 * rvals[i][j] * gvals[i][j] * \(1 - S3 * rvals[i][j]\))59.5 512.4 ms
+(                     - a5 * rvals[i][j]\);)59.5 502.4 ms
+(               totalInd[1] += tempr[i][j];)59.5 492.4 ms
+(               tempg[i][j] = gvals[i][j])59.5 472.4 ms
+(                     + DELTA_T * \(-a6 * rvals[i][j] * gvals[i][j])59.5 462.4 ms
+(                           * \(1 - S3 * rvals[i][j]\) / \(1 + S4 * gvals[i][j]\))59.5 452.4 ms
+(                           + a7 * gvals[i][j] * \(1 - S5 * gvals[i][j]\)\);)59.5 442.4 ms
+(               totalInd[2] += tempg[i][j];)59.5 432.4 ms
+(            })59.5 422.4 ms
+(         fvals = tempf;)59.5 412.4 ms
+(         rvals = tempr;)59.5 402.4 ms
+(         gvals = tempg;)59.5 392.4 ms
+(         System.out.println\(t + ")59.5 382.4 ms
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + totalInd[0] + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + totalInd[1] + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(")s
+(               + totalInd[2]\);)59.5 372.4 ms
+(         // Print output.)59.5 352.4 ms
+(         if \(\()59.5 342.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+(\) t % 2000 == 0\))s
+(            print\(\);)59.5 332.4 ms
+(      })59.5 322.4 ms
+(   })59.5 312.4 ms
+(   // Increment size of map diagonally \(= add cross in toroidal case\))59.5 292.4 ms
+(   )59.5 282.4 ms
+F1 sf
+0 1 0 r
+(public)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][][] expandDiag\()s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] matrixOne,)s
+(         )59.5 272.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] matrixTwo\))s
+(   {)59.5 262.4 ms
+(      )59.5 242.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] newMatrixOne = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([matrixOne.length)s
+(            + 1][matrixOne[0].length + 1];)59.5 232.4 ms
+(      )59.5 222.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][] newMatrixTwo = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([matrixTwo.length)s
+(            + 1][matrixTwo[0].length + 1];)59.5 212.4 ms
+(      for \()59.5 192.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( i = 0; i < HEIGHT; i++\))s
+(         for \()59.5 182.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( j = 0; j < WIDTH; j++\))s
+(         {)59.5 172.4 ms
+(            newMatrixOne[i][j] = matrixOne[i][j];)59.5 162.4 ms
+(            newMatrixTwo[i][j] = matrixTwo[i][j];)59.5 152.4 ms
+(         })59.5 142.4 ms
+(      for \()59.5 122.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( i = 0; i < newMatrixTwo.length; i++\))s
+(      {)59.5 112.4 ms
+(         newMatrixOne[newMatrixOne.length - 1][i] = Double.MIN_VALUE;)59.5 102.4 ms
+(         newMatrixTwo[newMatrixTwo.length - 1][i] = Double.MIN_VALUE;)59.5 92.4 ms
+(         newMatrixOne[i][newMatrixOne.length - 1] = Double.MIN_VALUE;)59.5 82.4 ms
+(         newMatrixTwo[i][newMatrixTwo.length - 1] = Double.MIN_VALUE;)59.5 72.4 ms
+(      })59.5 62.4 ms
+(      HEIGHT += 1;)59.5 52.4 ms
+re sp
+%%PageTrailer
+%%Page: 3 3
+%%BeginPageSetup
+sv
+0 g
+F0 sf
+%%EndPageSetup
+F1 sf
+(projects/Foxes/src/spatial.java                                               Page 3)59.5 792.4 ms
+F0 sf
+(      WIDTH += 1;)59.5 772.4 ms
+(      )59.5 762.4 ms
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([][][] newMatrices = new )s
+F1 sf
+0 1 0 r
+(double)s
+F0 sf
+0 g
+([2][HEIGHT][WIDTH];)s
+(      newMatrices[0] = newMatrixOne;)59.5 752.4 ms
+(      newMatrices[1] = newMatrixTwo;)59.5 742.4 ms
+(      return newMatrices;)59.5 722.4 ms
+(   })59.5 712.4 ms
+(   )59.5 692.4 ms
+F1 sf
+0 1 0 r
+(public)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(void)s
+F0 sf
+0 g
+( print\(\))s
+(         )59.5 682.4 ms
+F1 sf
+0 1 0 r
+(throws)s
+F0 sf
+0 g
+( FileNotFoundException, UnsupportedEncodingException)s
+(   {)59.5 672.4 ms
+(      PrintWriter writer = new PrintWriter\()59.5 662.4 ms
+(            "/home/william/b16_henrikahl/popdyn/t" + \()59.5 652.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+(\) t + ".dat", "UTF-8"\);)s
+(      for \()59.5 642.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( i = 0; i < HEIGHT; i++\))s
+(      {)59.5 632.4 ms
+(         for \()59.5 622.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+( j = 0; j < WIDTH; j++\))s
+(         {)59.5 612.4 ms
+(            writer.println\(t + ")59.5 602.4 ms
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + i + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + j + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + fvals[i][j] + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(")s
+(                  + rvals[i][j] + ")59.5 592.4 ms
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + gvals[i][j]\);)s
+(         })59.5 582.4 ms
+(         writer.println\(\);)59.5 572.4 ms
+(      })59.5 562.4 ms
+(      writer.close\(\);)59.5 552.4 ms
+(   })59.5 542.4 ms
+(   )59.5 522.4 ms
+F1 sf
+0 1 0 r
+(public)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(static)s
+F0 sf
+0 g
+( )s
+F1 sf
+0 1 0 r
+(void)s
+F0 sf
+0 g
+( printEvery\(\))s
+(         )59.5 512.4 ms
+F1 sf
+0 1 0 r
+(throws)s
+F0 sf
+0 g
+( FileNotFoundException, UnsupportedEncodingException)s
+(   {)59.5 502.4 ms
+(      PrintWriter totWriter = new PrintWriter\()59.5 492.4 ms
+(            "/home/william/b16_henrikahl/popdyn/tot_t" + \()59.5 482.4 ms
+F1 sf
+0 1 0 r
+(int)s
+F0 sf
+0 g
+(\) t + ".dat",)s
+(            "UTF-8"\);)59.5 472.4 ms
+(      totWriter.println\()59.5 462.4 ms
+(            t + ")59.5 452.4 ms
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + totalInd[0] + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + totalInd[1] + ")s
+F1 sf
+1 0 0 r
+(\\t)s
+F0 sf
+0 g
+(" + totalInd[2]\);)s
+(      totWriter.close\(\);)59.5 442.4 ms
+(   })59.5 432.4 ms
+(})59.5 422.4 ms
+re sp
+%%PageTrailer
+%%Trailer
+%%Pages: 3
+%%EOF
+

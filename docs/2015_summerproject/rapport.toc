@@ -1,0 +1,69 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\select@language {english}
+\defcounter {refsection}{0}\relax 
+\select@language {swedish}
+\defcounter {refsection}{0}\relax 
+\select@language {english}
+\defcounter {refsection}{0}\relax 
+\select@language {swedish}
+\defcounter {refsection}{0}\relax 
+\select@language {english}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Background}{1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.1}The study of genetic algorithms}{1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2}General structure}{2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.1}From code to fitness}{2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.2}Genetic operators}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Selection}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Mutation}{4}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Crossover}{4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3}The search space}{5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.3.1}The encoding of information shapes the search space}{5}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Binary}{5}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{Gray code}{6}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.3.2}Neutral evolution}{6}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}Methods}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1}Algorithm setting and genotype--phenotype maps}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2}Algorithm objective}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Results}{9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1}Analysing performance}{9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2}Distribution of cost effects}{11}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3}Robustness to various mutation rates}{13}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4}Discussion}{15}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1}Evolution is determined by the accessible phenotypes}{15}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.1}Binary and Gray code encodings evolve by a different distribution of phenotype alterations}{15}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.2}Consensus encodings evolve by adding and removing random numbers}{16}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2}Small differences in the distribution of mutation effects cause significant differences in performance}{17}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3}The consensus structure allows for higher robustness}{17}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5}Concluding remarks}{17}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A}Appendix}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.1}Distribution of cost effects by generation}{19}
