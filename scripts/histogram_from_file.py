@@ -27,7 +27,7 @@ def main(args):
 
     data = np.loadtxt(args.file, comments='#', usecols={int(args.col)})
     print("# Data from: %s, mean: %s, median: %s, variance: %s" %
-          (args.file, np.mean(data), np.median(data), np.var(data)))
+          (args.file, np.mean(filter(lambda x: x != float('inf'), data)), np.median(filter(lambda x: x != float('inf'), data)), np.var(filter(lambda x: x != float('inf'), data))))
 
     bins = np.sqrt(len(data))
     if args.bins is not None:
@@ -37,16 +37,20 @@ def main(args):
         logdata = [np.log(i) for i in data if i > 0]
         f, x = np.histogram(logdata, bins=bins)
     else:
-        nr_bins = 9
-        low_range =-4
-        high_range = 4
+         my_bins = np.linspace(0.0, 1, 11)
+         my_bins2 = np.linspace(1.000001, 1.1, 1)
+         my_bins3 = np.linspace(1.1, 2.1, 11)
+         my_bins = np.r_[my_bins,my_bins2,my_bins3]
+     #   nr_bins = 9
+     #   low_range =-4
+     #   high_range = 4
 
-        my_bins = np.logspace(low_range, high_range, num=nr_bins,base=2)
-        bins = np.r_[0, my_bins,np.inf]
-        f, x = np.histogram(data, bins)
+     #   my_bins = np.logspace(low_range, high_range, num=nr_bins,base=2)
+         bins = np.r_[my_bins,np.inf]
+         f, x = np.histogram(data, bins)
 
     # Normalize:
-    tot_number = np.sum(f) # total count
+    tot_number = np.sum(filter(lambda x: x != float('inf'), f)) # total count
 
     print("# value:\t fraq:\t count:")
     for i in range(len(f)):

@@ -1,0 +1,940 @@
+#! /usr/bin/perl -w
+
+####################################################
+#
+# A perl script to run jobs on other machines.
+#
+# Author: Mattias Ohlsson
+#
+# Last date of change: Feb 2016
+# 
+#
+#
+####################################################
+####################################################
+use strict;
+use Getopt::Long;
+use IO::Handle;
+autoflush STDOUT 1;
+use POSIX;
+use threads;
+use threads::shared;
+
+########## Variable declarations #################
+use vars qw(%Par); # Parameters read from the command line and hardcoded.
+		   # These can be changed during run.
+use vars qw(%Opt); # Options read from the command line or hardcoded.
+		   # These cannot be changed during run.
+use vars qw(@CompToUse);	# The computers to select from
+use vars qw(%CompS);	# The hash that holds info about each computer
+
+# For the threading
+share(%Par);
+share(%Opt);
+share(@CompToUse);
+share(%CompS);
+
+########## Main part of the program ##############
+
+Setup();
+
+#  The computers to use for the session (using a static list defined in this program)
+my $CompList = DefComputers();
+
+# Check that these computers are up and running. If not delete them from the list.
+Up($CompList,1);
+
+if ($Opt{'ListComp'}) {
+   ListComp($CompList);
+   exit;
+}
+
+# A short info statement
+print "Appending log information to the file ($Opt{'LogFile'}) \n\n";
+
+sleep(1);
+# Start the main program
+if ( $Opt{'Interactive'} == 1 ) {
+   my $go_thr = threads->create(\&Go);
+   Shell();
+   $go_thr->join;
+} else {
+   Go();
+}
+
+###################################################
+########### Subroutine declarations ###############
+###################################################
+
+sub Setup {
+
+   # First look for a -c flag
+   $Opt{'UserJobFile'} = 1;
+   my $lastidx = $#ARGV;
+   my @cmdarr;
+   for my $i (0 .. $lastidx) {
+      if ( $ARGV[$i] eq '-c' ) {
+	 $Opt{'UserJobFile'} = 0;
+	 @cmdarr = splice(@ARGV, $i+1);
+	 pop @ARGV;
+	 last;
+      }
+   }
+
+   ############ Hardcoded options #########
+   $Par{'Sleep'}       = 45;   # The time to sleep before checking computers
+   $Par{'CpuCut'}      = 75;   # If the cpu load is larger than this value, then
+                               # a job is not submitted
+   $Par{'Debug'}       = 0;    # Will print debugging messages if set to 1
+   $Par{'MachineList'} = '/nfs/thep/machines.txt';
+
+   #### The rest are set using Getopt::Long
+   $Opt{'Interactive'} = 0;
+   $Opt{'FastComp'}    = 0;
+   $Opt{'osVer'}       = '';
+   $Par{'LoadCut'}     = 0.2;
+   $Par{'UseJobsLog'}  = 0;
+   $Par{'ExcludeComp'} = '';
+   $Opt{'ListComp'}    = 0;
+
+   my $help = 0;
+   my $ok = GetOptions( 
+		       "i"         => \$Opt{'Interactive'},
+		       "fast"      => \$Opt{'FastComp'},
+		       "os=s"      => \$Opt{'osVer'},
+		       "load=f"    => \$Par{'LoadCut'},
+		       "log"       => \$Par{'UseJobsLog'},
+		       "e=s"       => \$Par{'ExcludeComp'},
+		       "list|l"    => \$Opt{'ListComp'},
+		       "h"         => \$help
+		      );
+
+   # Check that it went ok
+   if ( !$ok ) {
+      print STDERR "Error parsing the commandline. Use -h for help!\n";
+      exit(1);
+   }
+
+   # Should we print some help?
+   if ( $help == 1 ) {
+      Usage();
+   }
+
+   if ($Opt{'ListComp'}) {
+      return;
+   }
+
+   if ( $Opt{'UserJobFile'} == 1 ) {
+
+      # The rest of the arguments should be the commandfile or commands to execute
+      if ( (scalar @ARGV) == 1 ) {
+	 if ( -f $ARGV[0] ) {
+	    $Par{'JobFile'} = $ARGV[0];
+	 } else {
+	    print STDERR "Error: Cannot read the command file $ARGV[0]\n";
+	    exit(-1);
+	 }
+      } else {
+	 print STDERR "Error: No command file specified. Use -h for help\n";
+	 exit(-1);
+      }
+   }
+
+   # Here we must parse the commands specified on the commandline
+   else {
+      # Come up with a temporary 
+      my $jobfile = '/tmp/Robot_cmd.txt';
+      $Par{'JobFile'} = $jobfile;
+      open(FILETMP, ">$jobfile");
+      my $jobtmp = join(' ', @cmdarr);
+      my @list = split(/,/, $jobtmp);
+      my $cmd = shift @list;
+      foreach my $arg (@list) {
+	 print FILETMP "$cmd  $arg\n";
+      }
+      close(FILETMP);
+   }
+
+   # The log file that shows the commands that are submitted
+   if ( $Opt{'UserJobFile'} == 1 ) {
+      $Opt{'LogFile'} = "$Par{'JobFile'}.log";
+   } else {
+      $Opt{'LogFile'} = "robot.log";
+   }
+
+}  # End of Setup
+
+
+sub Usage {
+
+   print <<END_USAGE_STD;
+Name
+	   Robot.pl - A program for running jobs on the department computers.
+
+Usage 
+	   Robot.pl [options]... {path-to-file-with-commands
+	   Robot.pl [options]... -c {cmd} [,{cmdarg1} [,{cmdarg2} [,...]]]
+
+Description 
+           This perl script is used for running one or more jobs on
+           the department computers.
+
+	   It can be run with a syntax similar to 'sub' which means
+	   that you specify the commands to be executed directly on
+	   the commandline. Or, you can can specify commands in a
+	   textfile. This file is then monitored by the script and
+	   starts new jobs as long as there are commands specified in
+	   the textfile. If you start the script with the -i flag you
+	   enter a small shell where you can monitor the progress,
+	   remove jobs and change other parameters.
+
+           NOTE: This script requires passwordless ssh login to all
+           computers at the deparment. See 
+           http://dev.thep.lu.se/computersWiki/wiki/JobRunning 
+           for more information.
+
+	   Options that can be specified on the commandline:
+
+	   -i          Start an interactive shell (default = FALSE).
+	   -fast       Include only the fastest machines. (default = FALSE)
+           -os         Run only on machines that fit this OpenSuse version eg 13.1
+	   -log        Save the output of each job into a logfile (default = FALSE).
+	   -e  {list}  Computers to exclude (default = '').
+           -l          Only list the computers matching your selection criteria 
+                       (-fast, -os, -e) and that are currently up nad running. No jobs
+                       will be started.
+	   -h          This help
+
+END_USAGE_STD
+
+   exit;
+
+}				# End of Usage
+
+
+
+sub Up {
+   my ($compList, $mode) = @_;
+    
+   @CompToUse = ();
+   my @tmp = ();
+    
+   my $debug = 0;
+
+   for ( my $i = 0; $i < $compList->{N}; ++$i ) {
+      my $machine = $compList->{name}->[$i];
+      if ($mode) {
+	 printf "Checking computer: %-15s (%-2d/%-2d)\r", $machine, $i+1, $compList->{N};
+      }
+      my $ssh_res = `ssh -o ConnectTimeout=1 -o ForwardX11=no $machine echo "YES"`;
+      chomp $ssh_res;
+      if ( $debug ) {
+	 print "ssh -o ConnectTimeout=1 -o ForwardX11=no $machine echo \"YES\" \n";
+	 print "$ssh_res\n";
+      }
+      if ( $ssh_res =~ /^YES/ ) {
+	 push(@CompToUse, $machine);
+	 push(@tmp, $compList->{ncpu}->[$i]);
+      }
+   }
+   if ($mode) {
+      print "\n";
+   }
+    
+   # Prepare for newly arrived computers
+   for ( my $i = 0; $i < scalar @CompToUse; ++$i ) {
+      my $cc = $CompToUse[$i];
+      unless ( defined($CompS{$cc}) ) {
+	 $CompS{$cc} = &share({});
+	 $CompS{$cc}->{'ncpu'} = $tmp[$i];
+	 #
+	 $CompS{"$cc-0"} = &share({});
+	 $CompS{"$cc-0"}->{'lock'} = 0;
+	 $CompS{"$cc-0"}->{'pid'}  = -1;
+	    
+	 if ( $tmp[$i] == 2 ) {
+	    $CompS{"$cc-1"} = &share({});
+	    $CompS{"$cc-1"}->{'lock'} = 0;
+	    $CompS{"$cc-1"}->{'pid'}  = -1;
+	 }
+	 if ( $tmp[$i] == 4 ) {
+	    $CompS{"$cc-1"} = &share({});
+	    $CompS{"$cc-1"}->{'lock'} = 0;
+	    $CompS{"$cc-1"}->{'pid'}  = -1;
+	    #
+	    $CompS{"$cc-2"} = &share({});
+	    $CompS{"$cc-2"}->{'lock'} = 0;
+	    $CompS{"$cc-2"}->{'pid'}  = -1;
+	    #
+	    $CompS{"$cc-3"} = &share({});
+	    $CompS{"$cc-3"}->{'lock'} = 0;
+	    $CompS{"$cc-3"}->{'pid'}  = -1;
+	 }
+      }
+   }
+    
+}				# End of Up
+
+
+sub Go {
+
+   # Get the current directory
+   my $PWD = GetPWD();
+
+   # Main loop 
+   my $epoch = 0;
+   my $host = 'null';
+   my $job = 'null';
+   my $cpu;
+   while ( 1 ) {
+
+      # Add the epoch counter
+      $epoch++;
+
+      # Recheck for available computers
+      if ( $epoch%10 == 0 ) {
+	 my $CompList = DefComputers();
+	 Up($CompList, 0);
+      }
+
+      # Get a new job
+      $job = CheckJobFile('get', '');
+
+      # Check if there is a command to execute
+      unless( $job eq 'null' ) {
+
+	 # Find a free computer to run on
+	 $host = FindFreeComputer(1);
+	 $cpu = 0;
+	 if ( $host eq 'null' ) {
+	    $host = FindFreeComputer(2);
+	    $cpu = 1;
+	 }
+	 unless( $host eq 'null' ) {
+
+				# Run the job
+	    my ($runcmd, $multi) = MakeRunCmd($PWD, $job);
+	    my $systmp = system("ssh -n -o ForwardX11=no $host \"$runcmd\" &");
+	    unless( $systmp == -1 ) {
+	       ToLog("Running command: ssh -n -o ForwardX11=no $host \"$runcmd\" &");
+	       CheckJobFile('remove', $job);
+	       sleep(1);
+	       my ($rcmd, $pid, $time) = GetPid($host, $job);
+	       $CompS{"$host-$cpu"}->{'lock'}  = 1;
+	       $CompS{"$host-$cpu"}->{'job'}   = $job;
+	       $CompS{"$host-$cpu"}->{'rcmd'}  = $rcmd;
+	       $CompS{"$host-$cpu"}->{'pid'}   = $pid;
+	       $CompS{"$host-$cpu"}->{'time'}  = $time;
+	       $CompS{"$host-$cpu"}->{'multi'} = $multi;
+	    } else {
+	       ToLog("Failed running the command: ssh -n -o ForwardX11=no $host-$cpu \"$runcmd\" &. Will retry!");
+	    }
+	 }
+      }
+
+      # Sleep for a while!
+      if ( $host eq 'null' || $job eq 'null' ) {
+
+	 if ( $Par{'Debug'} ) {
+	    print "D Go: Will sleep for $Par{'Sleep'} seconds\n";
+	 }
+	 sleep($Par{'Sleep'});
+	 CheckJobs();
+      }
+   }
+
+
+}				# End of Go
+
+
+
+sub CheckJobFile {
+
+   my ($mode, $cmdtoremove) = @_;
+
+   if ( $mode eq 'get' ) {
+
+      # Read the full file
+      open my $FH, '<', $Par{'JobFile'};
+      my($line, $cmd);
+      $cmd = 'null';
+      while ( ($line = <$FH>) ) {
+	 next if($line =~ /^\#/);
+	 next if($line =~ /^\s*$/);
+
+	 # 
+	 if ( defined($line) ) {
+	    chomp $line;
+	    $line =~ s/^\s+//;
+	    $cmd = $line;
+	    last;
+	 }
+      }
+      close $FH;
+
+      # Debug statement
+      if ( $Par{'Debug'} ) {
+	 print "D CheckJobFile: found the command '$cmd' in the job-command-file\n";
+      }
+
+      return($cmd);
+
+   } elsif ( $mode eq 'remove' ) {
+      my @file = `cat $Par{'JobFile'}`;
+      open my $FHO, ">", $Par{'JobFile'};
+      my $wr = 0;
+      foreach my $line (@file) {	
+	 if ($line =~ /^\#/) {
+	    print $FHO $line;
+	 } elsif ( ($line =~ /$cmdtoremove/) && ($wr == 0) ) {
+	    print $FHO "# $line";
+	    $wr = 1;
+		    
+	    # Debug statement
+	    if ( $Par{'Debug'} ) {
+	       print "D CheckJobFile: removed command '$cmdtoremove' from the ",
+	       "job-command-file. \n";
+	       print $line;
+	       print $cmdtoremove, "\n";
+	    }
+		    
+	 } else {
+	    print $FHO $line;
+	 }
+      }
+      close $FHO;
+   }
+	
+}				# End of CheckJobFile
+
+
+
+sub FindFreeComputer {
+
+   my ($nCpu) = @_;
+   #
+   my $CompOk = 'null';
+   my $pscmd = 'ps axo %cpu,cmd';
+   my $loadcmd = 'cat /proc/loadavg';
+
+   foreach my $cc (@CompToUse) {
+      my $cpucc = sprintf("$cc-%1d", $nCpu-1);
+
+      next if( $CompS{$cc}->{ncpu} < $nCpu );
+      next if( $CompS{$cpucc}->{lock} == 1 );
+	    
+      # Make a call to $cc to get some load and ps info
+      my @tmp = `ssh -o ForwardX11=no $cc '$loadcmd; $pscmd'`; chomp @tmp;
+	    
+      # Get the load info
+      my ($load, @list) = split(' ', shift @tmp);
+	    
+      # Check the ps list to find recently added computers
+      shift @tmp;
+      my @tmp2;
+      for my $i (0 .. scalar @tmp-1) {
+	 next if( $tmp[$i] =~ /ps\s+axo\s+\%cpu/ ); # Change here if the pscmd if modified
+	 my @list = split(' ', $tmp[$i]);
+	 push(@tmp2, $list[0]);
+      }
+      my @topcpulist = sort {$b <=> $a} @tmp2;
+
+      # Select the top one (except for the case with many cpus)
+      my $topcpu = $topcpulist[$nCpu-1];
+	    
+      # Debug info
+      if ( $Par{'Debug'} ) {
+	 print "D FindFreeComputer: Computer $cc: load = $load, topcpu = $topcpu\n";
+      }
+	    
+      # Decide if we can use this computer
+      my $loadcut = $Par{'LoadCut'} + ($nCpu-1);
+      if ( $load <= $loadcut && $topcpu < $Par{'CpuCut'} ) {
+	 $CompOk = $cc;
+		
+	 if ( $Par{'Debug'} ) {
+	    print "D FindFreeComputer: Using computer $cc\n";
+	 }
+		
+	 last; 
+      }
+   }
+	
+   return($CompOk);
+
+}				# End of CheckLoad 
+
+
+
+sub CheckJobs {
+
+   foreach my $cc (@CompToUse) {
+      for ( my $core = 0; $core < $CompS{$cc}->{ncpu}; ++$core ) {
+	    
+	 my $cpucc = sprintf("$cc-%1d", $core);
+	 next if( $CompS{$cpucc}->{'lock'} == 0 );
+	    
+	 # Find the command that you are running
+	 my $job = $CompS{$cpucc}->{'job'};
+	 my ($rcmd, $pid, $time) = GetPid($cc, $job);
+	    
+	 # Remove the lock if we can't find the command
+	 if ( $pid == -1 ) {
+	    $CompS{$cpucc}->{'lock'} = 0;
+	    $CompS{$cpucc}->{'pid'}  = -1;
+	    $CompS{$cpucc}->{'time'} = '0:00';
+	 } else {
+	    # Update the time, pid and running command
+	    $CompS{$cpucc}->{'rcmd'} = $rcmd;
+	    $CompS{$cpucc}->{'pid'}  = $pid;
+	    $CompS{$cpucc}->{'time'} = $time;
+	 }
+	    
+      }
+   }
+
+}				# End of CheckJobs
+
+
+sub GetPid {
+
+   my ($cc, $job) = @_;
+
+   # Split into list of commands
+   my @cmds = split(';', $job); chomp @cmds;
+
+   # Make an ssh call to the host
+   my @psres = `ssh -o ForwardX11=no $cc 'ps xo user,pid,stat,%cpu,%mem,bsdtime,nice,command'`;
+
+   my $rcmd = 'null';
+   my $pid = -1;
+   my $time = '0:00';
+ PSLOOP: foreach my $line (@psres) {
+
+      next if( $line =~ /bash\s+-c\s+cd/ );
+
+      # Make sure that we get the correct command to search for
+      my @list = split(' ', $line); chomp @list;
+      my $stattmp = $list[2];
+      my $pidtmp = $list[1]; 
+      my $timetmp = $list[5];
+
+      # If the process is not nice then skip
+      next unless( $stattmp =~ /N/ );
+
+      # The command, nicely formatted
+      splice(@list, 0, 6);
+      my $pscmd = join(' ', @list);
+
+      # Test if it matches one of the possible commands
+      foreach my $cmd (@cmds) {
+
+	 # Filter the command
+	 $cmd =~ s/\s(?=\s)//g;
+	 $cmd =~ s/^\s+//g;
+	 $cmd =~ s/\s+$//g;
+	 $cmd =~ s/(\"|\')//g;
+
+	 my $test = index($pscmd, $cmd);
+	 if ( $test >= 0 ) {
+	    $rcmd = $cmd;
+	    $pid = $pidtmp;
+	    $time = $timetmp;
+	    last PSLOOP;
+	 }
+      }
+   }
+
+   return($rcmd, $pid, $time);
+
+}				# End of GetPid
+
+
+
+sub ToLog {
+
+   my ($line) = @_;
+   chomp $line;
+
+   my $now = strftime "%a %b %e %H:%M:%S %Y", localtime;
+   my $logfile = "$Opt{'LogFile'}";
+   open(FILE, ">>$logfile");
+   print FILE "$now: $line\n";
+   close(FILE);
+
+}				# End of ToLog
+
+
+
+sub GetPWD {
+
+   my $pwd = `pwd`;
+   chomp($pwd);
+
+   return($pwd);
+
+}				# End of GetPWD
+
+
+
+sub MakeRunCmd {
+
+   my ($pwd, $cmd) = @_;
+
+   # Find out the name of the log file (if used)
+   my $logfile = '';
+   if ( $Par{'UseJobsLog'} == 1 ) {
+      my @list = split(';', $cmd); chomp @list;
+      foreach my $item (@list) {
+	 my @list2 = split(' ', $item); chomp @list2;
+	 foreach my $item2 (@list2) {
+	    $item2 =~ s/^.*\///g;
+	    $logfile .= "$item2" . '_';
+	 }
+	 chop $logfile;
+	 $logfile .= ':';
+      }
+      chop $logfile;
+      $logfile .= '.log';
+   } else {
+      $logfile = '/dev/null';
+   }
+
+   # Change to the correct directory
+   my $runcmd = "cd $pwd; ";
+
+   # Split the possible ; separated list of commands
+   my @Cmds = split(';', $cmd); chomp @Cmds;
+
+   # Set a flag if more than one command was found
+   my $multicmd = 0;
+   if ( scalar @Cmds > 1 ) {
+      $multicmd = 1;
+   }
+
+   for my $i (0 .. $#Cmds) {
+      my $nice = 'nice +19';
+      if ( $Cmds[$i] =~ /^\s*cd\s+/) {
+	 $nice = ''; 
+      }
+      if ($i == 0) {
+	 $runcmd .= "$nice $Cmds[$i]; ";
+      } else {
+	 $runcmd .= "$nice $Cmds[$i]; ";
+      }
+   }
+   chop $runcmd; chop $runcmd;
+
+   return($runcmd, $multicmd);
+
+}				# End of MakeRunCmd
+
+
+
+sub DefComputers {
+
+   my $FH;
+   if ( -f $Par{'MachineList'} ) {
+      open $FH, '<', $Par{'MachineList'} or die "Cannot open file $Par{'MachineList'} $!";
+   } else {
+      die "Cannot find the computer list file ($Par{'MachineList'})";
+   }
+
+   my $n = 0;
+   my %comp;
+   while (<$FH>) {
+      chomp;
+      next if (/^\#/);
+      my ($ip, $name, $os, $speed, $cores, $mem, $role, $student) = split ' ';
+      next unless ($role eq 'w');
+      next if ($Opt{'FastComp'} && $speed eq 's');
+      next if ($Opt{'osVer'} && $os ne $Opt{'osVer'});
+      $comp{'name'}->[$n] = $name;
+      $comp{'ncpu'}->[$n] = $cores;
+      $comp{'mem'}->[$n] = $mem;
+      $comp{'speed'}->[$n] = $speed;
+      $comp{'os'}->[$n] = $os;
+      $n++;
+   }
+   
+   # Check is some computers should be excluded
+   my %compR;
+   my $nR = 0;
+   my @list = split(' ', $Par{'ExcludeComp'});
+   for ( my $i = 0; $i < $n; ++$i ) {
+	    
+      my $cp = $comp{'name'}->[$i];
+      my $ok = 1;
+      foreach my $ex (@list) {
+	 if ( $cp eq $ex ) {
+	    $ok = 0;
+	    last;
+	 }
+      }
+      if ( $ok == 1 ) {
+	 $nR++;
+	 push(@{ $compR{'name'} }, $cp);
+	 push(@{ $compR{'ncpu'} }, $comp{'ncpu'}->[$i]);
+	 push(@{ $compR{'mem'} }, $comp{'mem'}->[$i]);
+	 push(@{ $compR{'speed'} }, $comp{'speed'}->[$i]);
+	 push(@{ $compR{'os'} }, $comp{'os'}->[$i]);
+      }
+   }
+
+   $compR{'N'} = $nR;
+   return(\%compR);
+
+
+}				# End of DefComputers
+
+
+sub ListComp {
+   my ($CompList) = @_;
+
+   printf "%-15s  Memory  Slow/Fast   openSUSE version\n", 'Name';
+   for (my $n = 0; $n < $CompList->{N}; $n++) {
+      printf "%-15s  %-2d      %1s           %s\n", 
+      $CompList->{name}->[$n], $CompList->{mem}->[$n], $CompList->{speed}->[$n], 
+      $CompList->{os}->[$n];
+   }
+
+
+} # End of ListComp
+
+
+##############################################################
+########### The Shell subroutine and related stuff ###########
+##############################################################
+sub Shell {
+
+   print STDOUT "Type help or ? for the available commands\n";
+   print STDOUT "To quit, use Ctrl-c\n";
+
+   while ( 1 ) {
+
+      print STDOUT ">>";
+
+      my $ans = <STDIN>; chomp $ans;
+      $ans =~ s/^\s+//g;
+
+      if ( $ans =~ /^(\?|h|help)(\s+\w*)?$/ ) {
+	 ShellHelp($ans);
+      } elsif ( $ans =~ /^(l|load)$/ ) {
+	 ShellLoad();
+      } elsif ( $ans =~ /^(s|stat)$/ ) {
+	 ShellStat();
+      } elsif ( $ans =~ /^(p|ps)\s+/ ) {
+	 ShellPs($ans);
+      } elsif ( $ans =~ /^(k|kill)\s+/ ) {
+	 ShellKill($ans);
+      } elsif ( $ans =~ /^(a|killall)$/ ) {
+	 ShellKillAll();
+      } elsif ( $ans =~ /^(t|list)$/ ) {
+	 ShellList();
+      } elsif ( $ans =~ /^(par)$/ ) {
+	 ShellListParam();
+      } elsif ( $ans =~ /^set\s+/ ) {
+	 ShellSetParam($ans);
+      } elsif ( $ans eq '' ) {
+	 next;
+      } else {
+	 print STDOUT "$ans: Command unknown\n";
+      } 
+
+   }
+
+   # Return
+   return;
+
+
+}				# End of Shell
+
+
+
+sub ShellHelp {
+
+   my ($ans) = @_;
+   my @list = split(' ', $ans);
+   if ( scalar @list == 1 ) {
+
+      print STDOUT "The following commands are available:\n\n";
+      print STDOUT "load                Check the load of each computer\n";
+      print STDOUT "s|stat              Print status\n";
+      print STDOUT "p|ps {comp}         Make a ps ux call to host comp\n";
+      print STDOUT "kill {comp} {pid}   Kill the pid on computer comp\n";
+      print STDOUT "killall             Kill all running jobs\n";
+      print STDOUT "list                List the commands in the que\n";
+      print STDOUT "par                 List parameters that can be changed\n";
+      print STDOUT "set {par} {val}     Set parameter 'par' to value 'val' \n";
+
+      print STDOUT "?|h|help [command]  This help\n\n";
+
+      print STDOUT "More help can sometimes be found by typing help 'command' \n";
+   } else {
+      my $cmd = $list[1];
+      if ( $cmd =~ /^load$/ ) {
+	 print STDOUT <<load_END;
+load: This command queries all computers for their load 
+	  and displays it on the screen.
+load_END
+      } elsif ( $cmd =~ /^(s|stat)$/ ) {
+	    print STDOUT <<stat_END;
+stat: This command shows the computers that are running your jobs, the pid
+	  and the command that is running.
+stat_END
+	 } else {
+	    print STDOUT "No help available for $cmd\n";
+	 }
+   }
+
+}				# End of ShellHelp 
+
+
+
+sub ShellLoad {
+
+   print STDOUT "Computer      Load\n";
+   foreach my $cc (@CompToUse) {
+      my $tmp = `ssh -o ForwardX11=no $cc 'cat /proc/loadavg'`;
+      my @list = split(' ', $tmp);
+      printf STDOUT "%-12s  %s\n", $cc, $list[0];
+   }
+
+}				# End of ShellLoad 
+
+
+
+sub ShellStat {
+
+   print STDOUT "Computer       Pid     Time    Job\n";
+   foreach my $cc (@CompToUse) {
+      for ( my $core = 0; $core < $CompS{$cc}->{ncpu}; ++$core ) {
+	 my $cpucc = sprintf("$cc-%1d", $core);
+	 next if( $CompS{$cpucc}->{'lock'} == 0 );
+	    
+	 printf STDOUT "%-12s  %-6d   %s    %s\n", $cc, 
+	 $CompS{$cpucc}->{'pid'}, $CompS{$cpucc}->{'time'}, $CompS{$cpucc}->{'rcmd'};
+	 if ( $CompS{$cpucc}->{'multi'} ) {
+	    printf STDOUT "%-12s  (orig job = %s)\n", ' ',$CompS{$cpucc}->{'job'};
+	 }
+      }
+   }
+   print STDOUT "(Note: This list is updated every $Par{'Sleep'} seconds)\n";
+    
+}				# End of ShellHelp 
+    
+
+
+sub ShellPs {
+   my ($arg) = @_;
+
+   my ($tmp, $host) = split(' ', $arg);
+   if ( defined($host) ) {
+      chomp $host;
+      print STDOUT `ssh -o ForwardX11=no $host 'ps xo user,pid,%cpu,%mem,bsdtime,nice,command'`;
+   }
+
+}				# End of ShellPs
+
+
+
+sub ShellKill {
+
+   my ($tmp) = @_;
+   chomp $tmp;
+
+   my ($dum, $cc, $pid) = split(' ', $tmp);
+
+   unless ( defined($CompS{$cc}) ) {
+      print STDOUT "Unknown computer $cc\n"; 
+      return;
+   }
+
+   print STDOUT "\nKill pid $pid on computer $cc (y/n)? >> ";
+   my $ans = <STDIN>; chomp $ans;
+   if ( $ans =~ /^(y|yes)$/ ) {
+      system("ssh -o ForwardX11=no $cc \"kill $pid\"");
+   }
+
+   # Call CheckJobs to update the stat
+   sleep(1);
+   CheckJobs();
+
+}				# End of ShellKill 
+
+
+
+sub ShellKillAll {
+
+   print STDOUT "The following jobs will be killed:\n\n";
+   print STDOUT "Computer       Pid     Job\n";
+   foreach my $cc (@CompToUse) {
+      for ( my $core = 0; $core < $CompS{$cc}->{ncpu}; ++$core ) {
+	 my $cpucc = sprintf("$cc-%1d", $core);
+		
+	 next if( $CompS{$cpucc}->{'lock'} == 0 );
+	 printf STDOUT "%-12s  %6d   %s\n", $cc, 
+	 $CompS{$cpucc}->{'pid'}, $CompS{$cpucc}->{'cmd'};
+      }
+   }
+   print STDOUT "\nGo ahead (y/n)? >> ";
+   my $ans = <STDIN>; chomp $ans;
+
+   if ( $ans =~ /^(y|yes)$/ ) {
+      foreach my $cc (@CompToUse) {
+	 for ( my $core = 0; $core < $CompS{$cc}->{ncpu}; ++$core ) {
+	    my $cpucc = sprintf("$cc-%1d", $core);
+	    next if( $CompS{$cpucc}->{'lock'} == 0 );
+	    my $pid = $CompS{$cpucc}->{'pid'};
+	    system("ssh -o ForwardX11=no $cc \"kill $pid\"");
+	 }
+      }
+   }
+	
+   # Call CheckJobs to update the stat
+   sleep(1);
+   CheckJobs();
+
+}				# End of ShellKillAll
+
+
+
+sub ShellList {
+
+   # Read the full file
+   open(FILE, "$Par{'JobFile'}");
+   my($line, $cmd);
+   while ( ($line = <FILE>) ) {
+      next if($line =~ /^\#/);
+      next if($line =~ /^\s*$/);
+      print $line;
+   }
+   close(FILE);
+
+}				# End of ShellList 
+
+
+
+sub ShellListParam {
+
+   my @params = sort keys %Par;
+
+   print STDOUT "All keys and values in the changable 'Par' hash\n";
+   foreach my $par (@params) {
+      printf STDOUT "%-15s => $Par{$par}\n", $par;
+   }
+
+}				# End of ShellPar
+
+
+
+sub ShellSetParam {
+
+   my ($tmp) = @_;
+   chomp $tmp;
+
+   my ($dum, $par, $val) = split(' ', $tmp);
+
+   $Par{$par} = $val;
+
+}				# End of ShellSetParam
